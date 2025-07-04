@@ -1,87 +1,55 @@
-# Welcome to React Router!
+MMOJournal-Web
+MMOJournal-Web is the web-based evolution of the MMOJournal CLI app — a personal tracker and journal for PokeMMO players. It helps players manage competitive Pokémon builds, shiny hunts, and gameplay progression with a clean, user-friendly interface.
 
-A modern, production-ready template for building full-stack React applications using React Router.
+🚀 Current Features
+User authentication with login and account creation (basic setup)
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/remix-run/react-router-templates/tree/main/default)
+Navigation between core areas: Competitive Compendium, Shiny Showcase, and Progress Journal
 
-## Features
+View and manage Pokémon builds and shiny hunt entries (in progress)
 
-- 🚀 Server-side rendering
-- ⚡️ Hot Module Replacement (HMR)
-- 📦 Asset bundling and optimization
-- 🔄 Data loading and mutations
-- 🔒 TypeScript by default
-- 🎉 TailwindCSS for styling
-- 📖 [React Router docs](https://reactrouter.com/)
+Responsive design for mobile and desktop
 
-## Getting Started
+🎯 Future Goals
+Full CRUD support: Add, edit, delete Pokémon entries and shiny hunts directly from the UI
 
-### Installation
+PokeAPI integration: Fetch official Pokémon data including images, abilities, moves, and locations
 
-Install the dependencies:
+Showdown import/export: Easily paste or export team builds compatible with Pokémon Showdown formats
 
+Team grouping & smart suggestions: Organize builds into teams and get AI-driven team-building advice
+
+Progress Journal with rich text: Allow players to blog their gameplay stories with media uploads and tagging
+
+Community features: Comments, sharing public journals, and social interaction
+
+Improved UX: Polished UI components, animations, and accessibility improvements
+
+User settings & preferences: Theme options, notifications, and more personalized experience
+
+🛠️ Built With
+React + React Router (for SPA navigation)
+
+TypeScript (type-safe JavaScript)
+
+Tailwind CSS (utility-first styling)
+
+Node.js (backend APIs, if added)
+
+PokeAPI (planned for Pokémon data)
+
+📦 Getting Started
 ```bash
+Copy
+git clone https://github.com/michaelprk/MMOJournal-Web.git
+cd MMOJournal-Web
 npm install
-```
-
-### Development
-
-Start the development server with HMR:
-
-```bash
 npm run dev
 ```
+Open http://localhost:5173 in your browser to start using the app locally.
 
-Your application will be available at `http://localhost:5173`.
+🤝 Contributions
+This is an ongoing personal project and learning experience. Contributions, feedback, and suggestions are very welcome!
 
-## Building for Production
-
-Create a production build:
-
-```bash
-npm run build
-```
-
-## Deployment
-
-### Docker Deployment
-
-To build and run using Docker:
-
-```bash
-docker build -t my-app .
-
-# Run the container
-docker run -p 3000:3000 my-app
-```
-
-The containerized application can be deployed to any platform that supports Docker, including:
-
-- AWS ECS
-- Google Cloud Run
-- Azure Container Apps
-- Digital Ocean App Platform
-- Fly.io
-- Railway
-
-### DIY Deployment
-
-If you're familiar with deploying Node applications, the built-in app server is production-ready.
-
-Make sure to deploy the output of `npm run build`
-
-```
-├── package.json
-├── package-lock.json (or pnpm-lock.yaml, or bun.lockb)
-├── build/
-│   ├── client/    # Static assets
-│   └── server/    # Server-side code
-```
-
-## Styling
-
-This template comes with [Tailwind CSS](https://tailwindcss.com/) already configured for a simple default starting experience. You can use whatever CSS framework you prefer.
-
----
-
-Built with ❤️ using React Router.
+📜 License
+MIT License — free to use and modify.
