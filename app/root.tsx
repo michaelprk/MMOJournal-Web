@@ -23,23 +23,30 @@ export const links: Route.LinksFunction = () => [
   },
 ];
 
+import { Navbar } from "app/components/Navbar"; // Adjust path if you put Navbar in a different folder
+
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <head>
+        {/* existing stuff */}
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
         <Links />
       </head>
       <body>
-        {children}
+        <Navbar />
+        <main>{children}</main>
+        <footer>{/* Optional footer */}</footer>
         <ScrollRestoration />
         <Scripts />
       </body>
     </html>
   );
 }
+
+
 
 export default function App() {
   return <Outlet />;
