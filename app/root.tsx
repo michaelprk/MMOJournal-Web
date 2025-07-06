@@ -7,8 +7,11 @@ import {
   ScrollRestoration,
 } from "react-router";
 
+import { useLocation } from "react-router-dom";
 import type { Route } from "./+types/root";
 import "./app.css";
+
+import { Navbar } from "./components/Navbar";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -23,30 +26,63 @@ export const links: Route.LinksFunction = () => [
   },
 ];
 
-import { Navbar } from "app/components/Navbar"; // Adjust path if you put Navbar in a different folder
-
 export function Layout({ children }: { children: React.ReactNode }) {
+  const location = useLocation();
+  const showNavbar = location.pathname !== "/login";
+
   return (
     <html lang="en">
       <head>
-        {/* existing stuff */}
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
         <Links />
       </head>
-      <body>
-        <Navbar />
-        <main>{children}</main>
-        <footer>{/* Optional footer */}</footer>
+      <body style={{ margin: 0, minHeight: "100vh", position: "relative" }}>
+        {/* Background image container */}
+        <div
+          aria-hidden="true"
+          style={{
+            position: "fixed",
+            inset: 0,
+            backgroundImage: "url('/images/cave-bg.png')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            filter:
+              location.pathname === "/login"
+                ? "grayscale(50%) brightness(80%) contrast(95%) blur(4px)"
+                : "grayscale(70%) brightness(80%) contrast(90%)",
+            zIndex: -1,
+            pointerEvents: "none", // Allow clicks through background
+          }}
+        />
+
+        {showNavbar && <Navbar />}
+
+        {/* Main content */}
+        <main
+          style={{
+            position: "relative",
+            zIndex: 1,
+            minHeight: "100vh",
+            backgroundColor:
+              location.pathname === "/login" ? "transparent" : "rgba(0,0,0,0.7)",
+            color: "#fff",
+            paddingBottom: "2rem",
+            backdropFilter: "none", // Ensure no blur effect on content
+          }}
+        >
+          {children}
+        </main>
+
+        <footer style={{ position: "relative", zIndex: 1 }}>{/* Optional footer */}</footer>
+
         <ScrollRestoration />
         <Scripts />
       </body>
     </html>
   );
 }
-
-
 
 export default function App() {
   return <Outlet />;
