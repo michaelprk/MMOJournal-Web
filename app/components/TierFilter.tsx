@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { CompetitiveTier } from '../types/pokemon';
-import { COMPETITIVE_TIERS, TIER_FULL_NAMES } from '../types/pokemon';
+import { COMPETITIVE_TIERS, TIER_FULL_NAMES, TIER_COLORS } from '../types/pokemon';
 
 interface TierFilterProps {
   selectedTier?: CompetitiveTier;
@@ -45,46 +45,52 @@ export function TierFilter({ selectedTier, onTierChange, style = 'dropdown' }: T
         >
           ALL
         </button>
-        {COMPETITIVE_TIERS.map((tier) => (
-          <button
-            key={tier}
-            onClick={() => onTierChange(tier)}
-            style={{
-              backgroundColor: selectedTier === tier ? '#ffcb05' : 'rgba(255, 203, 5, 0.2)',
-              color: selectedTier === tier ? '#000' : '#ffcb05',
-              border: '2px solid #ffcb05',
-              padding: '8px 16px',
-              borderRadius: '8px',
-              fontSize: '0.9rem',
-              fontWeight: 'bold',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-            }}
-            onMouseEnter={(e) => {
-              if (selectedTier === tier) return;
-              e.currentTarget.style.backgroundColor = 'rgba(255, 203, 5, 0.3)';
-            }}
-            onMouseLeave={(e) => {
-              if (selectedTier === tier) return;
-              e.currentTarget.style.backgroundColor = 'rgba(255, 203, 5, 0.2)';
-            }}
-            title={TIER_FULL_NAMES[tier]}
-          >
-            {tier}
-          </button>
-        ))}
+        {COMPETITIVE_TIERS.map((tier) => {
+          const tierColor = TIER_COLORS[tier];
+          const isSelected = selectedTier === tier;
+          return (
+            <button
+              key={tier}
+              onClick={() => onTierChange(tier)}
+              style={{
+                background: isSelected ? tierColor.gradient : `rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.2)`,
+                color: isSelected ? tierColor.text : tierColor.background,
+                border: `2px solid ${tierColor.background}`,
+                padding: '8px 16px',
+                borderRadius: '8px',
+                fontSize: '0.9rem',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+              }}
+              onMouseEnter={(e) => {
+                if (isSelected) return;
+                e.currentTarget.style.background = `rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.3)`;
+              }}
+              onMouseLeave={(e) => {
+                if (isSelected) return;
+                e.currentTarget.style.background = `rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.2)`;
+              }}
+              title={TIER_FULL_NAMES[tier]}
+            >
+              {tier}
+            </button>
+          );
+        })}
       </div>
     );
   }
+
+  const selectedTierColor = selectedTier ? TIER_COLORS[selectedTier] : null;
 
   return (
     <div style={{ position: 'relative', display: 'inline-block' }}>
       <button
         onClick={() => setIsOpen(!isOpen)}
         style={{
-          backgroundColor: 'rgba(255, 203, 5, 0.2)',
-          border: '2px solid #ffcb05',
-          color: '#ffcb05',
+          background: selectedTierColor ? selectedTierColor.gradient : 'rgba(255, 203, 5, 0.2)',
+          border: `2px solid ${selectedTierColor ? selectedTierColor.background : '#ffcb05'}`,
+          color: selectedTierColor ? selectedTierColor.text : '#ffcb05',
           padding: '12px 40px 12px 16px',
           borderRadius: '8px',
           fontSize: '1rem',
@@ -96,10 +102,14 @@ export function TierFilter({ selectedTier, onTierChange, style = 'dropdown' }: T
           position: 'relative',
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.backgroundColor = 'rgba(255, 203, 5, 0.3)';
+          if (!selectedTierColor) {
+            e.currentTarget.style.backgroundColor = 'rgba(255, 203, 5, 0.3)';
+          }
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = 'rgba(255, 203, 5, 0.2)';
+          if (!selectedTierColor) {
+            e.currentTarget.style.backgroundColor = 'rgba(255, 203, 5, 0.2)';
+          }
         }}
       >
         {selectedTier ? `${selectedTier} - ${TIER_FULL_NAMES[selectedTier]}` : 'SELECT TIER'}
@@ -174,38 +184,42 @@ export function TierFilter({ selectedTier, onTierChange, style = 'dropdown' }: T
             >
               All Tiers
             </button>
-            {COMPETITIVE_TIERS.map((tier) => (
-              <button
-                key={tier}
-                onClick={() => {
-                  onTierChange(tier);
-                  setIsOpen(false);
-                }}
-                style={{
-                  width: '100%',
-                  backgroundColor: selectedTier === tier ? 'rgba(255, 203, 5, 0.3)' : 'transparent',
-                  border: 'none',
-                  color: '#ffcb05',
-                  padding: '12px 16px',
-                  textAlign: 'left',
-                  cursor: 'pointer',
-                  fontSize: '0.9rem',
-                  fontWeight: selectedTier === tier ? 'bold' : 'normal',
-                  borderBottom: tier !== COMPETITIVE_TIERS[COMPETITIVE_TIERS.length - 1] ? '1px solid rgba(255, 203, 5, 0.2)' : 'none',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = 'rgba(255, 203, 5, 0.2)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = selectedTier === tier ? 'rgba(255, 203, 5, 0.3)' : 'transparent';
-                }}
-              >
-                <div>
-                  <div style={{ fontWeight: 'bold' }}>{tier}</div>
-                  <div style={{ fontSize: '0.8rem', color: '#ccc' }}>{TIER_FULL_NAMES[tier]}</div>
-                </div>
-              </button>
-            ))}
+            {COMPETITIVE_TIERS.map((tier) => {
+              const tierColor = TIER_COLORS[tier];
+              const isSelected = selectedTier === tier;
+              return (
+                <button
+                  key={tier}
+                  onClick={() => {
+                    onTierChange(tier);
+                    setIsOpen(false);
+                  }}
+                  style={{
+                    width: '100%',
+                    backgroundColor: isSelected ? `rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.3)` : 'transparent',
+                    border: 'none',
+                    color: tierColor.background,
+                    padding: '12px 16px',
+                    textAlign: 'left',
+                    cursor: 'pointer',
+                    fontSize: '0.9rem',
+                    fontWeight: isSelected ? 'bold' : 'normal',
+                    borderBottom: tier !== COMPETITIVE_TIERS[COMPETITIVE_TIERS.length - 1] ? `1px solid rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.2)` : 'none',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = `rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.2)`;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = isSelected ? `rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.3)` : 'transparent';
+                  }}
+                >
+                  <div>
+                    <div style={{ fontWeight: 'bold', color: tierColor.background }}>{tier}</div>
+                    <div style={{ fontSize: '0.8rem', color: '#ccc' }}>{TIER_FULL_NAMES[tier]}</div>
+                  </div>
+                </button>
+              );
+            })}
           </div>
         </>
       )}

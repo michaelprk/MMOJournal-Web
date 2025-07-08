@@ -10,6 +10,9 @@ generator client {
 model PokemonBuild {
   id         Int      @id @default(autoincrement())
   name       String   // Pokemon name
+  species    String?  // Pokemon species (same as name for now)
+  gender     String?  // Pokemon gender (M, F, or U for unknown/genderless)
+  level      Int      @default(50) // Pokemon level
   tier       String   // Tier (e.g., OU, UU, etc.)
   moves      String   // JSON string of moves array
   item       String?  // Held item

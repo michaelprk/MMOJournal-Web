@@ -44,7 +44,9 @@ router.post('/', validatePokemonBuild, async (req, res) => {
     
     const newBuild = await prisma.pokemonBuild.create({
       data: {
-                 name: buildData.name,
+         name: buildData.name,
+         species: buildData.species || buildData.name,
+         level: buildData.level || 50,
          tier: buildData.tier,
          moves: JSON.stringify(buildData.moves),
          item: buildData.item,
@@ -90,7 +92,9 @@ router.patch('/:id', validatePokemonBuild, async (req, res) => {
     const updatedBuild = await prisma.pokemonBuild.update({
       where: { id: parseInt(id) },
       data: {
-                 name: buildData.name,
+         name: buildData.name,
+         species: buildData.species || buildData.name,
+         level: buildData.level || 50,
          tier: buildData.tier,
          moves: JSON.stringify(buildData.moves),
          item: buildData.item,

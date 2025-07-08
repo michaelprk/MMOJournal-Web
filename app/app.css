@@ -4,10 +4,11 @@
 html, body {
   margin: 0;
   padding: 0;
-  height: 100%;
+  height: 100vh;
   background: transparent; /* no bg here */
   color: white;
   font-family: "Inter", sans-serif;
+  overflow: hidden;
 }
 
 /* No filter on body or html */
@@ -41,4 +42,10 @@ html, body {
 
 .item-icon:hover {
   transform: scale(1.1) !important;
+}
+
+/* Ensure the root app container fills the viewport */
+#root {
+  height: 100vh;
+  overflow: hidden;
 }

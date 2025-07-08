@@ -1,47 +1,12 @@
 import { NavLink, useNavigate } from "react-router-dom";
-import { useState, useEffect, useRef } from "react";
 
 export function Navbar() {
   const navigate = useNavigate();
-  const [isVisible, setIsVisible] = useState(true);
-  const lastScrollY = useRef(0);
-
-  useEffect(() => {
-    let ticking = false;
-
-    const handleScroll = () => {
-      if (!ticking) {
-        requestAnimationFrame(() => {
-          const currentScrollY = window.scrollY;
-          
-          // Show navbar when at the top of the page
-          if (currentScrollY === 0) {
-            setIsVisible(true);
-          } 
-          // Hide navbar when scrolling down
-          else if (currentScrollY > lastScrollY.current && currentScrollY > 20) {
-            setIsVisible(false);
-          }
-          // Show navbar when scrolling up
-          else if (currentScrollY < lastScrollY.current) {
-            setIsVisible(true);
-          }
-          
-          lastScrollY.current = currentScrollY;
-          ticking = false;
-        });
-        ticking = true;
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []); // Empty dependency array
 
   return (
     <nav
       style={{
-        padding: "0.5rem 2rem",
+        padding: "2rem",
         backgroundColor: "transparent",
         color: "white",
         position: "fixed",
@@ -49,14 +14,11 @@ export function Navbar() {
         left: 0,
         right: 0,
         width: "100%",
-        zIndex: 1000,
         userSelect: "none",
         textAlign: "center",
-        pointerEvents: "none", // Make navbar not block clicks
-        transform: `translateY(${isVisible ? "0" : "-100%"})`, // Hide/show navbar
-        willChange: "transform", // Optimize for animations
-        boxSizing: "border-box", // Ensure proper box model
-        transition: "transform 0.3s ease-in-out", // Smooth transition
+        boxSizing: "border-box",
+        zIndex: 1000,
+        borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
       }}
       className="navbar"
     >
@@ -66,29 +28,30 @@ export function Navbar() {
           display: "flex", 
           justifyContent: "center", 
           cursor: "pointer",
-          pointerEvents: "auto" // Re-enable clicks for logo
+          marginBottom: "1.5rem"
         }}
         onClick={() => navigate("/")}
       >
         <img
           src="/images/MMOJournal_logo.svg"
           alt="MMO Journal Logo"
-          style={{ height: "80px" }}
+          style={{ height: "140px" }}
         />
       </div>
 
-      {/* Nav links below logo, always visible now (no hover logic) */}
+      {/* Nav links below logo */}
       <div
         style={{
-          marginTop: "0.25rem",
-          whiteSpace: "nowrap",
-          fontSize: "0.85rem",
-          fontWeight: "400",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          gap: "1rem",
+          fontSize: "0.95rem",
+          fontWeight: "500",
           textTransform: "lowercase",
-          display: "inline-block",
-          width: "100%",
-          textAlign: "center",
-          pointerEvents: "auto", // Re-enable clicks for nav links
+          letterSpacing: "0.025em",
+          maxWidth: "800px",
+          margin: "0 auto",
         }}
       >
         <NavLink
@@ -96,29 +59,54 @@ export function Navbar() {
           style={({ isActive }) => ({
             color: isActive ? "#ffcb05" : "white",
             textDecoration: "none",
-            margin: "0 1rem",
+            padding: "0.5rem 1.5rem",
+            transition: "all 0.2s ease",
+            borderRadius: "4px",
+            whiteSpace: "nowrap",
           })}
         >
           competitive compendium
         </NavLink>
-        <span style={{ color: "#888" }}>|</span>
+        
+        <div style={{ 
+          color: "rgba(255, 255, 255, 0.4)", 
+          fontSize: "1rem",
+          fontWeight: "300"
+        }}>
+          |
+        </div>
+        
         <NavLink
           to="/shiny-hunt"
           style={({ isActive }) => ({
             color: isActive ? "#ffcb05" : "white",
             textDecoration: "none",
-            margin: "0 1rem",
+            padding: "0.5rem 1.5rem",
+            transition: "all 0.2s ease",
+            borderRadius: "4px",
+            whiteSpace: "nowrap",
           })}
         >
           shiny showcase
         </NavLink>
-        <span style={{ color: "#888" }}>|</span>
+        
+        <div style={{ 
+          color: "rgba(255, 255, 255, 0.4)", 
+          fontSize: "1rem",
+          fontWeight: "300"
+        }}>
+          |
+        </div>
+        
         <NavLink
           to="/journey"
           style={({ isActive }) => ({
             color: isActive ? "#ffcb05" : "white",
             textDecoration: "none",
-            margin: "0 1rem",
+            padding: "0.5rem 1.5rem",
+            transition: "all 0.2s ease",
+            borderRadius: "4px",
+            whiteSpace: "nowrap",
           })}
         >
           journal

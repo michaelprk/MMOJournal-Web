@@ -6,22 +6,58 @@ import type { ShowdownImport, PokemonStats, PokemonBuild, CompetitiveTier } from
 export function parseShowdownImport(importString: string): ShowdownImport {
   const lines = importString.trim().split('\n').map(line => line.trim());
   
-  // First line contains name, item, and gender
+  // First line contains name, gender, item
   const firstLine = lines[0];
-  const nameMatch = firstLine.match(/^(.+?)(?:\s+\(([^)]+)\))?(?:\s+@\s+(.+))?$/);
   
-  if (!nameMatch) {
-    throw new Error('Invalid Showdown import format');
+  // Parse the complex format: "Name (Species) (Gender) @ Item" or "Species (Gender) @ Item"
+  let name = '';
+  let species = '';
+  let gender: 'M' | 'F' | 'U' | undefined = undefined;
+  let item: string | undefined = undefined;
+  
+  // Split by @ to separate item first
+  const parts = firstLine.split('@');
+  const nameAndSpeciesPart = parts[0].trim();
+  item = parts[1]?.trim();
+  
+  // Handle gender parsing - look for (M) or (F) at the end
+  const genderMatch = nameAndSpeciesPart.match(/^(.+?)\s*\(([MF])\)\s*$/);
+  
+  if (genderMatch) {
+    // Gender found, extract it
+    const baseNameSpecies = genderMatch[1].trim();
+    gender = genderMatch[2] as 'M' | 'F';
+    
+    // Now check if there's a nickname format: "Nickname (Species)"
+    const nicknameMatch = baseNameSpecies.match(/^(.+?)\s*\((.+?)\)\s*$/);
+    if (nicknameMatch) {
+      // Format: "Nickname (Species) (Gender)"
+      name = nicknameMatch[1].trim();
+      species = nicknameMatch[2].trim();
+    } else {
+      // Format: "Species (Gender)"
+      name = baseNameSpecies;
+      species = baseNameSpecies;
+    }
+  } else {
+    // No gender, check for nickname format: "Nickname (Species)"
+    const nicknameMatch = nameAndSpeciesPart.match(/^(.+?)\s*\((.+?)\)\s*$/);
+    if (nicknameMatch) {
+      // Format: "Nickname (Species)"
+      name = nicknameMatch[1].trim();
+      species = nicknameMatch[2].trim();
+    } else {
+      // Format: "Species"
+      name = nameAndSpeciesPart;
+      species = nameAndSpeciesPart;
+    }
   }
-  
-  const name = nameMatch[1].trim();
-  const species = nameMatch[2] || name; // Use nickname if species is in parentheses
-  const item = nameMatch[3]?.trim();
   
   // Initialize the result object
   const result: ShowdownImport = {
     name,
     species,
+    gender,
     item,
     ability: '',
     level: 50,
@@ -56,7 +92,7 @@ export function parseShowdownImport(importString: string): ShowdownImport {
 }
 
 /**
- * Parse stats string like "252 HP / 252 Atk / 4 Def" into PokemonStats object
+ * Parse stats string like "252 SpA / 4 SpD / 252 Spe" into PokemonStats object
  */
 function parseStats(statsString: string): Partial<PokemonStats> {
   const stats: Partial<PokemonStats> = {};
@@ -67,8 +103,9 @@ function parseStats(statsString: string): Partial<PokemonStats> {
     const match = pair.match(/^(\d+)\s+(.+)$/);
     if (match) {
       const value = parseInt(match[1]);
-      const statName = match[2].toLowerCase();
+      const statName = match[2].toLowerCase().trim();
       
+      // Handle Pokemon Showdown stat abbreviations exactly as they appear
       switch (statName) {
         case 'hp':
           stats.hp = value;
@@ -79,18 +116,22 @@ function parseStats(statsString: string): Partial<PokemonStats> {
           break;
         case 'def':
         case 'defense':
+        case 'defence':
           stats.defense = value;
           break;
         case 'spa':
         case 'spatk':
         case 'sp. atk':
         case 'special attack':
+        case 'sp atk':
           stats.sp_attack = value;
           break;
         case 'spd':
         case 'spdef':
         case 'sp. def':
         case 'special defense':
+        case 'special defence':
+        case 'sp def':
           stats.sp_defense = value;
           break;
         case 'spe':
@@ -107,10 +148,11 @@ function parseStats(statsString: string): Partial<PokemonStats> {
 /**
  * Convert a ShowdownImport to a PokemonBuild-compatible object
  */
-export function showdownImportToBuild(showdownImport: ShowdownImport, tier: string = 'OU'): Partial<any> {
+export function showdownImportToBuild(showdownImport: ShowdownImport, tier: CompetitiveTier = 'OU'): Omit<PokemonBuild, 'id' | 'created_at' | 'updated_at'> {
   return {
     name: showdownImport.name,
     species: showdownImport.species,
+    gender: showdownImport.gender,
     tier,
     level: showdownImport.level,
     nature: showdownImport.nature,

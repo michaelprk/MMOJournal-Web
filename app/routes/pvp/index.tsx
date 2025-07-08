@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import type { PokemonBuild, CompetitiveTier } from '../../types/pokemon';
+import { COMPETITIVE_TIERS } from '../../types/pokemon';
 import { PokemonBuildService } from '../../services/pokemon-backend';
 import { TierFilter } from '../../components/TierFilter';
 import { PokemonBuildCard } from '../../components/PokemonBuildCard';
@@ -16,18 +17,34 @@ export default function PVPPage() {
   const [showAddOptions, setShowAddOptions] = useState(false);
   const [modalDefaultTab, setModalDefaultTab] = useState<'manual' | 'showdown'>('manual');
 
+  // Sort builds by tier order
+  const sortBuildsByTier = (builds: PokemonBuild[]) => {
+    return [...builds].sort((a, b) => {
+      const tierIndexA = COMPETITIVE_TIERS.indexOf(a.tier);
+      const tierIndexB = COMPETITIVE_TIERS.indexOf(b.tier);
+      
+      // If tier not found, put it at the end
+      if (tierIndexA === -1) return 1;
+      if (tierIndexB === -1) return -1;
+      
+      return tierIndexA - tierIndexB;
+    });
+  };
+
   // Load Pokemon builds
   useEffect(() => {
     loadBuilds();
   }, []);
 
-  // Filter builds when tier changes
+  // Filter and sort builds when tier changes
   useEffect(() => {
-    if (selectedTier) {
-      setFilteredBuilds(builds.filter(build => build.tier === selectedTier));
-    } else {
-      setFilteredBuilds(builds);
-    }
+    let filtered = selectedTier 
+      ? builds.filter(build => build.tier === selectedTier)
+      : builds;
+    
+    // Always sort by tier order
+    filtered = sortBuildsByTier(filtered);
+    setFilteredBuilds(filtered);
   }, [builds, selectedTier]);
 
   const loadBuilds = async () => {
@@ -108,15 +125,24 @@ export default function PVPPage() {
   return (
     <div
       style={{
-        minHeight: '100vh',
+        position: 'fixed',
+        top: '220px', // Start below the navbar
+        left: 0,
+        right: 0,
+        height: 'calc(100vh - 220px)', // Take remaining viewport height
         backgroundColor: 'transparent',
-        padding: '2rem',
-        paddingTop: '120px', // Add space for fixed navbar
+        overflowY: 'auto', // Allow scrolling within this container
+        overflowX: 'hidden',
       }}
     >
-      <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
+      <div style={{ 
+        maxWidth: '1400px', 
+        margin: '0 auto',
+        padding: '2rem',
+        minHeight: '100%', // Ensure content can fill the container
+      }}>
         {/* Header */}
-        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+        <div style={{ textAlign: 'center', marginBottom: '2rem', marginTop: '50px' }}>
           <h1
             style={{
               color: '#ffcb05',
@@ -140,20 +166,31 @@ export default function PVPPage() {
           </p>
         </div>
 
-        {/* Controls */}
+        {/* Sticky Controls */}
         <div
           style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
+            position: 'sticky',
+            top: '0',
+            zIndex: 50,
+            backgroundColor: 'transparent',
+            padding: '1rem 0',
             marginBottom: '2rem',
-            flexWrap: 'wrap',
-            gap: '1rem',
           }}
         >
-          <TierFilter selectedTier={selectedTier} onTierChange={setSelectedTier} style="dropdown" />
-          
-          <div style={{ position: 'relative' }}>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              gap: '1rem',
+              maxWidth: '1400px',
+              margin: '0 auto',
+            }}
+          >
+            <TierFilter selectedTier={selectedTier} onTierChange={setSelectedTier} style="dropdown" />
+            
+            <div style={{ position: 'relative' }}>
             <button
               onClick={() => setShowAddOptions(!showAddOptions)}
               style={{
@@ -264,6 +301,7 @@ export default function PVPPage() {
               </>
             )}
           </div>
+        </div>
         </div>
 
         {/* Build count */}

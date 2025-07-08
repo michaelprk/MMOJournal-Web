@@ -74,7 +74,7 @@ app.get('/api/pokemon/:id', async (req, res) => {
 app.post('/api/pokemon', async (req, res) => {
   try {
     console.log('Creating new Pokemon build...');
-    const { name, tier, moves, item, nature, ability, description } = req.body;
+    const { name, species, gender, level, tier, moves, item, nature, ability, ivs, evs, description, hpIV, attackIV, defenseIV, spAttackIV, spDefenseIV, speedIV, hpEV, attackEV, defenseEV, spAttackEV, spDefenseEV, speedEV } = req.body;
     
     // Basic validation
     if (!name) {
@@ -84,11 +84,28 @@ app.post('/api/pokemon', async (req, res) => {
     const newBuild = await prisma.pokemonBuild.create({
       data: {
         name,
+        species: species || name,
+        gender: gender || null,
+        level: level || 50,
         tier: tier || 'OU',
         moves: JSON.stringify(moves || []),
         item,
         nature,
         ability,
+        // IVs with defaults - handle both nested and flat formats
+        hpIV: hpIV ?? ivs?.hp ?? 31,
+        attackIV: attackIV ?? ivs?.attack ?? 31,
+        defenseIV: defenseIV ?? ivs?.defense ?? 31,
+        spAttackIV: spAttackIV ?? ivs?.spAttack ?? 31,
+        spDefenseIV: spDefenseIV ?? ivs?.spDefense ?? 31,
+        speedIV: speedIV ?? ivs?.speed ?? 31,
+        // EVs with defaults - handle both nested and flat formats
+        hpEV: hpEV ?? evs?.hp ?? 0,
+        attackEV: attackEV ?? evs?.attack ?? 0,
+        defenseEV: defenseEV ?? evs?.defense ?? 0,
+        spAttackEV: spAttackEV ?? evs?.spAttack ?? 0,
+        spDefenseEV: spDefenseEV ?? evs?.spDefense ?? 0,
+        speedEV: speedEV ?? evs?.speed ?? 0,
         description
       }
     });
@@ -121,17 +138,34 @@ app.patch('/api/pokemon/:id', async (req, res) => {
       return res.status(404).json({ error: 'Pokemon build not found' });
     }
     
-    const { name, tier, moves, item, nature, ability, description } = req.body;
+    const { name, species, gender, level, tier, moves, item, nature, ability, ivs, evs, description, hpIV, attackIV, defenseIV, spAttackIV, spDefenseIV, speedIV, hpEV, attackEV, defenseEV, spAttackEV, spDefenseEV, speedEV } = req.body;
     
     const updatedBuild = await prisma.pokemonBuild.update({
       where: { id: parseInt(id) },
       data: {
         name,
+        species: species || name,
+        gender: gender !== undefined ? gender : existingBuild.gender,
+        level: level || existingBuild.level || 50,
         tier,
         moves: JSON.stringify(moves || []),
         item,
         nature,
         ability,
+        // Update IVs if provided - handle both nested and flat formats
+        hpIV: hpIV ?? ivs?.hp ?? existingBuild.hpIV,
+        attackIV: attackIV ?? ivs?.attack ?? existingBuild.attackIV,
+        defenseIV: defenseIV ?? ivs?.defense ?? existingBuild.defenseIV,
+        spAttackIV: spAttackIV ?? ivs?.spAttack ?? existingBuild.spAttackIV,
+        spDefenseIV: spDefenseIV ?? ivs?.spDefense ?? existingBuild.spDefenseIV,
+        speedIV: speedIV ?? ivs?.speed ?? existingBuild.speedIV,
+        // Update EVs if provided - handle both nested and flat formats
+        hpEV: hpEV ?? evs?.hp ?? existingBuild.hpEV,
+        attackEV: attackEV ?? evs?.attack ?? existingBuild.attackEV,
+        defenseEV: defenseEV ?? evs?.defense ?? existingBuild.defenseEV,
+        spAttackEV: spAttackEV ?? evs?.spAttack ?? existingBuild.spAttackEV,
+        spDefenseEV: spDefenseEV ?? evs?.spDefense ?? existingBuild.spDefenseEV,
+        speedEV: speedEV ?? evs?.speed ?? existingBuild.speedEV,
         description
       }
     });

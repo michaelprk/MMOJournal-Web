@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { PokemonBuild, CompetitiveTier } from '../types/pokemon';
-import { COMPETITIVE_TIERS, POKEMON_NATURES, TIER_FULL_NAMES } from '../types/pokemon';
+import { COMPETITIVE_TIERS, POKEMON_NATURES, TIER_FULL_NAMES, TIER_COLORS } from '../types/pokemon';
 import { parseMultipleShowdownImports, multipleShowdownImportsToBuilds, isValidShowdownImport } from '../utils/showdown-parser';
 import { PokeApiService } from '../services/pokemon-backend';
 import { AutocompleteInput } from './AutocompleteInput';
@@ -18,6 +18,8 @@ export function AddPokemonModal({ isOpen, onClose, onSave, editBuild, defaultTab
   const [isLoading, setIsLoading] = useState(false);
   const [showdownText, setShowdownText] = useState('');
   const [importedBuilds, setImportedBuilds] = useState<Array<Omit<PokemonBuild, 'id' | 'created_at' | 'updated_at'>>>([]);
+  const [showTierPopup, setShowTierPopup] = useState(false);
+  const [selectedImportTier, setSelectedImportTier] = useState<CompetitiveTier>('OU');
   
   // Autocomplete states
   const [pokemonSuggestions, setPokemonSuggestions] = useState<string[]>([]);
@@ -26,7 +28,7 @@ export function AddPokemonModal({ isOpen, onClose, onSave, editBuild, defaultTab
   
   const [formData, setFormData] = useState({
     name: '',
-    species: '',
+    gender: '' as 'M' | 'F' | 'U' | '',
     tier: 'OU' as CompetitiveTier,
     level: 50,
     nature: 'Hardy',
@@ -59,11 +61,11 @@ export function AddPokemonModal({ isOpen, onClose, onSave, editBuild, defaultTab
       document.body.style.overflow = 'hidden';
       document.body.classList.add('modal-open');
       
-      setActiveTab(defaultTab);
       if (editBuild) {
+        setActiveTab(defaultTab);
         setFormData({
           name: editBuild.name,
-          species: editBuild.species,
+          gender: editBuild.gender || '',
           tier: editBuild.tier,
           level: editBuild.level,
           nature: editBuild.nature,
@@ -75,11 +77,12 @@ export function AddPokemonModal({ isOpen, onClose, onSave, editBuild, defaultTab
           description: editBuild.description || '',
         });
         setShowdownText(editBuild.showdown_import || '');
+        setShowTierPopup(false);
       } else {
         // Reset to defaults
         setFormData({
           name: '',
-          species: '',
+          gender: '',
           tier: 'OU',
           level: 50,
           nature: 'Hardy',
@@ -105,6 +108,15 @@ export function AddPokemonModal({ isOpen, onClose, onSave, editBuild, defaultTab
           description: '',
         });
         setShowdownText('');
+        
+        // Show tier popup if opening directly to showdown tab
+        if (defaultTab === 'showdown') {
+          setShowTierPopup(true);
+          // Don't set active tab yet, wait for tier selection
+        } else {
+          setActiveTab(defaultTab);
+          setShowTierPopup(false);
+        }
       }
       setImportedBuilds([]);
     } else {
@@ -144,6 +156,20 @@ export function AddPokemonModal({ isOpen, onClose, onSave, editBuild, defaultTab
     }
   }, []);
 
+  const handleShowdownTabClick = () => {
+    if (!editBuild) {
+      setShowTierPopup(true);
+    } else {
+      setActiveTab('showdown');
+    }
+  };
+
+  const handleTierSelection = (tier: CompetitiveTier) => {
+    setSelectedImportTier(tier);
+    setShowTierPopup(false);
+    setActiveTab('showdown');
+  };
+
   const handleShowdownImport = () => {
     try {
       if (!isValidShowdownImport(showdownText)) {
@@ -157,7 +183,7 @@ export function AddPokemonModal({ isOpen, onClose, onSave, editBuild, defaultTab
         return;
       }
 
-      const builds = multipleShowdownImportsToBuilds(parsedPokemon, formData.tier);
+      const builds = multipleShowdownImportsToBuilds(parsedPokemon, selectedImportTier);
       setImportedBuilds(builds);
       
       if (builds.length === 1) {
@@ -165,7 +191,7 @@ export function AddPokemonModal({ isOpen, onClose, onSave, editBuild, defaultTab
         const build = builds[0];
         setFormData({
           name: build.name,
-          species: build.species,
+          gender: build.gender || '',
           tier: build.tier,
           level: build.level,
           nature: build.nature,
@@ -198,8 +224,9 @@ export function AddPokemonModal({ isOpen, onClose, onSave, editBuild, defaultTab
       } else {
         // Save single Pokemon build
         const build = {
-          name: formData.name || formData.species,
-          species: formData.species || formData.name,
+          name: formData.name,
+          species: formData.name,
+          gender: formData.gender || undefined,
           tier: formData.tier,
           level: formData.level,
           nature: formData.nature,
@@ -227,7 +254,7 @@ export function AddPokemonModal({ isOpen, onClose, onSave, editBuild, defaultTab
 
   const canSave = activeTab === 'showdown' ? 
     importedBuilds.length > 0 : 
-    (formData.name && formData.species && formData.ability);
+    (formData.name && formData.ability);
 
   return (
     <div
@@ -250,6 +277,96 @@ export function AddPokemonModal({ isOpen, onClose, onSave, editBuild, defaultTab
         }
       }}
     >
+      {/* Tier Selection Popup */}
+      {showTierPopup && (
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.95)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 10000,
+          }}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setShowTierPopup(false);
+            }
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: 'rgba(0, 0, 0, 0.98)',
+              border: '2px solid #ffcb05',
+              borderRadius: '12px',
+              padding: '2rem',
+              maxWidth: '500px',
+              width: '90%',
+            }}
+          >
+            <h3 style={{ color: '#ffcb05', marginTop: 0, marginBottom: '1.5rem', textAlign: 'center' }}>
+              Select Tier for Import
+            </h3>
+            <p style={{ color: '#ccc', marginBottom: '1.5rem', textAlign: 'center' }}>
+              Choose which tier these Pokemon belong to:
+            </p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.75rem' }}>
+              {COMPETITIVE_TIERS.map((tier) => {
+                const tierColor = TIER_COLORS[tier];
+                return (
+                  <button
+                    key={tier}
+                    onClick={() => handleTierSelection(tier)}
+                    style={{
+                      background: tierColor.gradient,
+                      color: tierColor.text,
+                      border: `2px solid ${tierColor.background}`,
+                      padding: '12px',
+                      borderRadius: '8px',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease',
+                      fontWeight: 'bold',
+                      textAlign: 'center',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = 'scale(1.05)';
+                      e.currentTarget.style.boxShadow = `0 4px 15px rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.4)`;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = 'scale(1)';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
+                  >
+                    <div style={{ fontSize: '1.1rem', marginBottom: '4px' }}>{tier}</div>
+                    <div style={{ fontSize: '0.8rem', opacity: 0.9 }}>{TIER_FULL_NAMES[tier]}</div>
+                  </button>
+                );
+              })}
+            </div>
+            <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
+              <button
+                onClick={() => setShowTierPopup(false)}
+                style={{
+                  backgroundColor: 'rgba(220, 53, 69, 0.2)',
+                  border: '2px solid #dc3545',
+                  color: '#dc3545',
+                  padding: '8px 16px',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontWeight: 'bold',
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div
         style={{
           backgroundColor: 'rgba(0, 0, 0, 0.95)',
@@ -283,7 +400,7 @@ export function AddPokemonModal({ isOpen, onClose, onSave, editBuild, defaultTab
             Manual Input
           </button>
           <button
-            onClick={() => setActiveTab('showdown')}
+            onClick={handleShowdownTabClick}
             style={{
               backgroundColor: activeTab === 'showdown' ? '#ffcb05' : 'rgba(255, 203, 5, 0.2)',
               color: activeTab === 'showdown' ? '#000' : '#ffcb05',
@@ -300,6 +417,14 @@ export function AddPokemonModal({ isOpen, onClose, onSave, editBuild, defaultTab
 
         {activeTab === 'showdown' ? (
           <div>
+            {selectedImportTier && (
+              <div style={{ marginBottom: '1rem', padding: '8px 12px', backgroundColor: `rgba(${TIER_COLORS[selectedImportTier].background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.2)`, borderRadius: '6px', border: `1px solid ${TIER_COLORS[selectedImportTier].background}` }}>
+                <span style={{ color: '#ccc', fontSize: '0.85rem' }}>Importing to tier: </span>
+                <span style={{ color: TIER_COLORS[selectedImportTier].background, fontWeight: 'bold' }}>
+                  {selectedImportTier} - {TIER_FULL_NAMES[selectedImportTier]}
+                </span>
+              </div>
+            )}
             <label style={{ color: '#ffcb05', display: 'block', marginBottom: '0.5rem' }}>
               Paste your Pokemon Showdown export (supports multiple Pokemon):
             </label>
@@ -417,17 +542,29 @@ Timid Nature
                   />
                 </div>
 
+
+
                 <div style={{ marginBottom: '1rem' }}>
                   <label style={{ color: '#ffcb05', display: 'block', marginBottom: '0.5rem' }}>
-                    Species *
+                    Gender
                   </label>
-                  <AutocompleteInput
-                    value={formData.species}
-                    onChange={(value) => setFormData({ ...formData, species: value })}
-                    placeholder="Enter species name"
-                    suggestions={pokemonSuggestions}
-                    onSearch={searchPokemon}
-                  />
+                  <select
+                    value={formData.gender}
+                    onChange={(e) => setFormData({ ...formData, gender: e.target.value as 'M' | 'F' | 'U' | '' })}
+                    style={{
+                      width: '100%',
+                      backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                      border: '1px solid #ffcb05',
+                      borderRadius: '8px',
+                      color: '#fff',
+                      padding: '8px 12px',
+                    }}
+                  >
+                    <option value="" style={{ backgroundColor: '#000' }}>No gender specified</option>
+                    <option value="M" style={{ backgroundColor: '#000' }}>♂ Male</option>
+                    <option value="F" style={{ backgroundColor: '#000' }}>♀ Female</option>
+                    <option value="U" style={{ backgroundColor: '#000' }}>◯ Genderless</option>
+                  </select>
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>

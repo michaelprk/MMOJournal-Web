@@ -2,6 +2,7 @@ export interface PokemonBuild {
   id: string;
   name: string;
   species: string;
+  gender?: 'M' | 'F' | 'U'; // Male, Female, or Unknown/Genderless
   tier: CompetitiveTier;
   level: number;
   nature: string;
@@ -48,6 +49,7 @@ export interface PokemonApiData {
 export interface ShowdownImport {
   name: string;
   species: string;
+  gender?: 'M' | 'F' | 'U';
   item?: string;
   ability: string;
   level: number;
@@ -68,6 +70,39 @@ export const TIER_FULL_NAMES: Record<CompetitiveTier, string> = {
   'Doubles': 'Doubles/VGC',
   'RU': 'Rarely Used',
   'LC': 'Little Cup'
+};
+
+export const TIER_COLORS: Record<CompetitiveTier, { background: string; text: string; gradient: string }> = {
+  'OU': { 
+    background: '#2196f3', 
+    text: '#fff', 
+    gradient: 'linear-gradient(135deg, #2196f3, #42a5f5)' 
+  },
+  'UU': { 
+    background: '#4caf50', 
+    text: '#fff', 
+    gradient: 'linear-gradient(135deg, #4caf50, #66bb6a)' 
+  },
+  'RU': { 
+    background: '#ff9800', 
+    text: '#fff', 
+    gradient: 'linear-gradient(135deg, #ff9800, #ffb74d)' 
+  },
+  'NU': { 
+    background: '#f9c74f', 
+    text: '#000', 
+    gradient: 'linear-gradient(135deg, #f9c74f, #f9d71c)' 
+  },
+  'LC': { 
+    background: '#9c27b0', 
+    text: '#fff', 
+    gradient: 'linear-gradient(135deg, #9c27b0, #ba68c8)' 
+  },
+  'Doubles': { 
+    background: '#f44336', 
+    text: '#fff', 
+    gradient: 'linear-gradient(135deg, #f44336, #ef5350)' 
+  }
 };
 
 export const POKEMON_NATURES = [
