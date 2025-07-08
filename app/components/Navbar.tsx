@@ -1,53 +1,94 @@
 import { NavLink, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 export function Navbar() {
-  const [hovered, setHovered] = useState(false);
   const navigate = useNavigate();
+  const [isVisible, setIsVisible] = useState(true);
+  const lastScrollY = useRef(0);
+
+  useEffect(() => {
+    let ticking = false;
+
+    const handleScroll = () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          const currentScrollY = window.scrollY;
+          
+          // Show navbar when at the top of the page
+          if (currentScrollY === 0) {
+            setIsVisible(true);
+          } 
+          // Hide navbar when scrolling down
+          else if (currentScrollY > lastScrollY.current && currentScrollY > 20) {
+            setIsVisible(false);
+          }
+          // Show navbar when scrolling up
+          else if (currentScrollY < lastScrollY.current) {
+            setIsVisible(true);
+          }
+          
+          lastScrollY.current = currentScrollY;
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []); // Empty dependency array
 
   return (
     <nav
       style={{
-        padding: "1rem 2rem",
-        backgroundColor: "rgba(0, 0, 0, 0.3)",
+        padding: "0.5rem 2rem",
+        backgroundColor: "transparent",
         color: "white",
-        position: "sticky",
+        position: "fixed",
         top: 0,
+        left: 0,
+        right: 0,
+        width: "100%",
         zIndex: 1000,
         userSelect: "none",
         textAlign: "center",
+        pointerEvents: "none", // Make navbar not block clicks
+        transform: `translateY(${isVisible ? "0" : "-100%"})`, // Hide/show navbar
+        willChange: "transform", // Optimize for animations
+        boxSizing: "border-box", // Ensure proper box model
+        transition: "transform 0.3s ease-in-out", // Smooth transition
       }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+      className="navbar"
     >
       {/* Clickable logo container */}
       <div
-        style={{ display: "flex", justifyContent: "center", cursor: "pointer" }}
+        style={{ 
+          display: "flex", 
+          justifyContent: "center", 
+          cursor: "pointer",
+          pointerEvents: "auto" // Re-enable clicks for logo
+        }}
         onClick={() => navigate("/")}
       >
         <img
           src="/images/MMOJournal_logo.svg"
           alt="MMO Journal Logo"
-          style={{ height: "150px" }} // increased size
+          style={{ height: "80px" }}
         />
       </div>
 
-      {/* Nav links below logo, centered, smaller font, lowercase */}
+      {/* Nav links below logo, always visible now (no hover logic) */}
       <div
         style={{
-          marginTop: "0.5rem",
-          opacity: hovered ? 1 : 0,
-          maxHeight: hovered ? "40px" : "0",
-          overflow: "hidden",
-          transition: "opacity 0.3s ease, max-height 0.3s ease",
+          marginTop: "0.25rem",
           whiteSpace: "nowrap",
-          pointerEvents: hovered ? "auto" : "none",
-          fontSize: "0.85rem", // smaller font size
+          fontSize: "0.85rem",
           fontWeight: "400",
-          textTransform: "lowercase", // lowercase text
+          textTransform: "lowercase",
           display: "inline-block",
           width: "100%",
           textAlign: "center",
+          pointerEvents: "auto", // Re-enable clicks for nav links
         }}
       >
         <NavLink

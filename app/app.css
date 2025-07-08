@@ -11,3 +11,34 @@ html, body {
 }
 
 /* No filter on body or html */
+
+/* Ensure navbar stays fixed at top */
+.navbar {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  transform: translateZ(0) !important;
+  backface-visibility: hidden !important;
+}
+
+/* Disable navbar when modal is open */
+.modal-open .navbar {
+  pointer-events: none !important;
+  z-index: 1 !important;
+}
+
+.modal-open .navbar * {
+  pointer-events: none !important;
+}
+
+/* Item icon styling */
+.item-icon {
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)) !important;
+  transition: transform 0.2s ease !important;
+}
+
+.item-icon:hover {
+  transform: scale(1.1) !important;
+}

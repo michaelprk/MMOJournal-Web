@@ -51,7 +51,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             filter:
               location.pathname === "/login"
                 ? "grayscale(50%) brightness(80%) contrast(95%) blur(4px)"
-                : "grayscale(70%) brightness(80%) contrast(90%)",
+                : "grayscale(70%) brightness(40%) contrast(90%) blur(1px)",
             zIndex: -1,
             pointerEvents: "none", // Allow clicks through background
           }}
@@ -66,8 +66,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
             zIndex: 1,
             minHeight: "100vh",
             backgroundColor:
-              location.pathname === "/login" ? "transparent" : "rgba(0,0,0,0.7)",
-            color: "#fff",
+              location.pathname === "/login" ||
+              location.pathname === "/" ||
+              location.pathname === "/pvp" ||
+              location.pathname === "/shiny-hunt" ||
+              location.pathname === "/journey"
+            ? "transparent"
+            : "rgba(0,0,0,0.7)",
+            paddingTop: showNavbar ? "200px" : "0", // Add padding to account for fixed navbar
             paddingBottom: "2rem",
             backdropFilter: "none", // Ensure no blur effect on content
           }}

@@ -1,0 +1,36 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model PokemonBuild {
+  id         Int      @id @default(autoincrement())
+  name       String   // Pokemon name
+  tier       String   // Tier (e.g., OU, UU, etc.)
+  moves      String   // JSON string of moves array
+  item       String?  // Held item
+  nature     String?  // Pokemon nature
+  ability    String?  // Pokemon ability
+  // IVs (Individual Values) - 0-31 for each stat
+  hpIV       Int      @default(31)
+  attackIV   Int      @default(31)
+  defenseIV  Int      @default(31)
+  spAttackIV Int      @default(31)
+  spDefenseIV Int     @default(31)
+  speedIV    Int      @default(31)
+  // EVs (Effort Values) - 0-252 for each stat, max 510 total
+  hpEV       Int      @default(0)
+  attackEV   Int      @default(0)
+  defenseEV  Int      @default(0)
+  spAttackEV Int      @default(0)
+  spDefenseEV Int     @default(0)
+  speedEV    Int      @default(0)
+  // Metadata
+  description String? // Optional description
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
