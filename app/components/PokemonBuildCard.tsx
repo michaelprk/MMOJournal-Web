@@ -563,37 +563,35 @@ export function PokemonBuildCard({ build, onEdit, onDelete }: PokemonBuildCardPr
           </div>
         </div>
 
-        {/* Stats Layout - IVs compact, EVs emphasized */}
+        {/* Stats Layout - Compact and Consistent */}
         <div style={{ marginBottom: '12px' }}>
-          {/* Compact IVs Section */}
+          {/* IVs Section - Single Line */}
           <div style={{ marginBottom: '16px' }}>
-            <h4 style={{ color: tierColor.background, margin: '0 0 8px 0', fontSize: '0.8rem', fontWeight: 'bold' }}>Individual Values</h4>
-            <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', fontSize: '0.7rem' }}>
-              {[
-                { label: 'HP', value: build.ivs.hp },
-                { label: 'ATK', value: build.ivs.attack },
-                { label: 'DEF', value: build.ivs.defense },
-                { label: 'SPA', value: build.ivs.sp_attack },
-                { label: 'SPD', value: build.ivs.sp_defense },
-                { label: 'SPE', value: build.ivs.speed },
-              ].map((stat, index) => (
-                <div key={index} style={{ 
-                  display: 'flex', 
-                  alignItems: 'center',
-                  gap: '4px',
-                  padding: '3px 8px', 
-                  backgroundColor: `rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.15)`, 
-                  borderRadius: '4px',
-                  border: `1px solid rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.25)`
-                }}>
-                  <span style={{ color: '#aaa', fontSize: '0.65rem' }}>{stat.label}</span>
-                  <span style={{ color: '#fff', fontWeight: 'bold', fontSize: '0.75rem' }}>{stat.value}</span>
-                </div>
-              ))}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+              <h4 style={{ color: tierColor.background, margin: '0', fontSize: '0.9rem', fontWeight: 'bold' }}>Individual Values</h4>
+              <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                {[
+                  { label: 'HP', value: build.ivs.hp },
+                  { label: 'ATK', value: build.ivs.attack },
+                  { label: 'DEF', value: build.ivs.defense },
+                  { label: 'SPA', value: build.ivs.sp_attack },
+                  { label: 'SPD', value: build.ivs.sp_defense },
+                  { label: 'SPE', value: build.ivs.speed },
+                ].map((stat, index) => (
+                  <div key={index} style={{ 
+                    display: 'flex', 
+                    alignItems: 'center',
+                    gap: '4px',
+                  }}>
+                    <span style={{ color: tierColor.background, fontSize: '0.65rem', fontWeight: '600' }}>{stat.label}</span>
+                    <span style={{ color: '#fff', fontWeight: 'bold', fontSize: '0.8rem' }}>{stat.value}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 
-          {/* Emphasized EVs Section - 1x3 Layout */}
+          {/* EVs Section - Simplified 1x3 Layout */}
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
               <h4 style={{ color: tierColor.background, margin: '0', fontSize: '0.9rem', fontWeight: 'bold' }}>Effort Values</h4>
@@ -604,45 +602,44 @@ export function PokemonBuildCard({ build, onEdit, onDelete }: PokemonBuildCardPr
             
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', fontSize: '0.8rem' }}>
               {[
-                { label: 'HP', value: build.evs.hp, icon: '❤️' },
-                { label: 'ATK', value: build.evs.attack, icon: '⚔️' },
-                { label: 'DEF', value: build.evs.defense, icon: '🛡️' },
-                { label: 'SPA', value: build.evs.sp_attack, icon: '✨' },
-                { label: 'SPD', value: build.evs.sp_defense, icon: '🔰' },
-                { label: 'SPE', value: build.evs.speed, icon: '💨' },
+                { label: 'HP', value: build.evs.hp },
+                { label: 'ATK', value: build.evs.attack },
+                { label: 'DEF', value: build.evs.defense },
               ].map((stat, index) => (
                 <div key={index} style={{ 
                   display: 'flex', 
                   alignItems: 'center',
-                  gap: '8px',
-                  padding: '12px 10px', 
+                  gap: '6px',
+                  padding: '8px 10px', 
                   backgroundColor: `rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.2)`, 
-                  borderRadius: '8px',
-                  border: `2px solid rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.4)`,
-                  minHeight: '50px',
-                  position: 'relative',
-                  overflow: 'hidden'
+                  borderRadius: '6px',
+                  border: `1px solid rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.3)`,
+                  minHeight: '36px',
                 }}>
-                  {/* Background graphic */}
-                  <div style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    background: `linear-gradient(45deg, rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.1) 0%, transparent 50%, rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.1) 100%)`,
-                    backgroundSize: '20px 20px',
-                    zIndex: 1
-                  }} />
-                  
-                  {/* Content */}
-                  <div style={{ position: 'relative', zIndex: 2, display: 'flex', alignItems: 'center', gap: '8px', width: '100%' }}>
-                    <span style={{ fontSize: '1.2rem' }}>{stat.icon}</span>
-                    <div style={{ flex: 1 }}>
-                      <span style={{ color: '#bbb', fontSize: '0.7rem', display: 'block' }}>{stat.label}</span>
-                      <span style={{ color: '#fff', fontWeight: 'bold', fontSize: '1.2rem' }}>{stat.value}</span>
-                    </div>
-                  </div>
+                  <span style={{ color: tierColor.background, fontSize: '0.75rem', fontWeight: '600' }}>{stat.label}</span>
+                  <span style={{ color: '#fff', fontWeight: 'bold', fontSize: '1rem' }}>{stat.value}</span>
+                </div>
+              ))}
+            </div>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', fontSize: '0.8rem', marginTop: '8px' }}>
+              {[
+                { label: 'SPA', value: build.evs.sp_attack },
+                { label: 'SPD', value: build.evs.sp_defense },
+                { label: 'SPE', value: build.evs.speed },
+              ].map((stat, index) => (
+                <div key={index + 3} style={{ 
+                  display: 'flex', 
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '8px 10px', 
+                  backgroundColor: `rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.2)`, 
+                  borderRadius: '6px',
+                  border: `1px solid rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.3)`,
+                  minHeight: '36px',
+                }}>
+                  <span style={{ color: tierColor.background, fontSize: '0.75rem', fontWeight: '600' }}>{stat.label}</span>
+                  <span style={{ color: '#fff', fontWeight: 'bold', fontSize: '1rem' }}>{stat.value}</span>
                 </div>
               ))}
             </div>
