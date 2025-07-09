@@ -125,15 +125,40 @@ export function PokemonBuildCard({ build, onEdit, onDelete }: PokemonBuildCardPr
       const types: Record<string, string> = {};
       for (const move of build.moves) {
         if (move && !types[move]) {
-          try {
-            const response = await fetch(`https://pokeapi.co/api/v2/move/${move.toLowerCase().replace(/\s+/g, '-')}`);
-            if (response.ok) {
-              const data = await response.json();
-              types[move] = data.type.name;
+          // Handle Hidden Power moves
+          if (move.toLowerCase().includes('hidden power')) {
+            // Extract type from Hidden Power [Type] format
+            const hiddenPowerMatch = move.match(/hidden power\s*\[([^\]]+)\]/i);
+            if (hiddenPowerMatch) {
+              const hiddenPowerType = hiddenPowerMatch[1].toLowerCase().trim();
+              // Map the type to ensure it's valid
+              const validTypes = [
+                'normal', 'fire', 'water', 'electric', 'grass', 'ice', 'fighting', 'poison',
+                'ground', 'flying', 'psychic', 'bug', 'rock', 'ghost', 'dragon', 'dark', 'steel', 'fairy'
+              ];
+              if (validTypes.includes(hiddenPowerType)) {
+                types[move] = hiddenPowerType;
+              } else {
+                types[move] = 'normal'; // Default fallback
+              }
+            } else {
+              // If no type specified, default to normal
+              types[move] = 'normal';
             }
-          } catch (error) {
-            console.error(`Error fetching type for move ${move}:`, error);
-            types[move] = 'normal';
+          } else {
+            // Regular move type fetching
+            try {
+              const response = await fetch(`https://pokeapi.co/api/v2/move/${move.toLowerCase().replace(/\s+/g, '-')}`);
+              if (response.ok) {
+                const data = await response.json();
+                types[move] = data.type.name;
+              } else {
+                types[move] = 'normal';
+              }
+            } catch (error) {
+              console.error(`Error fetching type for move ${move}:`, error);
+              types[move] = 'normal';
+            }
           }
         }
       }
