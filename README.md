@@ -8,8 +8,16 @@ MMOJournal-Web is the web-based evolution of the MMOJournal CLI app — a person
 - **Full CRUD Operations**: Complete data management for Pokémon builds with add, edit, delete, and view functionality
 - **Pokemon Build Cards**: Responsive card displays featuring sprites, stats, moves, abilities, and items
 - **Tier Filtering**: Dynamic filtering system for competitive tiers (OU, UU, Doubles, RU, NU, LC)
-- **Auto-hiding Navbar**: Smooth scroll-based navigation with intelligent hide/show behavior
+- **Sticky Utility Bar**: Fixed navigation bar with tier filtering and add Pokemon options that stays visible while scrolling
+- **Optimized Layout**: Proper spacing and positioning ensuring no overlap between navigation elements
 - **Card Navigation**: Intuitive tab navigation between main view, stats, and moves with forward/back arrows
+
+### ✅ **Enhanced UI/UX Design**
+- **Sticky Navigation**: Utility bar positioned below navbar with transparent background for clean aesthetics
+- **Responsive Layout**: Cards scroll cleanly underneath navigation without obstruction
+- **Build Count Display**: Total build count shown at bottom of card list for better organization
+- **Consistent Spacing**: Proper margins and padding throughout the application
+- **Visual Hierarchy**: Clear separation between navigation, content, and supplementary information
 
 ### ✅ **Enhanced Item & Image System**
 - **Local Item Images**: 32+ competitive item images stored locally for instant loading
@@ -41,39 +49,45 @@ MMOJournal-Web is the web-based evolution of the MMOJournal CLI app — a person
 - **Data Validation**: Server-side validation for IV/EV limits and Pokémon data integrity
 - **PokeAPI Proxy**: Backend integration with PokeAPI for cached data retrieval
 
-### ✅ **Modern UI/UX**
-- **Responsive Design**: Optimized layouts for mobile and desktop viewing
-- **Loading States**: Smooth loading indicators and comprehensive error handling
-- **Hover Effects**: Interactive card reveals with detailed IV/EV information
+### ✅ **Modern Navigation & Routing**
+- **React Router v7**: Latest routing system with improved navigation performance
+- **Fixed Navigation**: Resolved routing conflicts and navigation issues between pages
+- **Seamless Transitions**: Smooth page transitions without overlap or layout issues
 - **TypeScript**: Full type safety across frontend and backend
 
 ## 🆕 Recent Development Progress
 
-### **Local Item Image System** (Latest)
-- **Lightning Fast Loading**: All competitive items now load instantly from local storage
-- **32 Local Images**: Core competitive items stored locally including all modern generations
-- **No External Dependencies**: 100% reliable item display with zero network requests
-- **Automatic Fallback**: Smart fallback to external sources for items not available locally
+### **Sticky Utility Bar Implementation** (Latest)
+- **Fixed Navigation**: Utility bar positioned below navbar that stays visible while scrolling
+- **Transparent Design**: Clean aesthetic with semi-transparent background and no blur effects
+- **Optimal Positioning**: Carefully positioned to avoid overlap with navbar or content
+- **Dropdown Integration**: Tier filtering and Add Pokemon options easily accessible
 
-### **Gender Support Enhancement**
-- **Complete Gender System**: Full support for male/female/unknown gender states
-- **Showdown Compatibility**: Automatic parsing of (M)/(F) indicators from Showdown imports
-- **Visual Indicators**: Gender icons displayed alongside Pokémon names on cards
-- **Form Integration**: Gender selection in manual build creation forms
+### **PVP Page Layout Improvements**
+- **Proper Content Spacing**: Fixed layout ensuring cards never overlap with navigation elements
+- **Bottom Build Count**: Moved total build count to bottom of page for better visual flow
+- **Container Optimization**: Scrollable content area with proper height calculations
+- **Responsive Grid**: Pokemon cards display in optimized grid layout with consistent spacing
 
-### **Enhanced Navigation**
-- **Card Tab System**: Seamless navigation between main, stats, and moves views
-- **Arrow Navigation**: Forward/back arrows for intuitive tab switching
-- **Improved UX**: Cleaner card layouts with better information organization
+### **Navigation System Fixes**
+- **Router Compatibility**: Fixed React Router v7 import issues and navigation conflicts
+- **Page Transitions**: Smooth navigation between PVP, Shiny Hunt, and Journal pages
+- **Component Organization**: Better separation of navigation and content components
+
+### **Enhanced User Experience**
+- **No Visual Conflicts**: Eliminated overlap issues between different UI elements
+- **Consistent Behavior**: Reliable navigation and interaction patterns across all pages
+- **Performance Optimized**: Faster page loads and smoother interactions
 
 ## 🎯 Development Goals
 
 ### 🔄 **Next Steps**
+- **Shiny Hunt Tracker**: Complete implementation with sprites, progress tracking, and portfolio management
 - **User Authentication**: Login and account creation system
 - **Personal Collections**: User-specific build management and privacy controls
 
 ### 📋 **Planned Features**
-- **Shiny Hunt Tracker**: Log and track shiny hunting progress with locations and methods
+- **Enhanced Shiny Hunt System**: Sprite integration, progress tracking, and portfolio showcase
 - **Progress Journal**: Rich text journaling with media uploads and gameplay stories
 - **Team Management**: Group builds into teams with strategic analysis
 - **AI Team Suggestions**: Smart team building recommendations and synergy analysis
@@ -149,11 +163,12 @@ The backend provides the following endpoints:
 
 ## 🎮 Demonstration Features
 
-1. **Browse Builds**: View competitive Pokémon collection with filtering options
-2. **Add New Pokémon**: Use the manual form or paste from Pokémon Showdown
+1. **Browse Builds**: View competitive Pokémon collection with filtering options via sticky utility bar
+2. **Add New Pokémon**: Use the dropdown in utility bar for manual form or Showdown import
 3. **Edit Builds**: Click edit on any card to modify stats, moves, or details
-4. **Filter by Tier**: Use the dropdown to view builds by competitive tier
-5. **Import Teams**: Paste entire teams from Showdown for quick batch import
+4. **Filter by Tier**: Use the tier dropdown in utility bar to view builds by competitive tier
+5. **Seamless Navigation**: Navigate between pages using the improved router system
+6. **Import Teams**: Paste entire teams from Showdown for quick batch import
 
 ## 🤝 Contributing
 

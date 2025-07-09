@@ -123,289 +123,299 @@ export default function PVPPage() {
   }, {} as Record<CompetitiveTier, number>);
 
   return (
-    <div
-      style={{
-        position: 'fixed',
-        top: '220px', // Start below the navbar
-        left: 0,
-        right: 0,
-        height: 'calc(100vh - 220px)', // Take remaining viewport height
-        backgroundColor: 'transparent',
-        overflowY: 'auto', // Allow scrolling within this container
-        overflowX: 'hidden',
-      }}
-    >
-      <div style={{ 
-        maxWidth: '1400px', 
-        margin: '0 auto',
-        padding: '2rem',
-        minHeight: '100%', // Ensure content can fill the container
-      }}>
-        {/* Header */}
-        <div style={{ textAlign: 'center', marginBottom: '2rem', marginTop: '50px' }}>
-          <h1
+    <>
+      {/* Sticky Utility Bar - positioned outside scrollable container */}
+      <div
+        className="sticky top-[64px] z-30 px-4 py-2 flex justify-between items-center bg-black/10 rounded-md shadow-sm"
+        style={{
+          position: 'sticky',
+          top: '280px', // Below navbar (200px navbar + 80px spacing)
+          left: 0,
+          right: 0,
+          zIndex: 30,
+          padding: '16px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          backgroundColor: 'rgba(0, 0, 0, 0.1)',
+          borderRadius: '8px',
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+          margin: '0 16px',
+          marginBottom: '16px',
+        }}
+      >
+        <TierFilter selectedTier={selectedTier} onTierChange={setSelectedTier} style="dropdown" />
+        
+        <div style={{ position: 'relative' }}>
+          <button
+            onClick={() => setShowAddOptions(!showAddOptions)}
             style={{
-              color: '#ffcb05',
-              fontSize: '3rem',
+              backgroundColor: '#ffcb05',
+              color: '#000',
+              border: 'none',
+              padding: '12px 24px',
+              borderRadius: '8px',
+              fontSize: '1rem',
               fontWeight: 'bold',
-              textShadow: '2px 2px 4px rgba(0,0,0,0.8)',
-              marginBottom: '0.5rem',
-            }}
-          >
-            PVP Battle Builds
-          </h1>
-          <p
-            style={{
-              color: '#ffffff',
-              fontSize: '1.2rem',
-              textShadow: '1px 1px 2px rgba(0,0,0,0.8)',
-              marginBottom: '2rem',
-            }}
-          >
-            Manage and showcase your competitive Pokémon builds
-          </p>
-        </div>
-
-        {/* Sticky Controls */}
-        <div
-          style={{
-            position: 'sticky',
-            top: '0',
-            zIndex: 50,
-            backgroundColor: 'transparent',
-            padding: '1rem 0',
-            marginBottom: '2rem',
-          }}
-        >
-          <div
-            style={{
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
               display: 'flex',
-              justifyContent: 'space-between',
               alignItems: 'center',
-              flexWrap: 'wrap',
-              gap: '1rem',
-              maxWidth: '1400px',
-              margin: '0 auto',
+              gap: '8px',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#e6b800';
+              e.currentTarget.style.transform = 'translateY(-1px)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = '#ffcb05';
+              e.currentTarget.style.transform = 'translateY(0)';
             }}
           >
-            <TierFilter selectedTier={selectedTier} onTierChange={setSelectedTier} style="dropdown" />
-            
-            <div style={{ position: 'relative' }}>
-            <button
-              onClick={() => setShowAddOptions(!showAddOptions)}
-              style={{
-                backgroundColor: '#ffcb05',
-                color: '#000',
-                border: 'none',
-                padding: '12px 24px',
-                borderRadius: '8px',
-                fontSize: '1rem',
-                fontWeight: 'bold',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = '#e6b800';
-                e.currentTarget.style.transform = 'translateY(-1px)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = '#ffcb05';
-                e.currentTarget.style.transform = 'translateY(0)';
-              }}
-            >
-              Add Pokemon
-              <span style={{ 
-                transform: showAddOptions ? 'rotate(180deg)' : 'rotate(0deg)',
-                transition: 'transform 0.2s ease'
-              }}>
-                ▼
-              </span>
-            </button>
+            Add Pokemon
+            <span style={{ 
+              transform: showAddOptions ? 'rotate(180deg)' : 'rotate(0deg)',
+              transition: 'transform 0.2s ease'
+            }}>
+              ▼
+            </span>
+          </button>
 
-            {/* Add Options Dropdown */}
-            {showAddOptions && (
-              <>
-                <div
+          {/* Add Options Dropdown */}
+          {showAddOptions && (
+            <>
+              <div
+                style={{
+                  position: 'fixed',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  zIndex: 100,
+                }}
+                onClick={() => setShowAddOptions(false)}
+              />
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '100%',
+                  right: 0,
+                  backgroundColor: 'rgba(0, 0, 0, 0.95)',
+                  border: '2px solid #ffcb05',
+                  borderRadius: '8px',
+                  marginTop: '4px',
+                  zIndex: 200,
+                  minWidth: '200px',
+                }}
+              >
+                <button
+                  onClick={handleAddNew}
                   style={{
-                    position: 'fixed',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    zIndex: 100,
+                    width: '100%',
+                    backgroundColor: 'transparent',
+                    border: 'none',
+                    color: '#ffcb05',
+                    padding: '12px 16px',
+                    textAlign: 'left',
+                    cursor: 'pointer',
+                    fontSize: '0.9rem',
+                    fontWeight: '600',
+                    borderBottom: '1px solid rgba(255, 203, 5, 0.2)',
                   }}
-                  onClick={() => setShowAddOptions(false)}
-                />
-                <div
-                  style={{
-                    position: 'absolute',
-                    top: '100%',
-                    right: 0,
-                    backgroundColor: 'rgba(0, 0, 0, 0.95)',
-                    border: '2px solid #ffcb05',
-                    borderRadius: '8px',
-                    marginTop: '4px',
-                    zIndex: 200,
-                    minWidth: '200px',
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'rgba(255, 203, 5, 0.2)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
                   }}
                 >
-                  <button
-                    onClick={handleAddNew}
-                    style={{
-                      width: '100%',
-                      backgroundColor: 'transparent',
-                      border: 'none',
-                      color: '#ffcb05',
-                      padding: '12px 16px',
-                      textAlign: 'left',
-                      cursor: 'pointer',
-                      fontSize: '0.9rem',
-                      fontWeight: '600',
-                      borderBottom: '1px solid rgba(255, 203, 5, 0.2)',
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = 'rgba(255, 203, 5, 0.2)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = 'transparent';
-                    }}
-                  >
-                    ✚ New Pokemon Entry
-                  </button>
-                  <button
-                    onClick={handleShowdownImport}
-                    style={{
-                      width: '100%',
-                      backgroundColor: 'transparent',
-                      border: 'none',
-                      color: '#ffcb05',
-                      padding: '12px 16px',
-                      textAlign: 'left',
-                      cursor: 'pointer',
-                      fontSize: '0.9rem',
-                      fontWeight: '600',
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = 'rgba(255, 203, 5, 0.2)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = 'transparent';
-                    }}
-                  >
-                    📋 Showdown Import
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
+                  ✚ New Pokemon Entry
+                </button>
+                <button
+                  onClick={handleShowdownImport}
+                  style={{
+                    width: '100%',
+                    backgroundColor: 'transparent',
+                    border: 'none',
+                    color: '#ffcb05',
+                    padding: '12px 16px',
+                    textAlign: 'left',
+                    cursor: 'pointer',
+                    fontSize: '0.9rem',
+                    fontWeight: '600',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'rgba(255, 203, 5, 0.2)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  }}
+                >
+                  📋 Showdown Import
+                </button>
+              </div>
+            </>
+          )}
         </div>
-        </div>
+      </div>
 
-        {/* Build count */}
-        <div style={{ marginBottom: '1.5rem' }}>
-          <p style={{ color: '#ccc', fontSize: '1rem' }}>
-            {filteredBuilds.length} total builds
-            {selectedTier && ` in ${selectedTier}`}
-          </p>
-        </div>
-
-        {/* Content */}
-        {isLoading ? (
-          <div style={{ textAlign: 'center', padding: '4rem' }}>
-            <div
+      {/* Main Content Container - Scrollable */}
+      <div
+        style={{
+          position: 'fixed',
+          top: '350px', // Start below navbar + utility bar (280px + 70px)
+          left: 0,
+          right: 0,
+          height: 'calc(100vh - 350px)', // Take remaining viewport height
+          backgroundColor: 'transparent',
+          overflowY: 'auto', // Allow scrolling within this container
+          overflowX: 'hidden',
+        }}
+      >
+        <div style={{ 
+          maxWidth: '1400px', 
+          margin: '0 auto',
+          padding: '2rem',
+          minHeight: '100%', // Ensure content can fill the container
+        }}>
+          {/* Header */}
+          <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+            <h1
               style={{
                 color: '#ffcb05',
+                fontSize: '3rem',
+                fontWeight: 'bold',
+                textShadow: '2px 2px 4px rgba(0,0,0,0.8)',
+                marginBottom: '0.5rem',
+              }}
+            >
+              PVP Battle Builds
+            </h1>
+            <p
+              style={{
+                color: '#ffffff',
                 fontSize: '1.2rem',
-                fontWeight: 'bold',
-              }}
-            >
-              Loading Pokemon builds...
-            </div>
-          </div>
-        ) : error ? (
-          <div style={{ textAlign: 'center', padding: '4rem' }}>
-            <div
-              style={{
-                color: '#ff6b6b',
-                fontSize: '1.2rem',
-                fontWeight: 'bold',
-                marginBottom: '1rem',
-              }}
-            >
-              {error}
-            </div>
-            <button
-              onClick={loadBuilds}
-              style={{
-                backgroundColor: '#ffcb05',
-                color: '#000',
-                border: 'none',
-                padding: '12px 24px',
-                borderRadius: '8px',
-                fontSize: '1rem',
-                fontWeight: 'bold',
-                cursor: 'pointer',
-              }}
-            >
-              Try Again
-            </button>
-          </div>
-        ) : filteredBuilds.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '4rem' }}>
-            <div
-              style={{
-                color: '#ffcb05',
-                fontSize: '1.5rem',
-                fontWeight: 'bold',
-                marginBottom: '1rem',
-              }}
-            >
-              No Pokemon builds found
-            </div>
-            <p style={{ color: '#ccc', marginBottom: '2rem' }}>
-              {selectedTier 
-                ? `No builds found for ${selectedTier} tier. Try selecting a different tier or add some builds.`
-                : 'Start building your competitive Pokemon team by adding your first build.'
-              }
-            </p>
-            <button
-              onClick={() => setShowAddOptions(true)}
-              style={{
-                backgroundColor: '#ffcb05',
-                color: '#000',
-                border: 'none',
-                padding: '12px 24px',
-                borderRadius: '8px',
-                fontSize: '1rem',
-                fontWeight: 'bold',
-                cursor: 'pointer',
-              }}
-            >
-              Add Pokemon
-            </button>
-          </div>
-        ) : (
-                      <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))',
-                gap: '2rem',
+                textShadow: '1px 1px 2px rgba(0,0,0,0.8)',
                 marginBottom: '2rem',
               }}
             >
-            {filteredBuilds.map((build) => (
-              <PokemonBuildCard
-                key={build.id}
-                build={build}
-                onEdit={handleEditBuild}
-                onDelete={handleDeleteBuild}
-              />
-            ))}
+              Manage and showcase your competitive Pokémon builds
+            </p>
           </div>
-        )}
+
+          {/* Content */}
+          {isLoading ? (
+            <div style={{ textAlign: 'center', padding: '4rem' }}>
+              <div
+                style={{
+                  color: '#ffcb05',
+                  fontSize: '1.2rem',
+                  fontWeight: 'bold',
+                }}
+              >
+                Loading Pokemon builds...
+              </div>
+            </div>
+          ) : error ? (
+            <div style={{ textAlign: 'center', padding: '4rem' }}>
+              <div
+                style={{
+                  color: '#ff6b6b',
+                  fontSize: '1.2rem',
+                  fontWeight: 'bold',
+                  marginBottom: '1rem',
+                }}
+              >
+                {error}
+              </div>
+              <button
+                onClick={loadBuilds}
+                style={{
+                  backgroundColor: '#ffcb05',
+                  color: '#000',
+                  border: 'none',
+                  padding: '12px 24px',
+                  borderRadius: '8px',
+                  fontSize: '1rem',
+                  fontWeight: 'bold',
+                  cursor: 'pointer',
+                }}
+              >
+                Try Again
+              </button>
+            </div>
+          ) : filteredBuilds.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '4rem' }}>
+              <div
+                style={{
+                  color: '#ffcb05',
+                  fontSize: '1.5rem',
+                  fontWeight: 'bold',
+                  marginBottom: '1rem',
+                }}
+              >
+                No Pokemon builds found
+              </div>
+              <p style={{ color: '#ccc', marginBottom: '2rem' }}>
+                {selectedTier 
+                  ? `No builds found for ${selectedTier} tier. Try selecting a different tier or add some builds.`
+                  : 'Start building your competitive Pokemon team by adding your first build.'
+                }
+              </p>
+              <button
+                onClick={() => setShowAddOptions(true)}
+                style={{
+                  backgroundColor: '#ffcb05',
+                  color: '#000',
+                  border: 'none',
+                  padding: '12px 24px',
+                  borderRadius: '8px',
+                  fontSize: '1rem',
+                  fontWeight: 'bold',
+                  cursor: 'pointer',
+                }}
+              >
+                Add Pokemon
+              </button>
+            </div>
+          ) : (
+            <>
+              {/* Pokemon Cards Grid */}
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))',
+                  gap: '2rem',
+                  marginBottom: '3rem',
+                }}
+              >
+                {filteredBuilds.map((build) => (
+                  <PokemonBuildCard
+                    key={build.id}
+                    build={build}
+                    onEdit={handleEditBuild}
+                    onDelete={handleDeleteBuild}
+                  />
+                ))}
+              </div>
+
+              {/* Build Count - Moved to Bottom */}
+              <p 
+                className="text-center mt-10 text-sm text-white/60"
+                style={{ 
+                  textAlign: 'center', 
+                  marginTop: '2rem', 
+                  fontSize: '0.875rem', 
+                  color: 'rgba(255, 255, 255, 0.6)',
+                  paddingBottom: '2rem',
+                }}
+              >
+                {filteredBuilds.length} total builds
+                {selectedTier && ` in ${selectedTier}`}
+              </p>
+            </>
+          )}
+        </div>
       </div>
 
       {/* Add/Edit Modal */}
@@ -416,6 +426,6 @@ export default function PVPPage() {
         editBuild={editingBuild}
         defaultTab={modalDefaultTab}
       />
-    </div>
+    </>
   );
 }
