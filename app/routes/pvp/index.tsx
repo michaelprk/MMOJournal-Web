@@ -140,13 +140,29 @@ export default function PVPPage() {
           backgroundColor: 'rgba(0, 0, 0, 0.1)',
           borderRadius: '8px',
           boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-          margin: '0 16px',
+          margin: '0 32px', // Increased from 16px for better spacing
           marginBottom: '16px',
         }}
       >
-        <TierFilter selectedTier={selectedTier} onTierChange={setSelectedTier} style="dropdown" />
+        <div style={{ marginLeft: '16px' }}> {/* Bring inward from edge */}
+          <TierFilter selectedTier={selectedTier} onTierChange={setSelectedTier} style="dropdown" />
+        </div>
         
-        <div style={{ position: 'relative' }}>
+        {/* Centered Header */}
+        <h2 style={{
+          color: '#fff',
+          fontSize: '1.1rem',
+          fontWeight: 'bold',
+          margin: 0,
+          textShadow: '0 1px 2px rgba(0,0,0,0.8)',
+          display: 'flex',
+          alignItems: 'center',
+          height: '44px', // Match dropdown height
+        }}>
+          ⚔️ View Your Competitive Builds ⚔️
+        </h2>
+        
+        <div style={{ position: 'relative', marginRight: '16px' }}> {/* Bring inward from edge */}
           <button
             onClick={() => setShowAddOptions(!showAddOptions)}
             style={{

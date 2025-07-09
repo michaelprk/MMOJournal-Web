@@ -88,10 +88,10 @@ export function TierFilter({ selectedTier, onTierChange, style = 'dropdown' }: T
       <button
         onClick={() => setIsOpen(!isOpen)}
         style={{
-          background: selectedTierColor ? selectedTierColor.gradient : 'rgba(255, 203, 5, 0.2)',
-          border: `2px solid ${selectedTierColor ? selectedTierColor.background : '#ffcb05'}`,
-          color: selectedTierColor ? selectedTierColor.text : '#ffcb05',
-          padding: '12px 40px 12px 16px',
+          backgroundColor: '#ffcb05',
+          color: '#000',
+          border: 'none',
+          padding: '12px 24px',
           borderRadius: '8px',
           fontSize: '1rem',
           fontWeight: 'bold',
@@ -100,25 +100,24 @@ export function TierFilter({ selectedTier, onTierChange, style = 'dropdown' }: T
           minWidth: '200px',
           textAlign: 'left',
           position: 'relative',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
         }}
         onMouseEnter={(e) => {
-          if (!selectedTierColor) {
-            e.currentTarget.style.backgroundColor = 'rgba(255, 203, 5, 0.3)';
-          }
+          e.currentTarget.style.backgroundColor = '#e6b800';
+          e.currentTarget.style.transform = 'translateY(-1px)';
         }}
         onMouseLeave={(e) => {
-          if (!selectedTierColor) {
-            e.currentTarget.style.backgroundColor = 'rgba(255, 203, 5, 0.2)';
-          }
+          e.currentTarget.style.backgroundColor = '#ffcb05';
+          e.currentTarget.style.transform = 'translateY(0)';
         }}
       >
-        {selectedTier ? `${selectedTier} - ${TIER_FULL_NAMES[selectedTier]}` : 'SELECT TIER'}
+        {selectedTier ? `${selectedTier} - ${TIER_FULL_NAMES[selectedTier]}` : 'Select Tier'}
         <span
           style={{
-            position: 'absolute',
-            right: '12px',
-            top: '50%',
-            transform: `translateY(-50%) rotate(${isOpen ? '180deg' : '0deg'})`,
+            marginLeft: 'auto',
+            transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
             transition: 'transform 0.2s ease',
             fontSize: '0.8rem',
           }}

@@ -49,3 +49,107 @@ html, body {
   height: 100vh;
   overflow: hidden;
 }
+
+/* Custom scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Move type animations */
+@keyframes electricPulse {
+  0%, 100% { 
+    background-position: 0% 50%; 
+    box-shadow: 0 0 8px rgba(248, 208, 48, 0.4);
+  }
+  50% { 
+    background-position: 100% 50%; 
+    box-shadow: 0 0 12px rgba(248, 208, 48, 0.6);
+  }
+}
+
+@keyframes waterFlow {
+  0%, 100% { 
+    background-position: 0% 50%; 
+    box-shadow: 0 0 8px rgba(104, 144, 240, 0.4);
+  }
+  50% { 
+    background-position: 100% 50%; 
+    box-shadow: 0 0 12px rgba(104, 144, 240, 0.6);
+  }
+}
+
+@keyframes fireFlicker {
+  0%, 100% { 
+    background-position: 0% 50%; 
+    box-shadow: 0 0 8px rgba(240, 128, 48, 0.4);
+  }
+  50% { 
+    background-position: 100% 50%; 
+    box-shadow: 0 0 12px rgba(240, 128, 48, 0.6);
+  }
+}
+
+@keyframes grassSway {
+  0%, 100% { 
+    background-position: 0% 50%; 
+    box-shadow: 0 0 8px rgba(120, 200, 80, 0.4);
+  }
+  50% { 
+    background-position: 100% 50%; 
+    box-shadow: 0 0 12px rgba(120, 200, 80, 0.6);
+  }
+}
+
+@keyframes psychicGlow {
+  0%, 100% { 
+    background-position: 0% 50%; 
+    box-shadow: 0 0 8px rgba(248, 88, 136, 0.4);
+  }
+  50% { 
+    background-position: 100% 50%; 
+    box-shadow: 0 0 12px rgba(248, 88, 136, 0.6);
+  }
+}
+
+@keyframes iceShimmer {
+  0%, 100% { 
+    background-position: 0% 50%; 
+    box-shadow: 0 0 8px rgba(152, 216, 216, 0.4);
+  }
+  50% { 
+    background-position: 100% 50%; 
+    box-shadow: 0 0 12px rgba(152, 216, 216, 0.6);
+  }
+}
+
+@keyframes defaultMove {
+  0%, 100% { 
+    background-position: 0% 50%; 
+    box-shadow: 0 0 6px rgba(200, 200, 200, 0.4);
+  }
+  50% { 
+    background-position: 100% 50%; 
+    box-shadow: 0 0 10px rgba(200, 200, 200, 0.6);
+  }
+}
+
+.move-electric { animation: electricPulse 3s ease-in-out infinite; }
+.move-water { animation: waterFlow 3s ease-in-out infinite; }
+.move-fire { animation: fireFlicker 2.5s ease-in-out infinite; }
+.move-grass { animation: grassSway 4s ease-in-out infinite; }
+.move-psychic { animation: psychicGlow 3.5s ease-in-out infinite; }
+.move-ice { animation: iceShimmer 3s ease-in-out infinite; }
+.move-default { animation: defaultMove 4s ease-in-out infinite; }
