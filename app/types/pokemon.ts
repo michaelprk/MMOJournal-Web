@@ -214,5 +214,55 @@ export const getShinySpritePath = (pokemonId: number, pokemonName: string): stri
   return `/images/shiny-sprites/${paddedId}_${pokemonName}.gif`;
 };
 
+// Generate consistent colors for each Pokemon based on their ID
+export const getPokemonColors = (pokemonId: number) => {
+  // Create a simple hash from the Pokemon ID to generate consistent colors
+  const hue = (pokemonId * 137.508) % 360; // Golden ratio approximation for good color distribution
+  const saturation = 60 + (pokemonId % 40); // 60-100% saturation
+  const lightness = 45 + (pokemonId % 20); // 45-65% lightness
+  
+  const primaryColor = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+  const primaryColorRgb = hslToRgb(hue / 360, saturation / 100, lightness / 100);
+  
+  return {
+    primary: primaryColor,
+    primaryRgb: primaryColorRgb,
+    // Lighter version for backgrounds
+    light: `hsl(${hue}, ${Math.max(30, saturation - 20)}%, ${Math.min(80, lightness + 25)}%)`,
+    // Darker version for borders
+    dark: `hsl(${hue}, ${Math.min(100, saturation + 20)}%, ${Math.max(20, lightness - 20)}%)`,
+    // For glows and effects
+    glow: `hsla(${hue}, ${saturation}%, ${lightness}%, 0.6)`,
+    glowLight: `hsla(${hue}, ${saturation}%, ${lightness}%, 0.3)`,
+    glowDark: `hsla(${hue}, ${saturation}%, ${lightness}%, 0.8)`
+  };
+};
+
+// Helper function to convert HSL to RGB
+function hslToRgb(h: number, s: number, l: number): string {
+  let r, g, b;
+
+  if (s === 0) {
+    r = g = b = l; // achromatic
+  } else {
+    const hue2rgb = (p: number, q: number, t: number) => {
+      if (t < 0) t += 1;
+      if (t > 1) t -= 1;
+      if (t < 1/6) return p + (q - p) * 6 * t;
+      if (t < 1/2) return q;
+      if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+      return p;
+    };
+
+    const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+    const p = 2 * l - q;
+    r = hue2rgb(p, q, h + 1/3);
+    g = hue2rgb(p, q, h);
+    b = hue2rgb(p, q, h - 1/3);
+  }
+
+  return `${Math.round(r * 255)}, ${Math.round(g * 255)}, ${Math.round(b * 255)}`;
+}
+
 // Shiny odds for PokeMMO (1 in 30,000)
 export const SHINY_ODDS = 30000; 

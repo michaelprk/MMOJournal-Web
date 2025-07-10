@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import type { ShinyPortfolio, ShinyHunt, PokemonStats } from '../types/pokemon';
-import { getShinySpritePath, HUNTING_METHOD_COLORS, POKEMON_NATURES } from '../types/pokemon';
+import type { ShinyPortfolio, ShinyHunt, PokemonStats, HuntingMethod } from '../types/pokemon';
+import { getShinySpritePath, HUNTING_METHOD_COLORS, POKEMON_NATURES, HUNTING_METHODS, getPokemonColors } from '../types/pokemon';
 
 interface ShinyPortfolioSectionProps {
   portfolio: ShinyPortfolio[];
@@ -13,6 +13,14 @@ interface ShinyPortfolioSectionProps {
     notes?: string;
   }) => void;
   onCloseModal: () => void;
+  displayLimit?: number;
+  onShowMore?: () => void;
+  viewMode?: 'grid' | 'compact';
+  onViewModeChange?: (mode: 'grid' | 'compact') => void;
+  portfolioFilter?: 'all' | HuntingMethod;
+  onPortfolioFilterChange?: (filter: 'all' | HuntingMethod) => void;
+  portfolioSort?: 'date' | 'encounters' | 'name';
+  onPortfolioSortChange?: (sort: 'date' | 'encounters' | 'name') => void;
 }
 
 export default function ShinyPortfolioSection({
@@ -20,7 +28,15 @@ export default function ShinyPortfolioSection({
   showCompletionModal,
   completingHunt,
   onCompleteHunt,
-  onCloseModal
+  onCloseModal,
+  displayLimit,
+  onShowMore,
+  viewMode = 'grid',
+  onViewModeChange,
+  portfolioFilter = 'all',
+  onPortfolioFilterChange,
+  portfolioSort = 'date',
+  onPortfolioSortChange
 }: ShinyPortfolioSectionProps) {
   const [completionData, setCompletionData] = useState({
     nature: '',
@@ -59,68 +75,201 @@ export default function ShinyPortfolioSection({
 
   return (
     <div className="portfolio-section">
-      <h2>🏆 Shiny Portfolio</h2>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+        <h2>🏆 Shiny Portfolio</h2>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          {/* Portfolio Filter Controls */}
+          {onPortfolioFilterChange && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontSize: '0.875rem', color: 'rgba(255, 255, 255, 0.7)' }}>Method:</span>
+              <select
+                value={portfolioFilter}
+                onChange={(e) => onPortfolioFilterChange(e.target.value as 'all' | HuntingMethod)}
+                style={{
+                  padding: '6px 12px',
+                  borderRadius: '4px',
+                  border: '1px solid rgba(255, 215, 0, 0.3)',
+                  background: 'rgba(0, 0, 0, 0.4)',
+                  color: 'white',
+                  fontSize: '0.75rem',
+                }}
+              >
+                <option value="all">All Methods</option>
+                {HUNTING_METHODS.map(method => (
+                  <option key={method} value={method}>{method}</option>
+                ))}
+              </select>
+            </div>
+          )}
+          
+          {/* Portfolio Sort Controls */}
+          {onPortfolioSortChange && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontSize: '0.875rem', color: 'rgba(255, 255, 255, 0.7)' }}>Sort:</span>
+              <select
+                value={portfolioSort}
+                onChange={(e) => onPortfolioSortChange(e.target.value as 'date' | 'encounters' | 'name')}
+                style={{
+                  padding: '6px 12px',
+                  borderRadius: '4px',
+                  border: '1px solid rgba(255, 215, 0, 0.3)',
+                  background: 'rgba(0, 0, 0, 0.4)',
+                  color: 'white',
+                  fontSize: '0.75rem',
+                }}
+              >
+                <option value="date">Date (Newest)</option>
+                <option value="encounters">Encounters (Most)</option>
+                <option value="name">Name (A-Z)</option>
+              </select>
+            </div>
+          )}
+          
+          {/* View Mode Toggle */}
+          {onViewModeChange && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontSize: '0.875rem', color: 'rgba(255, 255, 255, 0.7)' }}>View:</span>
+              <button
+                onClick={() => onViewModeChange(viewMode === 'grid' ? 'compact' : 'grid')}
+                style={{
+                  backgroundColor: 'rgba(255, 215, 0, 0.2)',
+                  color: '#ffd700',
+                  border: '1px solid #ffd700',
+                  padding: '6px 12px',
+                  borderRadius: '4px',
+                  fontSize: '0.75rem',
+                  fontWeight: 'bold',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(255, 215, 0, 0.3)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(255, 215, 0, 0.2)';
+                }}
+              >
+                {viewMode === 'grid' ? '☰' : '⊞'} {viewMode === 'grid' ? 'Compact' : 'Grid'}
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
       
       {portfolio.length === 0 ? (
         <div className="empty-portfolio">
           <p>No shinies found yet. Start hunting to build your collection!</p>
         </div>
       ) : (
-        <div className="portfolio-grid">
-          {portfolio.map(shiny => (
-            <div key={shiny.id} className="portfolio-card">
-              <div className="portfolio-sprite-container">
-                <img 
-                  src={getShinySpritePath(shiny.pokemonId, shiny.pokemonName)}
-                  alt={`Shiny ${shiny.pokemonName}`}
-                  className="portfolio-sprite"
-                  onError={(e) => {
-                    e.currentTarget.src = '/images/shiny-sprites/001_Bulbasaur.gif';
+        <>
+          <div className={viewMode === 'grid' ? 'portfolio-grid' : 'portfolio-compact'}>
+            {(displayLimit ? portfolio.slice(0, displayLimit) : portfolio).map(shiny => {
+              const pokemonColors = getPokemonColors(shiny.pokemonId);
+              return (
+                <div 
+                  key={shiny.id} 
+                  className={viewMode === 'grid' ? 'portfolio-card' : 'portfolio-card compact'}
+                  style={{
+                    background: `rgba(0, 0, 0, 0.15)`,
+                    border: `1px solid ${pokemonColors.glow}`,
+                    boxShadow: `0 4px 12px rgba(${pokemonColors.primaryRgb}, 0.15), inset 0 0 20px ${pokemonColors.glowLight}`,
                   }}
-                />
-              </div>
-              
-              <h3 className="portfolio-pokemon-name">{shiny.pokemonName}</h3>
-              
-              <div className="portfolio-info">
-                <div className="portfolio-method" style={{ 
-                  background: HUNTING_METHOD_COLORS[shiny.method].background 
-                }}>
-                  {shiny.method}
-                </div>
-                
-                <div className="portfolio-date">
-                  Found: {new Date(shiny.dateFound).toLocaleDateString()}
-                </div>
-                
-                {shiny.nature && (
-                  <div className="portfolio-nature">
-                    Nature: {shiny.nature}
+                >
+                  <div className={viewMode === 'grid' ? 'portfolio-sprite-container' : 'portfolio-sprite-container compact'}>
+                    <img 
+                      src={getShinySpritePath(shiny.pokemonId, shiny.pokemonName)}
+                      alt={`Shiny ${shiny.pokemonName}`}
+                      className={viewMode === 'grid' ? 'portfolio-sprite' : 'portfolio-sprite compact'}
+                      style={{
+                        filter: `drop-shadow(0 0 10px ${pokemonColors.glow}) drop-shadow(0 0 20px ${pokemonColors.glowLight})`,
+                      }}
+                      onError={(e) => {
+                        e.currentTarget.src = '/images/shiny-sprites/001_Bulbasaur.gif';
+                      }}
+                    />
                   </div>
-                )}
-                
-                {shiny.encounterCount && (
-                  <div className="portfolio-encounters">
-                    Encounters: {shiny.encounterCount.toLocaleString()}
-                  </div>
-                )}
-                
-                {shiny.ivs && (
-                  <div className="portfolio-ivs">
-                    <div className="iv-display">
-                      <span>HP: {shiny.ivs.hp ?? 'N/A'}</span>
-                      <span>Atk: {shiny.ivs.attack ?? 'N/A'}</span>
-                      <span>Def: {shiny.ivs.defense ?? 'N/A'}</span>
-                      <span>SpA: {shiny.ivs.sp_attack ?? 'N/A'}</span>
-                      <span>SpD: {shiny.ivs.sp_defense ?? 'N/A'}</span>
-                      <span>Spe: {shiny.ivs.speed ?? 'N/A'}</span>
+                  
+                  <div className={viewMode === 'grid' ? 'portfolio-info' : 'portfolio-info compact'}>
+                    <h3 className={viewMode === 'grid' ? 'portfolio-pokemon-name' : 'portfolio-pokemon-name compact'}>{shiny.pokemonName}</h3>
+                    
+                    <div className="portfolio-method" style={{ 
+                      background: HUNTING_METHOD_COLORS[shiny.method].background 
+                    }}>
+                      {shiny.method}
                     </div>
+                    
+                    <div className="portfolio-date">
+                      Found: {new Date(shiny.dateFound).toLocaleDateString()}
+                    </div>
+                    
+                    {shiny.nature && (
+                      <div className="portfolio-nature">
+                        Nature: {shiny.nature}
+                      </div>
+                    )}
+                    
+                    {shiny.encounterCount && (
+                      <div className="portfolio-encounters">
+                        Encounters: {shiny.encounterCount.toLocaleString()}
+                      </div>
+                    )}
+                    
+                    {shiny.ivs && (
+                      <div className="portfolio-ivs">
+                        <div className="iv-display">
+                          <span>HP: {shiny.ivs.hp ?? 'N/A'}</span>
+                          <span>Atk: {shiny.ivs.attack ?? 'N/A'}</span>
+                          <span>Def: {shiny.ivs.defense ?? 'N/A'}</span>
+                          <span>SpA: {shiny.ivs.sp_attack ?? 'N/A'}</span>
+                          <span>SpD: {shiny.ivs.sp_defense ?? 'N/A'}</span>
+                          <span>Spe: {shiny.ivs.speed ?? 'N/A'}</span>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
+                </div>
+              );
+            })}
+          </div>
+          {displayLimit && portfolio.length > displayLimit && onShowMore && (
+            <div style={{ 
+              display: 'flex', 
+              justifyContent: 'center', 
+              marginTop: '1rem' 
+            }}>
+              <button
+                onClick={onShowMore}
+                style={{
+                  backgroundColor: 'rgba(255, 215, 0, 0.2)',
+                  color: '#ffd700',
+                  border: '1px solid #ffd700',
+                  padding: '12px 24px',
+                  borderRadius: '8px',
+                  fontSize: '1rem',
+                  fontWeight: 'bold',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(255, 215, 0, 0.3)';
+                  e.currentTarget.style.transform = 'translateY(-1px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(255, 215, 0, 0.2)';
+                  e.currentTarget.style.transform = 'translateY(0)';
+                }}
+              >
+                ⬇️ Show More Shinies ({portfolio.length - displayLimit} remaining)
+              </button>
             </div>
-          ))}
-        </div>
+          )}
+        </>
       )}
 
       {/* Completion Modal */}

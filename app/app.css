@@ -249,12 +249,10 @@ html, body {
 /* Shiny specific animations */
 @keyframes shinySparkle {
   0%, 100% { 
-    opacity: 0.3;
-    transform: scale(0.8) rotate(0deg);
+    filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.4)) drop-shadow(0 0 16px rgba(255, 215, 0, 0.2));
   }
   50% { 
-    opacity: 1;
-    transform: scale(1.2) rotate(180deg);
+    filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.8)) drop-shadow(0 0 24px rgba(255, 215, 0, 0.4));
   }
 }
 
@@ -269,19 +267,19 @@ html, body {
 
 @keyframes floatingShiny {
   0%, 100% { 
-    transform: translateY(0px) rotate(0deg);
+    filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.4)) drop-shadow(0 0 16px rgba(255, 215, 0, 0.2));
   }
   50% { 
-    transform: translateY(-10px) rotate(5deg);
+    filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.8)) drop-shadow(0 0 24px rgba(255, 215, 0, 0.4));
   }
 }
 
 @keyframes portfolioShimmer {
-  0% { 
-    background-position: -100% 0;
+  0%, 100% { 
+    opacity: 0.1;
   }
-  100% { 
-    background-position: 100% 0;
+  50% { 
+    opacity: 0.2;
   }
 }
 
@@ -374,27 +372,25 @@ html, body {
   margin: 2rem 0;
 }
 
+/* Hunt Card Optimizations */
 .hunts-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
   margin-top: 1rem;
 }
 
 .shiny-hunt-card {
-  background: rgba(0, 0, 0, 0.4);
-  border: 2px solid transparent;
-  border-radius: 16px;
-  padding: 1.5rem;
+  border-radius: 12px;
+  padding: 1rem;
+  transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
-  transition: all 0.3s ease;
-  animation: shinyGlow 4s ease-in-out infinite;
+  min-height: 300px;
 }
 
 .shiny-hunt-card:hover {
-  transform: translateY(-5px);
-  border-color: rgba(255, 215, 0, 0.5);
+  transform: translateY(-2px);
 }
 
 .shiny-hunt-card::before {
@@ -404,23 +400,23 @@ html, body {
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(
-    45deg,
-    transparent 30%,
-    rgba(255, 215, 0, 0.05) 50%,
-    transparent 70%
+  background: linear-gradient(135deg, 
+    rgba(255, 255, 255, 0.05) 0%,
+    rgba(255, 255, 255, 0.02) 20%,
+    transparent 40%,
+    transparent 60%,
+    rgba(255, 255, 255, 0.02) 80%,
+    rgba(255, 255, 255, 0.05) 100%
   );
-  background-size: 200% 200%;
-  animation: portfolioShimmer 6s ease-in-out infinite;
-  pointer-events: none;
   z-index: 1;
+  animation: portfolioShimmer 4s ease-in-out infinite;
 }
 
 .hunt-card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
   position: relative;
   z-index: 2;
 }
@@ -428,10 +424,10 @@ html, body {
 .edit-btn {
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  color: white;
-  padding: 0.5rem;
-  border-radius: 6px;
+  border-radius: 4px;
+  padding: 0.25rem 0.5rem;
   cursor: pointer;
+  font-size: 0.875rem;
   transition: all 0.3s ease;
 }
 
@@ -440,9 +436,9 @@ html, body {
 }
 
 .method-badge {
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  font-size: 0.875rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
   font-weight: bold;
   color: white;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
@@ -456,46 +452,46 @@ html, body {
 .shiny-sprite-container {
   display: flex;
   justify-content: center;
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
 }
 
 .shiny-sprite {
-  width: 80px;
-  height: 80px;
-  filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.6));
-  animation: floatingShiny 3s ease-in-out infinite;
+  width: 64px;
+  height: 64px;
 }
 
 .pokemon-name {
-  text-align: center;
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   font-weight: bold;
   color: #ffd700;
-  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-  margin-bottom: 1rem;
+  text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+  text-align: center;
+  margin-bottom: 0.75rem;
 }
 
 .hunt-stats {
   display: flex;
-  justify-content: space-between;
-  margin-bottom: 1rem;
+  justify-content: space-around;
+  margin-bottom: 0.75rem;
 }
 
 .stat {
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 0.25rem;
 }
 
 .stat-label {
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   color: rgba(255, 255, 255, 0.7);
 }
 
 .stat-value {
-  font-size: 1.25rem;
+  font-size: 1rem;
   font-weight: bold;
-  color: white;
+  color: #ffd700;
+  text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
 }
 
 .hunt-card-footer {
@@ -503,53 +499,53 @@ html, body {
   justify-content: space-between;
   align-items: center;
   gap: 0.5rem;
+  margin-top: 0.75rem;
 }
 
 .phase-btn {
-  background: linear-gradient(45deg, #4f46e5, #7c3aed);
+  background: rgba(76, 175, 80, 0.3);
+  border: 1px solid #4caf50;
+  border-radius: 4px;
+  padding: 0.5rem 0.75rem;
   color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .phase-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3);
+  background: rgba(76, 175, 80, 0.5);
 }
 
 .info-btn {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(33, 150, 243, 0.3);
+  border: 1px solid #2196f3;
+  border-radius: 4px;
+  padding: 0.5rem 0.75rem;
   color: white;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  padding: 0.5rem;
-  border-radius: 6px;
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .info-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(33, 150, 243, 0.5);
 }
 
 .found-btn {
-  background: linear-gradient(45deg, #10b981, #059669);
+  background: rgba(255, 215, 0, 0.3);
+  border: 1px solid #ffd700;
+  border-radius: 4px;
+  padding: 0.5rem 0.75rem;
   color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  font-size: 0.875rem;
+  font-size: 0.75rem;
+  font-weight: bold;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .found-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
+  background: rgba(255, 215, 0, 0.5);
 }
 
 .hunt-details {
@@ -643,28 +639,25 @@ html, body {
   margin-bottom: 1rem;
 }
 
+/* Portfolio Card Optimizations */
 .portfolio-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1rem;
   margin-top: 1rem;
 }
 
 .portfolio-card {
-  background: rgba(0, 0, 0, 0.4);
-  border: 2px solid rgba(255, 215, 0, 0.3);
-  border-radius: 16px;
-  padding: 1.5rem;
-  text-align: center;
+  border-radius: 12px;
+  padding: 1rem;
+  transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
-  transition: all 0.3s ease;
-  animation: shinyGlow 5s ease-in-out infinite;
+  min-height: 280px;
 }
 
 .portfolio-card:hover {
-  transform: translateY(-3px);
-  border-color: rgba(255, 215, 0, 0.6);
+  transform: translateY(-2px);
 }
 
 .portfolio-card::before {
@@ -674,37 +667,38 @@ html, body {
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(
-    45deg,
-    transparent 30%,
-    rgba(255, 215, 0, 0.1) 50%,
-    transparent 70%
+  background: linear-gradient(135deg, 
+    rgba(255, 255, 255, 0.05) 0%,
+    rgba(255, 255, 255, 0.02) 20%,
+    transparent 40%,
+    transparent 60%,
+    rgba(255, 255, 255, 0.02) 80%,
+    rgba(255, 255, 255, 0.05) 100%
   );
-  background-size: 200% 200%;
-  animation: portfolioShimmer 8s ease-in-out infinite;
-  pointer-events: none;
   z-index: 1;
+  animation: portfolioShimmer 6s ease-in-out infinite;
 }
 
 .portfolio-sprite-container {
-  position: relative;
-  z-index: 2;
-  margin-bottom: 1rem;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 0.75rem;
 }
 
 .portfolio-sprite {
-  width: 80px;
-  height: 80px;
-  filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.8));
-  animation: floatingShiny 4s ease-in-out infinite;
+  width: 64px;
+  height: 64px;
+  filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.6));
+  animation: shinySparkle 3s ease-in-out infinite;
 }
 
 .portfolio-pokemon-name {
-  position: relative;
-  z-index: 2;
+  font-size: 1.125rem;
+  font-weight: bold;
   color: #ffd700;
-  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-  margin-bottom: 1rem;
+  text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+  text-align: center;
+  margin-bottom: 0.75rem;
 }
 
 .portfolio-info {
@@ -713,13 +707,13 @@ html, body {
 }
 
 .portfolio-method {
-  display: inline-block;
   padding: 0.25rem 0.75rem;
-  border-radius: 12px;
-  font-size: 0.875rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
   font-weight: bold;
   color: white;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  display: inline-block;
   margin-bottom: 0.5rem;
 }
 
@@ -912,8 +906,6 @@ html, body {
 .floating-shiny-sprite {
   width: 50px;
   height: 50px;
-  filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.6));
-  animation: shinySparkle 3s ease-in-out infinite;
 }
 
 .shiny-name-tooltip {
@@ -1058,5 +1050,222 @@ html, body {
   .info-btn,
   .found-btn {
     width: 100%;
+  }
+}
+
+/* Compact View Styles */
+.hunts-compact {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.shiny-hunt-card.compact {
+  border-radius: 8px;
+  padding: 1rem;
+  width: 100%;
+}
+
+.hunt-card-compact-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.compact-sprite-container {
+  flex-shrink: 0;
+}
+
+.compact-sprite {
+  width: 40px;
+  height: 40px;
+}
+
+.compact-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.compact-pokemon-name {
+  font-size: 1.1rem;
+  color: #ffd700;
+  margin: 0 0 0.25rem 0;
+  text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+}
+
+.compact-method-badge {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  display: inline-block;
+  color: white;
+  font-weight: bold;
+}
+
+.compact-stats {
+  display: flex;
+  gap: 1rem;
+  margin-left: 1rem;
+}
+
+.compact-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.125rem;
+}
+
+.compact-stat-label {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.compact-stat-value {
+  font-size: 0.875rem;
+  font-weight: bold;
+  color: #ffd700;
+  text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+}
+
+.compact-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-left: 1rem;
+}
+
+.compact-btn {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.3);
+  color: white;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.compact-btn:hover {
+  background: rgba(255, 215, 0, 0.2);
+  border-color: #ffd700;
+}
+
+.compact-btn.phase-btn {
+  background: rgba(76, 175, 80, 0.3);
+  border-color: #4caf50;
+}
+
+.compact-btn.phase-btn:hover {
+  background: rgba(76, 175, 80, 0.5);
+}
+
+.compact-btn.found-btn {
+  background: rgba(255, 215, 0, 0.3);
+  border-color: #ffd700;
+}
+
+.compact-btn.found-btn:hover {
+  background: rgba(255, 215, 0, 0.5);
+}
+
+.compact-details {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 215, 0, 0.2);
+}
+
+/* Portfolio Compact View */
+.portfolio-compact {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.portfolio-card.compact {
+  border-radius: 8px;
+  padding: 1rem;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.portfolio-sprite-container.compact {
+  flex-shrink: 0;
+}
+
+.portfolio-sprite.compact {
+  width: 40px;
+  height: 40px;
+  filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.6));
+  animation: shinySparkle 3s ease-in-out infinite;
+}
+
+.portfolio-info.compact {
+  flex: 1;
+  min-width: 0;
+}
+
+.portfolio-pokemon-name.compact {
+  font-size: 1.1rem;
+  color: #ffd700;
+  margin: 0 0 0.25rem 0;
+  text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+}
+
+.portfolio-card.compact .portfolio-method {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  display: inline-block;
+  color: white;
+  font-weight: bold;
+  margin-bottom: 0.25rem;
+}
+
+.portfolio-card.compact .portfolio-date,
+.portfolio-card.compact .portfolio-nature,
+.portfolio-card.compact .portfolio-encounters {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 0.125rem;
+}
+
+.portfolio-card.compact .portfolio-ivs {
+  margin-top: 0.5rem;
+}
+
+.portfolio-card.compact .iv-display {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.portfolio-card.compact .iv-display span {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Responsive adjustments for compact view */
+@media (max-width: 768px) {
+  .hunt-card-compact-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+  
+  .compact-stats {
+    margin-left: 0;
+  }
+  
+  .compact-actions {
+    margin-left: 0;
+    justify-content: center;
+    width: 100%;
+  }
+  
+  .portfolio-card.compact {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
   }
 }

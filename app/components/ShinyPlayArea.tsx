@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import type { ShinyPortfolio } from '../types/pokemon';
-import { getShinySpritePath } from '../types/pokemon';
+import { getShinySpritePath, getPokemonColors } from '../types/pokemon';
 
 interface ShinyPlayAreaProps {
   portfolio: ShinyPortfolio[];
@@ -47,7 +47,7 @@ export default function ShinyPlayArea({ portfolio }: ShinyPlayAreaProps) {
           ...shiny,
           x: shiny.x + shiny.vx,
           y: shiny.y + shiny.vy,
-          rotation: shiny.rotation + 0.2,
+          rotation: shiny.rotation + 0.05, // Reduced from 0.2 to 0.05 for minimal movement
           // Bounce off walls
           vx: shiny.x <= 0 || shiny.x >= 750 ? -shiny.vx : shiny.vx,
           vy: shiny.y <= 0 || shiny.y >= 150 ? -shiny.vy : shiny.vy,
@@ -73,30 +73,36 @@ export default function ShinyPlayArea({ portfolio }: ShinyPlayAreaProps) {
     <div className="shiny-play-area">
       <h3>🌟 Shiny Play Area</h3>
       <div className="play-area-container">
-        {animatedShinies.map(shiny => (
-          <div
-            key={shiny.id}
-            className="floating-shiny"
-            style={{
-              left: `${shiny.x}px`,
-              top: `${shiny.y}px`,
-              transform: `rotate(${shiny.rotation}deg) scale(${shiny.scale})`,
-              transition: 'all 0.05s linear'
-            }}
-          >
-            <img 
-              src={getShinySpritePath(shiny.pokemonId, shiny.pokemonName)}
-              alt={`Shiny ${shiny.pokemonName}`}
-              className="floating-shiny-sprite"
-              onError={(e) => {
-                e.currentTarget.src = '/images/shiny-sprites/001_Bulbasaur.gif';
+        {animatedShinies.map(shiny => {
+          const pokemonColors = getPokemonColors(shiny.pokemonId);
+          return (
+            <div
+              key={shiny.id}
+              className="floating-shiny"
+              style={{
+                left: `${shiny.x}px`,
+                top: `${shiny.y}px`,
+                transform: `rotate(${shiny.rotation}deg) scale(${shiny.scale})`,
+                transition: 'all 0.05s linear'
               }}
-            />
-            <div className="shiny-name-tooltip">
-              {shiny.pokemonName}
+            >
+              <img 
+                src={getShinySpritePath(shiny.pokemonId, shiny.pokemonName)}
+                alt={`Shiny ${shiny.pokemonName}`}
+                className="floating-shiny-sprite"
+                style={{
+                  filter: `drop-shadow(0 0 8px ${pokemonColors.glow}) drop-shadow(0 0 16px ${pokemonColors.glowLight})`,
+                }}
+                onError={(e) => {
+                  e.currentTarget.src = '/images/shiny-sprites/001_Bulbasaur.gif';
+                }}
+              />
+              <div className="shiny-name-tooltip">
+                {shiny.pokemonName}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

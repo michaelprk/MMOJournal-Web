@@ -1,5 +1,11 @@
 import React, { useState } from 'react';
-import type { ShinyHunt, ShinyPortfolio, PokemonStats } from '../../types/pokemon';
+import type { 
+  ShinyHunt, 
+  ShinyPortfolio, 
+  PokemonStats, 
+  HuntingMethod
+} from '../../types/pokemon';
+import { HUNTING_METHODS } from '../../types/pokemon';
 import ShinyUtilityBar from '../../components/ShinyUtilityBar';
 import ShinyHuntCard from '../../components/ShinyHuntCard';
 import ShinyPortfolioSection from '../../components/ShinyPortfolioSection';
@@ -41,6 +47,188 @@ export default function ShinyShowcase() {
       notes: 'Finally! My first shiny!',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
+    },
+    {
+      id: 2,
+      pokemonId: 25,
+      pokemonName: 'Pikachu',
+      method: 'Hordes 5x',
+      dateFound: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+      nature: 'Jolly',
+      encounterCount: 1543,
+      ivs: { hp: 29, attack: 31, defense: 22, sp_attack: 15, sp_defense: 31, speed: 31 },
+      notes: 'Lightning fast!',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    },
+    {
+      id: 3,
+      pokemonId: 6,
+      pokemonName: 'Charizard',
+      method: 'Egg (including Alphas)',
+      dateFound: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+      nature: 'Modest',
+      encounterCount: 512,
+      ivs: { hp: 31, attack: 0, defense: 31, sp_attack: 31, sp_defense: 31, speed: 31 },
+      notes: 'Perfect shiny dragon!',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    },
+    {
+      id: 4,
+      pokemonId: 144,
+      pokemonName: 'Articuno',
+      method: 'Singles / Lures',
+      dateFound: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+      nature: 'Calm',
+      encounterCount: 8934,
+      ivs: { hp: 31, attack: 0, defense: 31, sp_attack: 31, sp_defense: 31, speed: 31 },
+      notes: 'Legendary shiny!',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    },
+    {
+      id: 5,
+      pokemonId: 448,
+      pokemonName: 'Lucario',
+      method: 'Hordes 3x',
+      dateFound: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
+      nature: 'Jolly',
+      encounterCount: 3421,
+      ivs: { hp: 31, attack: 31, defense: 31, sp_attack: 0, sp_defense: 31, speed: 31 },
+      notes: 'Aura warrior!',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    },
+    {
+      id: 6,
+      pokemonId: 149,
+      pokemonName: 'Dragonite',
+      method: 'Singles / Lures',
+      dateFound: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString(),
+      nature: 'Adamant',
+      encounterCount: 5678,
+      ivs: { hp: 31, attack: 31, defense: 31, sp_attack: 0, sp_defense: 31, speed: 31 },
+      notes: 'Green giant!',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    },
+    {
+      id: 7,
+      pokemonId: 196,
+      pokemonName: 'Espeon',
+      method: 'Egg (including Alphas)',
+      dateFound: new Date(Date.now() - 21 * 24 * 60 * 60 * 1000).toISOString(),
+      nature: 'Timid',
+      encounterCount: 234,
+      ivs: { hp: 31, attack: 0, defense: 31, sp_attack: 31, sp_defense: 31, speed: 31 },
+      notes: 'Psychic beauty!',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    },
+    {
+      id: 8,
+      pokemonId: 282,
+      pokemonName: 'Gardevoir',
+      method: 'Hordes 5x',
+      dateFound: new Date(Date.now() - 28 * 24 * 60 * 60 * 1000).toISOString(),
+      nature: 'Modest',
+      encounterCount: 4567,
+      ivs: { hp: 31, attack: 0, defense: 31, sp_attack: 31, sp_defense: 31, speed: 31 },
+      notes: 'Elegant dancer!',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    },
+    {
+      id: 9,
+      pokemonId: 445,
+      pokemonName: 'Garchomp',
+      method: 'Singles / Lures',
+      dateFound: new Date(Date.now() - 35 * 24 * 60 * 60 * 1000).toISOString(),
+      nature: 'Jolly',
+      encounterCount: 12345,
+      ivs: { hp: 31, attack: 31, defense: 31, sp_attack: 0, sp_defense: 31, speed: 31 },
+      notes: 'Land shark!',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    },
+    {
+      id: 10,
+      pokemonId: 133,
+      pokemonName: 'Eevee',
+      method: 'Egg (including Alphas)',
+      dateFound: new Date(Date.now() - 42 * 24 * 60 * 60 * 1000).toISOString(),
+      nature: 'Modest',
+      encounterCount: 678,
+      ivs: { hp: 31, attack: 0, defense: 31, sp_attack: 31, sp_defense: 31, speed: 31 },
+      notes: 'Evolution potential!',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    },
+    {
+      id: 11,
+      pokemonId: 94,
+      pokemonName: 'Gengar',
+      method: 'Hordes 3x',
+      dateFound: new Date(Date.now() - 49 * 24 * 60 * 60 * 1000).toISOString(),
+      nature: 'Timid',
+      encounterCount: 3456,
+      ivs: { hp: 31, attack: 0, defense: 31, sp_attack: 31, sp_defense: 31, speed: 31 },
+      notes: 'Ghost master!',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    },
+    {
+      id: 12,
+      pokemonId: 212,
+      pokemonName: 'Scizor',
+      method: 'Singles / Lures',
+      dateFound: new Date(Date.now() - 56 * 24 * 60 * 60 * 1000).toISOString(),
+      nature: 'Adamant',
+      encounterCount: 7890,
+      ivs: { hp: 31, attack: 31, defense: 31, sp_attack: 0, sp_defense: 31, speed: 31 },
+      notes: 'Metal bug!',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    },
+    {
+      id: 13,
+      pokemonId: 376,
+      pokemonName: 'Metagross',
+      method: 'Singles / Lures',
+      dateFound: new Date(Date.now() - 63 * 24 * 60 * 60 * 1000).toISOString(),
+      nature: 'Adamant',
+      encounterCount: 15678,
+      ivs: { hp: 31, attack: 31, defense: 31, sp_attack: 0, sp_defense: 31, speed: 31 },
+      notes: 'Silver monster!',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    },
+    {
+      id: 14,
+      pokemonId: 350,
+      pokemonName: 'Milotic',
+      method: 'Egg (including Alphas)',
+      dateFound: new Date(Date.now() - 70 * 24 * 60 * 60 * 1000).toISOString(),
+      nature: 'Bold',
+      encounterCount: 1234,
+      ivs: { hp: 31, attack: 0, defense: 31, sp_attack: 31, sp_defense: 31, speed: 31 },
+      notes: 'Beautiful serpent!',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    },
+    {
+      id: 15,
+      pokemonId: 609,
+      pokemonName: 'Chandelure',
+      method: 'Hordes 5x',
+      dateFound: new Date(Date.now() - 77 * 24 * 60 * 60 * 1000).toISOString(),
+      nature: 'Modest',
+      encounterCount: 4321,
+      ivs: { hp: 31, attack: 0, defense: 31, sp_attack: 31, sp_defense: 31, speed: 31 },
+      notes: 'Spectral flames!',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     }
   ]);
 
@@ -49,6 +237,21 @@ export default function ShinyShowcase() {
   const [huntModalMode, setHuntModalMode] = useState<'create' | 'phase'>('create');
   const [huntForPhase, setHuntForPhase] = useState<ShinyHunt | null>(null);
   const [completingHunt, setCompletingHunt] = useState<ShinyHunt | null>(null);
+  
+  // Display limit state
+  const [displayHuntsLimit, setDisplayHuntsLimit] = useState(6);
+  const [displayPortfolioLimit, setDisplayPortfolioLimit] = useState(12);
+  
+  // View mode state  
+  const [huntsViewMode, setHuntsViewMode] = useState<'grid' | 'compact'>('grid');
+  const [portfolioViewMode, setPortfolioViewMode] = useState<'grid' | 'compact'>('grid');
+  
+  // Filter and sort state
+  const [huntFilter, setHuntFilter] = useState<'all' | HuntingMethod>('all');
+  const [huntSort, setHuntSort] = useState<'date' | 'encounters' | 'name'>('date');
+  const [portfolioFilter, setPortfolioFilter] = useState<'all' | HuntingMethod>('all');
+  const [portfolioSort, setPortfolioSort] = useState<'date' | 'encounters' | 'name'>('date');
+  const [searchTerm, setSearchTerm] = useState('');
 
   const handleStartNewHunt = () => {
     setHuntModalMode('create');
@@ -160,6 +363,75 @@ export default function ShinyShowcase() {
     ));
   };
 
+  // Filter and sort functions
+  const getFilteredAndSortedHunts = () => {
+    let filteredHunts = currentHunts;
+    
+    // Apply search filter
+    if (searchTerm) {
+      filteredHunts = filteredHunts.filter(hunt => 
+        hunt.pokemonName.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+    
+    // Apply method filter
+    if (huntFilter !== 'all') {
+      filteredHunts = filteredHunts.filter(hunt => hunt.method === huntFilter);
+    }
+    
+    // Apply sorting
+    filteredHunts.sort((a, b) => {
+      switch (huntSort) {
+        case 'date':
+          return new Date(b.startDate).getTime() - new Date(a.startDate).getTime();
+        case 'encounters':
+          return b.totalEncounters - a.totalEncounters;
+        case 'name':
+          return a.pokemonName.localeCompare(b.pokemonName);
+        default:
+          return 0;
+      }
+    });
+    
+    return filteredHunts;
+  };
+
+  const getFilteredAndSortedPortfolio = () => {
+    let filteredPortfolio = portfolio;
+    
+    // Apply search filter
+    if (searchTerm) {
+      filteredPortfolio = filteredPortfolio.filter(shiny => 
+        shiny.pokemonName.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+    
+    // Apply method filter
+    if (portfolioFilter !== 'all') {
+      filteredPortfolio = filteredPortfolio.filter(shiny => shiny.method === portfolioFilter);
+    }
+    
+    // Apply sorting
+    filteredPortfolio.sort((a, b) => {
+      switch (portfolioSort) {
+        case 'date':
+          return new Date(b.dateFound).getTime() - new Date(a.dateFound).getTime();
+        case 'encounters':
+          return (b.encounterCount || 0) - (a.encounterCount || 0);
+        case 'name':
+          return a.pokemonName.localeCompare(b.pokemonName);
+        default:
+          return 0;
+      }
+    });
+    
+    return filteredPortfolio;
+  };
+
+  // Get filtered data
+  const filteredHunts = getFilteredAndSortedHunts();
+  const filteredPortfolio = getFilteredAndSortedPortfolio();
+
   return (
     <>
       {/* Sticky Utility Bar - positioned outside scrollable container */}
@@ -221,33 +493,68 @@ export default function ShinyShowcase() {
         </h1>
         
         <div style={{ marginRight: '16px' }}> {/* Bring inward from edge */}
-          <button
-            onClick={handleStartNewHunt}
-            style={{
-              backgroundColor: '#ffd700',
-              color: '#000',
-              border: 'none',
-              padding: '12px 24px',
-              borderRadius: '8px',
-              fontSize: '1rem',
-              fontWeight: 'bold',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#e6c200';
-              e.currentTarget.style.transform = 'translateY(-1px)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = '#ffd700';
-              e.currentTarget.style.transform = 'translateY(0)';
-            }}
-          >
-            ✨ Start New Hunt
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            {/* View Mode Controls */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontSize: '0.875rem', color: 'rgba(255, 255, 255, 0.7)' }}>View:</span>
+              <button
+                onClick={() => {
+                  setHuntsViewMode(huntsViewMode === 'grid' ? 'compact' : 'grid');
+                  setPortfolioViewMode(portfolioViewMode === 'grid' ? 'compact' : 'grid');
+                }}
+                style={{
+                  backgroundColor: 'rgba(255, 215, 0, 0.2)',
+                  color: '#ffd700',
+                  border: '1px solid #ffd700',
+                  padding: '8px 16px',
+                  borderRadius: '6px',
+                  fontSize: '0.875rem',
+                  fontWeight: 'bold',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(255, 215, 0, 0.3)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(255, 215, 0, 0.2)';
+                }}
+              >
+                {huntsViewMode === 'grid' ? '⊞' : '☰'} {huntsViewMode === 'grid' ? 'Grid' : 'Compact'}
+              </button>
+            </div>
+            
+            <button
+              onClick={handleStartNewHunt}
+              style={{
+                backgroundColor: '#ffd700',
+                color: '#000',
+                border: 'none',
+                padding: '12px 24px',
+                borderRadius: '8px',
+                fontSize: '1rem',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#e6c200';
+                e.currentTarget.style.transform = 'translateY(-1px)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = '#ffd700';
+                e.currentTarget.style.transform = 'translateY(0)';
+              }}
+            >
+              ✨ Start New Hunt
+            </button>
+          </div>
         </div>
       </div>
 
@@ -264,6 +571,93 @@ export default function ShinyShowcase() {
           overflowX: 'hidden',
         }}
       >
+        {/* Filter and Search Bar */}
+        <div style={{
+          position: 'sticky',
+          top: 0,
+          zIndex: 20,
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          padding: '16px 32px',
+          borderBottom: '1px solid rgba(255, 215, 0, 0.2)',
+          marginBottom: '16px',
+        }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '16px',
+            flexWrap: 'wrap',
+            justifyContent: 'space-between',
+          }}>
+            {/* Search */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontSize: '0.875rem', color: 'rgba(255, 255, 255, 0.7)' }}>🔍</span>
+              <input
+                type="text"
+                placeholder="Search Pokemon..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                style={{
+                  padding: '8px 12px',
+                  borderRadius: '4px',
+                  border: '1px solid rgba(255, 215, 0, 0.3)',
+                  background: 'rgba(0, 0, 0, 0.4)',
+                  color: 'white',
+                  fontSize: '0.875rem',
+                  minWidth: '200px',
+                }}
+              />
+            </div>
+            
+            {/* Method Filter */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontSize: '0.875rem', color: 'rgba(255, 255, 255, 0.7)' }}>Method:</span>
+              <select
+                value={huntFilter}
+                onChange={(e) => setHuntFilter(e.target.value as 'all' | HuntingMethod)}
+                style={{
+                  padding: '8px 12px',
+                  borderRadius: '4px',
+                  border: '1px solid rgba(255, 215, 0, 0.3)',
+                  background: 'rgba(0, 0, 0, 0.4)',
+                  color: 'white',
+                  fontSize: '0.875rem',
+                }}
+              >
+                <option value="all">All Methods</option>
+                {HUNTING_METHODS.map(method => (
+                  <option key={method} value={method}>{method}</option>
+                ))}
+              </select>
+            </div>
+            
+            {/* Sort Options */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontSize: '0.875rem', color: 'rgba(255, 255, 255, 0.7)' }}>Sort:</span>
+              <select
+                value={huntSort}
+                onChange={(e) => setHuntSort(e.target.value as 'date' | 'encounters' | 'name')}
+                style={{
+                  padding: '8px 12px',
+                  borderRadius: '4px',
+                  border: '1px solid rgba(255, 215, 0, 0.3)',
+                  background: 'rgba(0, 0, 0, 0.4)',
+                  color: 'white',
+                  fontSize: '0.875rem',
+                }}
+              >
+                <option value="date">Date (Newest)</option>
+                <option value="encounters">Encounters (Most)</option>
+                <option value="name">Name (A-Z)</option>
+              </select>
+            </div>
+            
+            {/* Results Count */}
+            <div style={{ fontSize: '0.875rem', color: 'rgba(255, 255, 255, 0.7)' }}>
+              {filteredHunts.length} hunts, {filteredPortfolio.length} shinies
+            </div>
+          </div>
+        </div>
+        
         <main style={{ 
           maxWidth: '1400px',
           margin: '0 auto',
@@ -272,30 +666,98 @@ export default function ShinyShowcase() {
         }}>
         {/* Current Hunts Section */}
         <section className="current-hunts-section">
-          <h2>🎯 Current Hunts</h2>
-          {currentHunts.length === 0 ? (
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+            <h2>🎯 Current Hunts</h2>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontSize: '0.875rem', color: 'rgba(255, 255, 255, 0.7)' }}>View:</span>
+              <button
+                onClick={() => setHuntsViewMode(huntsViewMode === 'grid' ? 'compact' : 'grid')}
+                style={{
+                  backgroundColor: 'rgba(255, 215, 0, 0.2)',
+                  color: '#ffd700',
+                  border: '1px solid #ffd700',
+                  padding: '6px 12px',
+                  borderRadius: '4px',
+                  fontSize: '0.75rem',
+                  fontWeight: 'bold',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(255, 215, 0, 0.3)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(255, 215, 0, 0.2)';
+                }}
+              >
+                {huntsViewMode === 'grid' ? '☰' : '⊞'} {huntsViewMode === 'grid' ? 'Compact' : 'Grid'}
+              </button>
+            </div>
+          </div>
+          {filteredHunts.length === 0 ? (
             <div className="empty-hunts">
-              <p>No active hunts. Click "Start New Hunt" to begin!</p>
+              <p>{searchTerm || huntFilter !== 'all' ? 'No hunts match your filters.' : 'No active hunts. Click "Start New Hunt" to begin!'}</p>
             </div>
           ) : (
-            <div className="hunts-grid">
-              {currentHunts.map(hunt => (
-                <ShinyHuntCard
-                  key={hunt.id}
-                  hunt={hunt}
-                  onEdit={handleEditHunt}
-                  onAddPhase={handleAddPhase}
-                  onMarkFound={handleMarkFound}
-                  onUpdateNotes={handleUpdateNotes}
-                />
-              ))}
-            </div>
+            <>
+              <div className={huntsViewMode === 'grid' ? 'hunts-grid' : 'hunts-compact'}>
+                {filteredHunts.slice(0, displayHuntsLimit).map(hunt => (
+                  <ShinyHuntCard
+                    key={hunt.id}
+                    hunt={hunt}
+                    onEdit={handleEditHunt}
+                    onAddPhase={handleAddPhase}
+                    onMarkFound={handleMarkFound}
+                    onUpdateNotes={handleUpdateNotes}
+                    viewMode={huntsViewMode}
+                  />
+                ))}
+              </div>
+              {filteredHunts.length > displayHuntsLimit && (
+                <div style={{ 
+                  display: 'flex', 
+                  justifyContent: 'center', 
+                  marginTop: '1rem' 
+                }}>
+                  <button
+                    onClick={() => setDisplayHuntsLimit(displayHuntsLimit + 6)}
+                    style={{
+                      backgroundColor: 'rgba(255, 215, 0, 0.2)',
+                      color: '#ffd700',
+                      border: '1px solid #ffd700',
+                      padding: '12px 24px',
+                      borderRadius: '8px',
+                      fontSize: '1rem',
+                      fontWeight: 'bold',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = 'rgba(255, 215, 0, 0.3)';
+                      e.currentTarget.style.transform = 'translateY(-1px)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = 'rgba(255, 215, 0, 0.2)';
+                      e.currentTarget.style.transform = 'translateY(0)';
+                    }}
+                  >
+                    ⬇️ Show More Hunts ({filteredHunts.length - displayHuntsLimit} remaining)
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </section>
 
         {/* Portfolio Section */}
         <ShinyPortfolioSection
-          portfolio={portfolio}
+          portfolio={filteredPortfolio}
           showCompletionModal={showCompletionModal}
           completingHunt={completingHunt}
           onCompleteHunt={handleCompleteHunt}
@@ -303,10 +765,18 @@ export default function ShinyShowcase() {
             setShowCompletionModal(false);
             setCompletingHunt(null);
           }}
+          displayLimit={displayPortfolioLimit}
+          onShowMore={() => setDisplayPortfolioLimit(displayPortfolioLimit + 12)}
+          viewMode={portfolioViewMode}
+          onViewModeChange={setPortfolioViewMode}
+          portfolioFilter={portfolioFilter}
+          onPortfolioFilterChange={setPortfolioFilter}
+          portfolioSort={portfolioSort}
+          onPortfolioSortChange={setPortfolioSort}
         />
 
         {/* Shiny Play Area */}
-        <ShinyPlayArea portfolio={portfolio} />
+        <ShinyPlayArea portfolio={filteredPortfolio} />
       </main>
 
       {/* Hunt Modal */}
