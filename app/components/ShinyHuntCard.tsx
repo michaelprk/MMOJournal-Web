@@ -44,8 +44,8 @@ export default function ShinyHuntCard({
         className="shiny-hunt-card compact"
         style={{
           background: `rgba(0, 0, 0, 0.15)`,
-          border: `1px solid ${pokemonColors.glow}`,
-          boxShadow: `0 4px 12px rgba(${pokemonColors.primaryRgb}, 0.15), inset 0 0 20px ${pokemonColors.glowLight}`,
+          border: `1px solid rgba(255, 215, 0, 0.4)`,
+          boxShadow: `0 4px 12px rgba(0, 0, 0, 0.3), inset 0 0 20px rgba(255, 215, 0, 0.1)`,
         }}
       >
         <div className="hunt-card-compact-content">
@@ -161,8 +161,8 @@ export default function ShinyHuntCard({
       className="shiny-hunt-card"
       style={{
         background: `rgba(0, 0, 0, 0.15)`,
-        border: `1px solid ${pokemonColors.glow}`,
-        boxShadow: `0 4px 12px rgba(${pokemonColors.primaryRgb}, 0.15), inset 0 0 20px ${pokemonColors.glowLight}`,
+        border: `1px solid rgba(255, 215, 0, 0.4)`,
+        boxShadow: `0 4px 12px rgba(0, 0, 0, 0.3), inset 0 0 20px rgba(255, 215, 0, 0.1)`,
       }}
     >
       <div className="hunt-card-header">

@@ -1,108 +1,117 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import type { ShinyPortfolio } from '../types/pokemon';
 import { getShinySpritePath, getPokemonColors } from '../types/pokemon';
 
-interface ShinyPlayAreaProps {
+interface ShinyTrophyCaseProps {
   portfolio: ShinyPortfolio[];
 }
 
-interface AnimatedShiny {
-  id: number;
-  pokemonId: number;
-  pokemonName: string;
-  x: number;
-  y: number;
-  vx: number;
-  vy: number;
-  rotation: number;
-  scale: number;
-}
-
-export default function ShinyPlayArea({ portfolio }: ShinyPlayAreaProps) {
-  const [animatedShinies, setAnimatedShinies] = useState<AnimatedShiny[]>([]);
-
-  useEffect(() => {
-    // Initialize positions for all shinies
-    const newAnimatedShinies: AnimatedShiny[] = portfolio.map((shiny, index) => ({
-      id: shiny.id,
-      pokemonId: shiny.pokemonId,
-      pokemonName: shiny.pokemonName,
-      x: Math.random() * 800,
-      y: Math.random() * 200,
-      vx: (Math.random() - 0.5) * 0.5,
-      vy: (Math.random() - 0.5) * 0.5,
-      rotation: Math.random() * 360,
-      scale: 0.8 + Math.random() * 0.4
-    }));
-    
-    setAnimatedShinies(newAnimatedShinies);
-  }, [portfolio]);
-
-  useEffect(() => {
-    if (animatedShinies.length === 0) return;
-
-    const animationInterval = setInterval(() => {
-      setAnimatedShinies(prev => 
-        prev.map(shiny => ({
-          ...shiny,
-          x: shiny.x + shiny.vx,
-          y: shiny.y + shiny.vy,
-          rotation: shiny.rotation + 0.05, // Reduced from 0.2 to 0.05 for minimal movement
-          // Bounce off walls
-          vx: shiny.x <= 0 || shiny.x >= 750 ? -shiny.vx : shiny.vx,
-          vy: shiny.y <= 0 || shiny.y >= 150 ? -shiny.vy : shiny.vy,
-        }))
-      );
-    }, 50);
-
-    return () => clearInterval(animationInterval);
-  }, [animatedShinies.length]);
-
+export default function ShinyTrophyCase({ portfolio }: ShinyTrophyCaseProps) {
   if (portfolio.length === 0) {
     return (
-      <div className="shiny-play-area">
-        <div className="empty-play-area">
-          <h3>🌟 Shiny Play Area</h3>
-          <p>Your caught shinies will appear here!</p>
+      <div className="shiny-trophy-case">
+        <div className="trophy-case-header">
+          <h3>🏆 Shiny Trophy Case</h3>
+          <p>Your prized shiny collection will be displayed here!</p>
+        </div>
+        <div className="empty-trophy-case">
+          <div className="empty-display-case">
+            <div className="glass-reflection"></div>
+            <div className="empty-shelves">
+              <div className="shelf"></div>
+              <div className="shelf"></div>
+              <div className="shelf"></div>
+            </div>
+            <div className="case-light"></div>
+            <p>Start hunting to fill your trophy case!</p>
+          </div>
         </div>
       </div>
     );
   }
 
+  // Group shinies into display rows (6 per row for optimal display)
+  const displayRows: ShinyPortfolio[][] = [];
+  for (let i = 0; i < portfolio.length; i += 6) {
+    displayRows.push(portfolio.slice(i, i + 6));
+  }
+
   return (
-    <div className="shiny-play-area">
-      <h3>🌟 Shiny Play Area</h3>
-      <div className="play-area-container">
-        {animatedShinies.map(shiny => {
-          const pokemonColors = getPokemonColors(shiny.pokemonId);
-          return (
-            <div
-              key={shiny.id}
-              className="floating-shiny"
-              style={{
-                left: `${shiny.x}px`,
-                top: `${shiny.y}px`,
-                transform: `rotate(${shiny.rotation}deg) scale(${shiny.scale})`,
-                transition: 'all 0.05s linear'
-              }}
-            >
-              <img 
-                src={getShinySpritePath(shiny.pokemonId, shiny.pokemonName)}
-                alt={`Shiny ${shiny.pokemonName}`}
-                className="floating-shiny-sprite"
-                style={{
-                  filter: `drop-shadow(0 0 8px ${pokemonColors.glow}) drop-shadow(0 0 16px ${pokemonColors.glowLight})`,
-                }}
-                onError={(e) => {
-                  e.currentTarget.src = '/images/shiny-sprites/001_Bulbasaur.gif';
-                }}
-              />
-              <div className="shiny-name-tooltip">
-                {shiny.pokemonName}
+    <div className="shiny-trophy-case">
+      <div className="trophy-case-header">
+        <h3>🏆 Shiny Trophy Case</h3>
+        <div className="collection-stats">
+          <span className="stat-badge">
+            <span className="stat-number">{portfolio.length}</span>
+            <span className="stat-label">Shinies Collected</span>
+          </span>
+          <span className="stat-badge">
+            <span className="stat-number">{new Set(portfolio.map(s => s.method)).size}</span>
+            <span className="stat-label">Hunt Methods Used</span>
+          </span>
+        </div>
+      </div>
+      
+      <div className="display-case">
+        <div className="glass-reflection"></div>
+        <div className="case-lighting"></div>
+        
+        <div className="trophy-shelves">
+          {displayRows.map((row, rowIndex) => (
+            <div key={rowIndex} className="trophy-shelf">
+              <div className="shelf-surface"></div>
+              <div className="shelf-items">
+                {row.map((shiny, itemIndex) => {
+                  const pokemonColors = getPokemonColors(shiny.pokemonId);
+                  const isRecent = new Date(shiny.dateFound).getTime() > Date.now() - (7 * 24 * 60 * 60 * 1000);
+                  
+                  return (
+                    <div 
+                      key={shiny.id} 
+                      className={`trophy-item ${isRecent ? 'recently-added' : ''}`}
+                      style={{
+                        animationDelay: `${(rowIndex * 6 + itemIndex) * 0.1}s`
+                      }}
+                    >
+                      <div className="trophy-pedestal">
+                        <div 
+                          className="pedestal-glow"
+                          style={{
+                            boxShadow: `0 0 20px ${pokemonColors.glowLight}, 0 0 40px ${pokemonColors.glowLight}`
+                          }}
+                        ></div>
+                      </div>
+                      
+                      <div className="trophy-sprite-container">
+                        <img 
+                          src={getShinySpritePath(shiny.pokemonId, shiny.pokemonName)}
+                          alt={`Shiny ${shiny.pokemonName}`}
+                          className="trophy-sprite"
+                          style={{
+                            filter: `drop-shadow(0 0 8px ${pokemonColors.glow}) drop-shadow(0 0 16px ${pokemonColors.glowLight})`,
+                          }}
+                          onError={(e) => {
+                            e.currentTarget.src = '/images/shiny-sprites/001_Bulbasaur.gif';
+                          }}
+                        />
+                        {isRecent && <div className="new-badge">NEW!</div>}
+                      </div>
+                      
+                      <div className="trophy-nameplate">
+                        <div className="nameplate-text">{shiny.pokemonName}</div>
+                        <div className="nameplate-date">
+                          {new Date(shiny.dateFound).toLocaleDateString()}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
-          );
-        })}
+          ))}
+        </div>
+        
+        <div className="case-frame"></div>
       </div>
     </div>
   );

@@ -174,8 +174,8 @@ export default function ShinyPortfolioSection({
                   className={viewMode === 'grid' ? 'portfolio-card' : 'portfolio-card compact'}
                   style={{
                     background: `rgba(0, 0, 0, 0.15)`,
-                    border: `1px solid ${pokemonColors.glow}`,
-                    boxShadow: `0 4px 12px rgba(${pokemonColors.primaryRgb}, 0.15), inset 0 0 20px ${pokemonColors.glowLight}`,
+                    border: `1px solid rgba(255, 215, 0, 0.4)`,
+                    boxShadow: `0 4px 12px rgba(0, 0, 0, 0.3), inset 0 0 20px rgba(255, 215, 0, 0.1)`,
                   }}
                 >
                   <div className={viewMode === 'grid' ? 'portfolio-sprite-container' : 'portfolio-sprite-container compact'}>

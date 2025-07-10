@@ -9,7 +9,7 @@ import { HUNTING_METHODS } from '../../types/pokemon';
 import ShinyUtilityBar from '../../components/ShinyUtilityBar';
 import ShinyHuntCard from '../../components/ShinyHuntCard';
 import ShinyPortfolioSection from '../../components/ShinyPortfolioSection';
-import ShinyPlayArea from '../../components/ShinyPlayArea';
+import ShinyTrophyCase from '../../components/ShinyPlayArea';
 import HuntModal from '../../components/HuntModal';
 
 export default function ShinyShowcase() {
@@ -775,8 +775,8 @@ export default function ShinyShowcase() {
           onPortfolioSortChange={setPortfolioSort}
         />
 
-        {/* Shiny Play Area */}
-        <ShinyPlayArea portfolio={filteredPortfolio} />
+        {/* Shiny Trophy Case */}
+        <ShinyTrophyCase portfolio={filteredPortfolio} />
       </main>
 
       {/* Hunt Modal */}
