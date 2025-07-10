@@ -6,7 +6,7 @@ export function Navbar() {
   return (
     <nav
       style={{
-        padding: "2rem",
+        padding: "1.8rem", // Reduced from 2rem to 1.8rem
         backgroundColor: "transparent",
         color: "white",
         position: "fixed",
