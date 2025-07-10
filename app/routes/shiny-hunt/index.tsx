@@ -8,7 +8,7 @@ import type {
 import { HUNTING_METHODS } from '../../types/pokemon';
 import ShinyUtilityBar from '../../components/ShinyUtilityBar';
 import ShinyHuntCard from '../../components/ShinyHuntCard';
-import ShinyPortfolioSection from '../../components/ShinyPortfolioSection';
+
 import ShinyCalendar from '../../components/ShinyPlayArea';
 import HuntModal from '../../components/HuntModal';
 
@@ -240,17 +240,16 @@ export default function ShinyShowcase() {
   
   // Display limit state
   const [displayHuntsLimit, setDisplayHuntsLimit] = useState(6);
-  const [displayPortfolioLimit, setDisplayPortfolioLimit] = useState(12);
+
   
   // View mode state  
   const [huntsViewMode, setHuntsViewMode] = useState<'grid' | 'compact'>('grid');
-  const [portfolioViewMode, setPortfolioViewMode] = useState<'grid' | 'compact'>('grid');
+
   
   // Filter and sort state
   const [huntFilter, setHuntFilter] = useState<'all' | HuntingMethod>('all');
   const [huntSort, setHuntSort] = useState<'date' | 'encounters' | 'name'>('date');
-  const [portfolioFilter, setPortfolioFilter] = useState<'all' | HuntingMethod>('all');
-  const [portfolioSort, setPortfolioSort] = useState<'date' | 'encounters' | 'name'>('date');
+
   const [searchTerm, setSearchTerm] = useState('');
 
   const handleStartNewHunt = () => {
@@ -396,41 +395,10 @@ export default function ShinyShowcase() {
     return filteredHunts;
   };
 
-  const getFilteredAndSortedPortfolio = () => {
-    let filteredPortfolio = portfolio;
-    
-    // Apply search filter
-    if (searchTerm) {
-      filteredPortfolio = filteredPortfolio.filter(shiny => 
-        shiny.pokemonName.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-    
-    // Apply method filter
-    if (portfolioFilter !== 'all') {
-      filteredPortfolio = filteredPortfolio.filter(shiny => shiny.method === portfolioFilter);
-    }
-    
-    // Apply sorting
-    filteredPortfolio.sort((a, b) => {
-      switch (portfolioSort) {
-        case 'date':
-          return new Date(b.dateFound).getTime() - new Date(a.dateFound).getTime();
-        case 'encounters':
-          return (b.encounterCount || 0) - (a.encounterCount || 0);
-        case 'name':
-          return a.pokemonName.localeCompare(b.pokemonName);
-        default:
-          return 0;
-      }
-    });
-    
-    return filteredPortfolio;
-  };
+
 
   // Get filtered data
   const filteredHunts = getFilteredAndSortedHunts();
-  const filteredPortfolio = getFilteredAndSortedPortfolio();
 
   return (
     <>
@@ -498,10 +466,7 @@ export default function ShinyShowcase() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span style={{ fontSize: '0.875rem', color: 'rgba(255, 255, 255, 0.7)' }}>View:</span>
               <button
-                onClick={() => {
-                  setHuntsViewMode(huntsViewMode === 'grid' ? 'compact' : 'grid');
-                  setPortfolioViewMode(portfolioViewMode === 'grid' ? 'compact' : 'grid');
-                }}
+                onClick={() => setHuntsViewMode(huntsViewMode === 'grid' ? 'compact' : 'grid')}
                 style={{
                   backgroundColor: 'rgba(255, 215, 0, 0.2)',
                   color: '#ffd700',
@@ -558,105 +523,107 @@ export default function ShinyShowcase() {
         </div>
       </div>
 
+      {/* Filter and Search Bar - Fixed */}
+      <div style={{
+        position: 'fixed',
+        top: '350px', // Start below navbar + utility bar
+        left: 0,
+        right: 0,
+        zIndex: 20,
+        backgroundColor: 'transparent',
+        padding: '16px 32px',
+        borderBottom: '1px solid rgba(255, 215, 0, 0.2)',
+      }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '16px',
+          flexWrap: 'wrap',
+          justifyContent: 'space-between',
+        }}>
+          {/* Search */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ fontSize: '0.875rem', color: 'rgba(255, 255, 255, 0.7)' }}>🔍</span>
+            <input
+              type="text"
+              placeholder="Search Pokemon..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              style={{
+                padding: '8px 12px',
+                borderRadius: '4px',
+                border: '1px solid rgba(255, 215, 0, 0.3)',
+                background: 'rgba(0, 0, 0, 0.4)',
+                color: 'white',
+                fontSize: '0.875rem',
+                minWidth: '200px',
+              }}
+            />
+          </div>
+          
+          {/* Method Filter */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ fontSize: '0.875rem', color: 'rgba(255, 255, 255, 0.7)' }}>Method:</span>
+            <select
+              value={huntFilter}
+              onChange={(e) => setHuntFilter(e.target.value as 'all' | HuntingMethod)}
+              style={{
+                padding: '8px 12px',
+                borderRadius: '4px',
+                border: '1px solid rgba(255, 215, 0, 0.3)',
+                background: 'rgba(0, 0, 0, 0.4)',
+                color: 'white',
+                fontSize: '0.875rem',
+              }}
+            >
+              <option value="all">All Methods</option>
+              {HUNTING_METHODS.map(method => (
+                <option key={method} value={method}>{method}</option>
+              ))}
+            </select>
+          </div>
+          
+          {/* Sort Options */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ fontSize: '0.875rem', color: 'rgba(255, 255, 255, 0.7)' }}>Sort:</span>
+            <select
+              value={huntSort}
+              onChange={(e) => setHuntSort(e.target.value as 'date' | 'encounters' | 'name')}
+              style={{
+                padding: '8px 12px',
+                borderRadius: '4px',
+                border: '1px solid rgba(255, 215, 0, 0.3)',
+                background: 'rgba(0, 0, 0, 0.4)',
+                color: 'white',
+                fontSize: '0.875rem',
+              }}
+            >
+              <option value="date">Date (Newest)</option>
+              <option value="encounters">Encounters (Most)</option>
+              <option value="name">Name (A-Z)</option>
+            </select>
+          </div>
+          
+          {/* Results Count */}
+          <div style={{ fontSize: '0.875rem', color: 'rgba(255, 255, 255, 0.7)' }}>
+            {filteredHunts.length} hunts, {portfolio.length} shinies
+          </div>
+        </div>
+      </div>
+
       {/* Main Content Container - Scrollable */}
       <div
         style={{
           position: 'fixed',
-          top: '350px', // Start below navbar + utility bar (280px + 70px)
+          top: '420px', // Start below navbar + utility bar + filter bar
           left: 0,
           right: 0,
-          height: 'calc(100vh - 350px)', // Take remaining viewport height
+          height: 'calc(100vh - 420px)', // Take remaining viewport height
           backgroundColor: 'transparent',
           overflowY: 'auto', // Allow scrolling within this container
           overflowX: 'hidden',
         }}
       >
-        {/* Filter and Search Bar */}
-        <div style={{
-          position: 'sticky',
-          top: 0,
-          zIndex: 20,
-          backgroundColor: 'rgba(0, 0, 0, 0.8)',
-          padding: '16px 32px',
-          borderBottom: '1px solid rgba(255, 215, 0, 0.2)',
-          marginBottom: '16px',
-        }}>
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '16px',
-            flexWrap: 'wrap',
-            justifyContent: 'space-between',
-          }}>
-            {/* Search */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontSize: '0.875rem', color: 'rgba(255, 255, 255, 0.7)' }}>🔍</span>
-              <input
-                type="text"
-                placeholder="Search Pokemon..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                style={{
-                  padding: '8px 12px',
-                  borderRadius: '4px',
-                  border: '1px solid rgba(255, 215, 0, 0.3)',
-                  background: 'rgba(0, 0, 0, 0.4)',
-                  color: 'white',
-                  fontSize: '0.875rem',
-                  minWidth: '200px',
-                }}
-              />
-            </div>
-            
-            {/* Method Filter */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontSize: '0.875rem', color: 'rgba(255, 255, 255, 0.7)' }}>Method:</span>
-              <select
-                value={huntFilter}
-                onChange={(e) => setHuntFilter(e.target.value as 'all' | HuntingMethod)}
-                style={{
-                  padding: '8px 12px',
-                  borderRadius: '4px',
-                  border: '1px solid rgba(255, 215, 0, 0.3)',
-                  background: 'rgba(0, 0, 0, 0.4)',
-                  color: 'white',
-                  fontSize: '0.875rem',
-                }}
-              >
-                <option value="all">All Methods</option>
-                {HUNTING_METHODS.map(method => (
-                  <option key={method} value={method}>{method}</option>
-                ))}
-              </select>
-            </div>
-            
-            {/* Sort Options */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontSize: '0.875rem', color: 'rgba(255, 255, 255, 0.7)' }}>Sort:</span>
-              <select
-                value={huntSort}
-                onChange={(e) => setHuntSort(e.target.value as 'date' | 'encounters' | 'name')}
-                style={{
-                  padding: '8px 12px',
-                  borderRadius: '4px',
-                  border: '1px solid rgba(255, 215, 0, 0.3)',
-                  background: 'rgba(0, 0, 0, 0.4)',
-                  color: 'white',
-                  fontSize: '0.875rem',
-                }}
-              >
-                <option value="date">Date (Newest)</option>
-                <option value="encounters">Encounters (Most)</option>
-                <option value="name">Name (A-Z)</option>
-              </select>
-            </div>
-            
-            {/* Results Count */}
-            <div style={{ fontSize: '0.875rem', color: 'rgba(255, 255, 255, 0.7)' }}>
-              {filteredHunts.length} hunts, {filteredPortfolio.length} shinies
-            </div>
-          </div>
-        </div>
         
         <main style={{ 
           maxWidth: '1400px',
@@ -755,28 +722,8 @@ export default function ShinyShowcase() {
           )}
         </section>
 
-        {/* Portfolio Section */}
-        <ShinyPortfolioSection
-          portfolio={filteredPortfolio}
-          showCompletionModal={showCompletionModal}
-          completingHunt={completingHunt}
-          onCompleteHunt={handleCompleteHunt}
-          onCloseModal={() => {
-            setShowCompletionModal(false);
-            setCompletingHunt(null);
-          }}
-          displayLimit={displayPortfolioLimit}
-          onShowMore={() => setDisplayPortfolioLimit(displayPortfolioLimit + 12)}
-          viewMode={portfolioViewMode}
-          onViewModeChange={setPortfolioViewMode}
-          portfolioFilter={portfolioFilter}
-          onPortfolioFilterChange={setPortfolioFilter}
-          portfolioSort={portfolioSort}
-          onPortfolioSortChange={setPortfolioSort}
-        />
-
         {/* Shiny Calendar */}
-        <ShinyCalendar portfolio={filteredPortfolio} />
+        <ShinyCalendar portfolio={portfolio} />
       </main>
 
       {/* Hunt Modal */}
