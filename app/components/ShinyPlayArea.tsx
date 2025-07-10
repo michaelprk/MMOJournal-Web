@@ -1,117 +1,181 @@
-import React from 'react';
+import React, { useState } from 'react';
 import type { ShinyPortfolio } from '../types/pokemon';
 import { getShinySpritePath, getPokemonColors } from '../types/pokemon';
 
-interface ShinyTrophyCaseProps {
+interface ShinyCalendarProps {
   portfolio: ShinyPortfolio[];
 }
 
-export default function ShinyTrophyCase({ portfolio }: ShinyTrophyCaseProps) {
+interface MonthData {
+  month: number;
+  year: number;
+  monthName: string;
+  shinies: ShinyPortfolio[];
+}
+
+export default function ShinyCalendar({ portfolio }: ShinyCalendarProps) {
+  const [selectedYear, setSelectedYear] = useState<number | null>(null);
+  
   if (portfolio.length === 0) {
     return (
-      <div className="shiny-trophy-case">
-        <div className="trophy-case-header">
-          <h3>🏆 Shiny Trophy Case</h3>
-          <p>Your prized shiny collection will be displayed here!</p>
+      <div className="shiny-calendar">
+        <div className="calendar-header">
+          <h3>📅 Shiny Calendar</h3>
+          <p>Your shiny hunting timeline will appear here!</p>
         </div>
-        <div className="empty-trophy-case">
-          <div className="empty-display-case">
-            <div className="glass-reflection"></div>
-            <div className="empty-shelves">
-              <div className="shelf"></div>
-              <div className="shelf"></div>
-              <div className="shelf"></div>
+        <div className="empty-calendar">
+          <div className="empty-calendar-grid">
+            <div className="empty-month">
+              <div className="month-header">Jan</div>
+              <div className="empty-days"></div>
             </div>
-            <div className="case-light"></div>
-            <p>Start hunting to fill your trophy case!</p>
+            <div className="empty-month">
+              <div className="month-header">Feb</div>
+              <div className="empty-days"></div>
+            </div>
+            <div className="empty-month">
+              <div className="month-header">Mar</div>
+              <div className="empty-days"></div>
+            </div>
+            <div className="empty-month">
+              <div className="month-header">Apr</div>
+              <div className="empty-days"></div>
+            </div>
           </div>
+          <p>Start hunting to fill your calendar!</p>
         </div>
       </div>
     );
   }
 
-  // Group shinies into display rows (6 per row for optimal display)
-  const displayRows: ShinyPortfolio[][] = [];
-  for (let i = 0; i < portfolio.length; i += 6) {
-    displayRows.push(portfolio.slice(i, i + 6));
-  }
+  // Group shinies by month and year
+  const groupedData: { [key: string]: MonthData } = {};
+  
+  portfolio.forEach(shiny => {
+    const date = new Date(shiny.dateFound);
+    const month = date.getMonth();
+    const year = date.getFullYear();
+    const key = `${year}-${month}`;
+    
+    if (!groupedData[key]) {
+      groupedData[key] = {
+        month,
+        year,
+        monthName: date.toLocaleString('default', { month: 'long' }),
+        shinies: []
+      };
+    }
+    
+    groupedData[key].shinies.push(shiny);
+  });
+
+  // Sort by year and month
+  const sortedMonths = Object.values(groupedData).sort((a, b) => {
+    if (a.year !== b.year) return b.year - a.year; // Most recent year first
+    return b.month - a.month; // Most recent month first
+  });
+
+  // Get available years
+  const availableYears = [...new Set(sortedMonths.map(m => m.year))].sort((a, b) => b - a);
+
+  // Filter by selected year if any
+  const filteredMonths = selectedYear ? sortedMonths.filter(m => m.year === selectedYear) : sortedMonths;
 
   return (
-    <div className="shiny-trophy-case">
-      <div className="trophy-case-header">
-        <h3>🏆 Shiny Trophy Case</h3>
-        <div className="collection-stats">
-          <span className="stat-badge">
-            <span className="stat-number">{portfolio.length}</span>
-            <span className="stat-label">Shinies Collected</span>
-          </span>
-          <span className="stat-badge">
-            <span className="stat-number">{new Set(portfolio.map(s => s.method)).size}</span>
-            <span className="stat-label">Hunt Methods Used</span>
-          </span>
+    <div className="shiny-calendar">
+      <div className="calendar-header">
+        <h3>📅 Shiny Calendar</h3>
+        <div className="calendar-controls">
+          <div className="year-selector">
+            <label>Year:</label>
+            <select 
+              value={selectedYear || 'all'} 
+              onChange={(e) => setSelectedYear(e.target.value === 'all' ? null : parseInt(e.target.value))}
+            >
+              <option value="all">All Years</option>
+              {availableYears.map(year => (
+                <option key={year} value={year}>{year}</option>
+              ))}
+            </select>
+          </div>
+          <div className="calendar-stats">
+            <span className="stat-badge">
+              <span className="stat-number">{portfolio.length}</span>
+              <span className="stat-label">Total Shinies</span>
+            </span>
+            <span className="stat-badge">
+              <span className="stat-number">{filteredMonths.length}</span>
+              <span className="stat-label">Active Months</span>
+            </span>
+          </div>
         </div>
       </div>
       
-      <div className="display-case">
-        <div className="glass-reflection"></div>
-        <div className="case-lighting"></div>
-        
-        <div className="trophy-shelves">
-          {displayRows.map((row, rowIndex) => (
-            <div key={rowIndex} className="trophy-shelf">
-              <div className="shelf-surface"></div>
-              <div className="shelf-items">
-                {row.map((shiny, itemIndex) => {
-                  const pokemonColors = getPokemonColors(shiny.pokemonId);
-                  const isRecent = new Date(shiny.dateFound).getTime() > Date.now() - (7 * 24 * 60 * 60 * 1000);
-                  
-                  return (
-                    <div 
-                      key={shiny.id} 
-                      className={`trophy-item ${isRecent ? 'recently-added' : ''}`}
-                      style={{
-                        animationDelay: `${(rowIndex * 6 + itemIndex) * 0.1}s`
-                      }}
-                    >
-                      <div className="trophy-pedestal">
-                        <div 
-                          className="pedestal-glow"
-                          style={{
-                            boxShadow: `0 0 20px ${pokemonColors.glowLight}, 0 0 40px ${pokemonColors.glowLight}`
-                          }}
-                        ></div>
-                      </div>
-                      
-                      <div className="trophy-sprite-container">
-                        <img 
-                          src={getShinySpritePath(shiny.pokemonId, shiny.pokemonName)}
-                          alt={`Shiny ${shiny.pokemonName}`}
-                          className="trophy-sprite"
-                          style={{
-                            filter: `drop-shadow(0 0 8px ${pokemonColors.glow}) drop-shadow(0 0 16px ${pokemonColors.glowLight})`,
-                          }}
-                          onError={(e) => {
-                            e.currentTarget.src = '/images/shiny-sprites/001_Bulbasaur.gif';
-                          }}
-                        />
-                        {isRecent && <div className="new-badge">NEW!</div>}
-                      </div>
-                      
-                      <div className="trophy-nameplate">
-                        <div className="nameplate-text">{shiny.pokemonName}</div>
-                        <div className="nameplate-date">
-                          {new Date(shiny.dateFound).toLocaleDateString()}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
+      <div className="calendar-timeline">
+        {filteredMonths.map((monthData, index) => (
+          <div key={`${monthData.year}-${monthData.month}`} className="calendar-month">
+            <div className="month-header">
+              <div className="month-info">
+                <h4>{monthData.monthName} {monthData.year}</h4>
+                <span className="month-count">{monthData.shinies.length} shinies</span>
               </div>
+              <div className="month-decoration"></div>
             </div>
-          ))}
-        </div>
-        
-        <div className="case-frame"></div>
+            
+            <div className="month-shinies">
+              {monthData.shinies.map((shiny, shinyIndex) => {
+                const pokemonColors = getPokemonColors(shiny.pokemonId);
+                const dayOfMonth = new Date(shiny.dateFound).getDate();
+                const isRecent = new Date(shiny.dateFound).getTime() > Date.now() - (7 * 24 * 60 * 60 * 1000);
+                
+                return (
+                  <div 
+                    key={shiny.id} 
+                    className={`calendar-shiny ${isRecent ? 'recent' : ''}`}
+                    style={{
+                      animationDelay: `${(index * 0.1) + (shinyIndex * 0.05)}s`
+                    }}
+                  >
+                    <div className="shiny-date-marker">
+                      <span className="day-number">{dayOfMonth}</span>
+                    </div>
+                    
+                    <div className="shiny-display">
+                      <div 
+                        className="shiny-glow-ring"
+                        style={{
+                          boxShadow: `0 0 20px ${pokemonColors.glowLight}, inset 0 0 20px ${pokemonColors.glowLight}`
+                        }}
+                      ></div>
+                      
+                      <img 
+                        src={getShinySpritePath(shiny.pokemonId, shiny.pokemonName)}
+                        alt={`Shiny ${shiny.pokemonName}`}
+                        className="calendar-sprite"
+                        style={{
+                          filter: `drop-shadow(0 0 10px ${pokemonColors.glow}) drop-shadow(0 0 20px ${pokemonColors.glowLight})`,
+                        }}
+                        onError={(e) => {
+                          e.currentTarget.src = '/images/shiny-sprites/001_Bulbasaur.gif';
+                        }}
+                      />
+                      
+                      {isRecent && <div className="recent-badge">NEW!</div>}
+                    </div>
+                    
+                    <div className="shiny-info">
+                      <div className="shiny-name">{shiny.pokemonName}</div>
+                      <div className="shiny-method">{shiny.method}</div>
+                      {shiny.encounterCount && (
+                        <div className="shiny-encounters">{shiny.encounterCount.toLocaleString()} enc</div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

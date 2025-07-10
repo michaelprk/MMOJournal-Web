@@ -654,6 +654,10 @@ html, body {
   position: relative;
   overflow: hidden;
   min-height: 280px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 }
 
 .portfolio-card:hover {
@@ -704,6 +708,11 @@ html, body {
 .portfolio-info {
   position: relative;
   z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  width: 100%;
 }
 
 .portfolio-method {
@@ -721,10 +730,14 @@ html, body {
   font-size: 0.875rem;
   color: rgba(255, 255, 255, 0.8);
   margin-bottom: 0.25rem;
+  text-align: center;
 }
 
 .portfolio-ivs {
   margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .iv-display {
@@ -733,6 +746,7 @@ html, body {
   gap: 0.25rem;
   font-size: 0.75rem;
   color: rgba(255, 255, 255, 0.7);
+  justify-items: center;
 }
 
 .empty-portfolio {
@@ -872,8 +886,8 @@ html, body {
   cursor: not-allowed;
 }
 
-/* Shiny Trophy Case */
-.shiny-trophy-case {
+/* Shiny Calendar */
+.shiny-calendar {
   margin: 3rem 0;
   padding: 2rem;
   background: linear-gradient(135deg, rgba(0, 0, 0, 0.2), rgba(20, 20, 20, 0.2));
@@ -881,7 +895,7 @@ html, body {
   border: 1px solid rgba(255, 215, 0, 0.3);
 }
 
-.trophy-case-header {
+.calendar-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -890,14 +904,41 @@ html, body {
   gap: 1rem;
 }
 
-.trophy-case-header h3 {
+.calendar-header h3 {
   color: #ffd700;
   text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
   margin: 0;
   font-size: 1.8rem;
 }
 
-.collection-stats {
+.calendar-controls {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.year-selector {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.year-selector label {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.875rem;
+}
+
+.year-selector select {
+  padding: 0.5rem 1rem;
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.4);
+  color: white;
+  font-size: 0.875rem;
+}
+
+.calendar-stats {
   display: flex;
   gap: 1rem;
 }
@@ -927,174 +968,160 @@ html, body {
   margin-top: 0.25rem;
 }
 
-/* Display Case Container */
-.display-case {
-  position: relative;
-  background: linear-gradient(135deg, rgba(0, 0, 0, 0.8), rgba(10, 10, 10, 0.8));
-  border: 2px solid rgba(255, 215, 0, 0.4);
+/* Calendar Timeline */
+.calendar-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.calendar-month {
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.3), rgba(10, 10, 10, 0.3));
+  border: 1px solid rgba(255, 215, 0, 0.2);
   border-radius: 12px;
-  padding: 2rem;
-  min-height: 300px;
+  padding: 1.5rem;
+  position: relative;
   overflow: hidden;
 }
 
-.glass-reflection {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, 
-    transparent 0%,
-    rgba(255, 255, 255, 0.1) 20%,
-    transparent 40%,
-    transparent 60%,
-    rgba(255, 255, 255, 0.05) 80%,
-    transparent 100%
-  );
-  pointer-events: none;
-  z-index: 10;
+.month-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  position: relative;
 }
 
-.case-lighting {
-  position: absolute;
-  top: -10px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 80%;
-  height: 20px;
+.month-info h4 {
+  color: #ffd700;
+  font-size: 1.5rem;
+  margin: 0;
+  text-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
+}
+
+.month-count {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin-top: 0.25rem;
+}
+
+.month-decoration {
+  width: 60px;
+  height: 3px;
   background: linear-gradient(90deg, 
     transparent 0%,
-    rgba(255, 215, 0, 0.3) 50%,
+    rgba(255, 215, 0, 0.6) 50%,
     transparent 100%
-  );
-  filter: blur(10px);
-  pointer-events: none;
-}
-
-.case-frame {
-  position: absolute;
-  top: -2px;
-  left: -2px;
-  right: -2px;
-  bottom: -2px;
-  border: 1px solid rgba(255, 215, 0, 0.6);
-  border-radius: 12px;
-  pointer-events: none;
-}
-
-/* Trophy Shelves */
-.trophy-shelves {
-  position: relative;
-  z-index: 5;
-}
-
-.trophy-shelf {
-  position: relative;
-  margin-bottom: 3rem;
-}
-
-.shelf-surface {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, 
-    rgba(101, 67, 33, 0.8) 0%,
-    rgba(139, 92, 46, 1) 50%,
-    rgba(101, 67, 33, 0.8) 100%
   );
   border-radius: 2px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-.shelf-items {
-  display: flex;
-  justify-content: flex-start;
+.month-shinies {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
   gap: 1rem;
-  padding: 1rem 0 1rem 0;
-  flex-wrap: wrap;
 }
 
-/* Trophy Items */
-.trophy-item {
+.calendar-shiny {
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 215, 0, 0.2);
+  border-radius: 8px;
   position: relative;
-  animation: trophyAppear 0.6s ease-out forwards;
+  transition: all 0.3s ease;
+  animation: calendarShinyAppear 0.6s ease-out forwards;
   opacity: 0;
   transform: translateY(20px);
 }
 
-@keyframes trophyAppear {
+@keyframes calendarShinyAppear {
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
-.trophy-item.recently-added {
-  animation: newTrophySparkle 2s ease-in-out infinite;
+.calendar-shiny:hover {
+  transform: translateY(-5px) scale(1.05);
+  border-color: rgba(255, 215, 0, 0.5);
 }
 
-@keyframes newTrophySparkle {
-  0%, 100% { filter: brightness(1); }
-  50% { filter: brightness(1.3) drop-shadow(0 0 15px rgba(255, 215, 0, 0.8)); }
+.calendar-shiny.recent {
+  animation: recentShinyPulse 2s ease-in-out infinite;
 }
 
-.trophy-pedestal {
-  position: relative;
-  width: 60px;
-  height: 20px;
-  background: linear-gradient(135deg, 
-    rgba(184, 134, 11, 0.8) 0%,
-    rgba(245, 158, 11, 1) 50%,
-    rgba(184, 134, 11, 0.8) 100%
-  );
-  border-radius: 0 0 8px 8px;
-  margin-bottom: -10px;
-  z-index: 1;
+@keyframes recentShinyPulse {
+  0%, 100% { 
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.3); 
+  }
+  50% { 
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.6), 0 0 30px rgba(255, 215, 0, 0.4); 
+  }
 }
 
-.pedestal-glow {
+.shiny-date-marker {
   position: absolute;
-  top: -5px;
-  left: -5px;
-  right: -5px;
-  bottom: -5px;
-  border-radius: 0 0 12px 12px;
-  opacity: 0.6;
-  animation: pedestalGlow 3s ease-in-out infinite;
-}
-
-@keyframes pedestalGlow {
-  0%, 100% { opacity: 0.3; }
-  50% { opacity: 0.7; }
-}
-
-.trophy-sprite-container {
-  position: relative;
+  top: -10px;
+  right: -10px;
+  width: 24px;
+  height: 24px;
+  background: linear-gradient(45deg, #ffd700, #ffed4e);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: bold;
+  color: black;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   z-index: 3;
-  margin-bottom: 0.5rem;
 }
 
-.trophy-sprite {
+.day-number {
+  text-shadow: none;
+}
+
+.shiny-display {
+  position: relative;
+  margin-bottom: 0.75rem;
+}
+
+.shiny-glow-ring {
+  position: absolute;
+  top: -8px;
+  left: -8px;
+  right: -8px;
+  bottom: -8px;
+  border-radius: 50%;
+  opacity: 0.6;
+  animation: calendarGlow 3s ease-in-out infinite;
+}
+
+@keyframes calendarGlow {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.1); }
+}
+
+.calendar-sprite {
   width: 60px;
   height: 60px;
   image-rendering: pixelated;
   transition: all 0.3s ease;
+  position: relative;
+  z-index: 2;
 }
 
-.trophy-sprite:hover {
+.calendar-sprite:hover {
   transform: scale(1.1);
 }
 
-.new-badge {
+.recent-badge {
   position: absolute;
   top: -8px;
-  right: -8px;
+  left: -8px;
   background: linear-gradient(45deg, #ff6b35, #f7931e);
   color: white;
   font-size: 0.6rem;
@@ -1111,116 +1138,120 @@ html, body {
   50% { transform: translateY(-3px); }
 }
 
-.trophy-nameplate {
-  background: rgba(0, 0, 0, 0.8);
-  border: 1px solid rgba(255, 215, 0, 0.4);
-  border-radius: 4px;
-  padding: 0.5rem;
+.shiny-info {
   text-align: center;
-  min-width: 80px;
-  z-index: 2;
+  width: 100%;
 }
 
-.nameplate-text {
-  font-size: 0.75rem;
+.shiny-name {
+  font-size: 0.875rem;
   font-weight: bold;
   color: #ffd700;
-  text-shadow: 0 0 3px rgba(255, 215, 0, 0.5);
+  text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
   margin-bottom: 0.25rem;
 }
 
-.nameplate-date {
+.shiny-method {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 0.25rem;
+}
+
+.shiny-encounters {
   font-size: 0.625rem;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.5);
 }
 
-/* Empty Trophy Case */
-.empty-trophy-case {
+/* Empty Calendar */
+.empty-calendar {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
+  gap: 2rem;
   min-height: 300px;
+  justify-content: center;
 }
 
-.empty-display-case {
-  position: relative;
+.empty-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
   width: 100%;
   max-width: 600px;
-  height: 200px;
-  background: linear-gradient(135deg, rgba(0, 0, 0, 0.6), rgba(10, 10, 10, 0.6));
-  border: 2px solid rgba(255, 215, 0, 0.2);
-  border-radius: 12px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow: hidden;
 }
 
-.empty-shelves {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 1;
+.empty-month {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 215, 0, 0.2);
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
 }
 
-.shelf {
-  position: absolute;
-  left: 10%;
-  right: 10%;
-  height: 2px;
-  background: rgba(139, 92, 46, 0.5);
-  border-radius: 1px;
+.empty-month .month-header {
+  color: #ffd700;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
 }
 
-.shelf:nth-child(1) { top: 25%; }
-.shelf:nth-child(2) { top: 50%; }
-.shelf:nth-child(3) { top: 75%; }
-
-.case-light {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 60%;
-  height: 10px;
-  background: linear-gradient(90deg, 
+.empty-days {
+  height: 60px;
+  background: linear-gradient(135deg, 
     transparent 0%,
-    rgba(255, 215, 0, 0.2) 50%,
+    rgba(255, 215, 0, 0.1) 50%,
     transparent 100%
   );
-  filter: blur(5px);
+  border-radius: 4px;
+  opacity: 0.5;
 }
 
-.empty-display-case p {
+.empty-calendar p {
   color: rgba(255, 255, 255, 0.5);
-  text-align: center;
-  z-index: 2;
   font-style: italic;
+  text-align: center;
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
-  .trophy-case-header {
+  .calendar-header {
     flex-direction: column;
     text-align: center;
   }
   
-  .collection-stats {
+  .calendar-controls {
+    justify-content: center;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .calendar-stats {
     justify-content: center;
   }
   
-  .shelf-items {
-    justify-content: center;
+  .month-shinies {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
   }
   
-  .trophy-sprite {
+  .calendar-sprite {
     width: 50px;
     height: 50px;
   }
   
   .stat-badge {
     min-width: 70px;
+  }
+  
+  .empty-calendar-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .month-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .month-decoration {
+    width: 40px;
   }
 }
