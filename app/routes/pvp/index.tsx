@@ -148,19 +148,20 @@ export default function PVPPage() {
           <TierFilter selectedTier={selectedTier} onTierChange={setSelectedTier} style="dropdown" />
         </div>
         
-        {/* Centered Header */}
-        <h2 style={{
-          color: '#fff',
-          fontSize: '1.1rem',
+        {/* Main Page Header */}
+        <h1 style={{
+          color: '#ffcb05',
+          fontSize: '1.8rem',
           fontWeight: 'bold',
           margin: 0,
-          textShadow: '0 1px 2px rgba(0,0,0,0.8)',
+          textShadow: '2px 2px 4px rgba(0,0,0,0.8)',
           display: 'flex',
           alignItems: 'center',
-          height: '44px', // Match dropdown height
+          height: '50px',
+          letterSpacing: '0.5px',
         }}>
-          ⚔️ View Your Competitive Builds ⚔️
-        </h2>
+          ⚔️ PVP Battle Builds ⚔️
+        </h1>
         
         <div style={{ position: 'relative', marginRight: '16px' }}> {/* Bring inward from edge */}
           <button
@@ -294,30 +295,7 @@ export default function PVPPage() {
           padding: '2rem',
           minHeight: '100%', // Ensure content can fill the container
         }}>
-          {/* Header */}
-          <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-            <h1
-              style={{
-                color: '#ffcb05',
-                fontSize: '3rem',
-                fontWeight: 'bold',
-                textShadow: '2px 2px 4px rgba(0,0,0,0.8)',
-                marginBottom: '0.5rem',
-              }}
-            >
-              PVP Battle Builds
-            </h1>
-            <p
-              style={{
-                color: '#ffffff',
-                fontSize: '1.2rem',
-                textShadow: '1px 1px 2px rgba(0,0,0,0.8)',
-                marginBottom: '2rem',
-              }}
-            >
-              Manage and showcase your competitive Pokémon builds
-            </p>
-          </div>
+
 
           {/* Content */}
           {isLoading ? (

@@ -190,9 +190,25 @@ export function PokemonBuildCard({ build, onEdit, onDelete }: PokemonBuildCardPr
 
   return (
     <div
+      className="pokemon-card"
       style={{
         position: 'relative',
-        backgroundColor: 'rgba(0, 0, 0, 0.9)',
+        background: `
+          linear-gradient(135deg, 
+            rgba(0, 0, 0, 0.5) 0%, 
+            rgba(0, 0, 0, 0.45) 25%, 
+            rgba(0, 0, 0, 0.5) 50%, 
+            rgba(0, 0, 0, 0.45) 75%, 
+            rgba(0, 0, 0, 0.5) 100%
+          ),
+          linear-gradient(45deg, 
+            rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.05) 0%, 
+            transparent 50%, 
+            rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.03) 100%
+          )
+        `,
+        backgroundSize: '400% 400%, 200% 200%',
+        animation: 'cardGlow 8s ease-in-out infinite',
         borderRadius: '12px',
         padding: '16px',
         border: `3px solid ${tierColor.background}`,
@@ -204,28 +220,34 @@ export function PokemonBuildCard({ build, onEdit, onDelete }: PokemonBuildCardPr
       }}
       onMouseEnter={(e) => {
         e.currentTarget.style.boxShadow = `0 8px 25px rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.5)`;
+        e.currentTarget.style.transform = 'translateY(-2px)';
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.boxShadow = `0 4px 15px rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.3)`;
+        e.currentTarget.style.transform = 'translateY(0px)';
       }}
     >
       {/* Main View */}
       <div
         style={{
           opacity: currentView === 'main' ? 1 : 0,
-          transform: currentView === 'main' ? 'translateX(0)' : 'translateX(-20px)',
-          transition: 'all 0.3s ease',
+          transform: currentView === 'main' 
+            ? 'translateY(0) rotateX(0deg) scale(1)' 
+            : 'translateY(30px) rotateX(10deg) scale(0.95)',
+          transition: 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
           position: currentView === 'main' ? 'relative' : 'absolute',
           width: '100%',
           pointerEvents: currentView === 'main' ? 'auto' : 'none',
+          transformOrigin: 'center center',
+          filter: currentView === 'main' ? 'blur(0px)' : 'blur(1px)',
         }}
       >
         <div>
           {/* Tab Label and Navigation - Top Right */}
           <div style={{ 
             position: 'absolute', 
-            top: '8px', 
-            right: '12px', 
+            top: '2px', 
+            right: '8px', 
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
@@ -385,10 +407,10 @@ export function PokemonBuildCard({ build, onEdit, onDelete }: PokemonBuildCardPr
           {/* Edit/Delete Buttons - Bottom Right Corner */}
           <div style={{ 
             position: 'absolute',
-            bottom: '8px',
-            right: '8px',
+            bottom: '6px',
+            right: '6px',
             display: 'flex',
-            gap: '10px',
+            gap: '6px',
           }}>
             {onEdit && (
               <button
@@ -398,15 +420,15 @@ export function PokemonBuildCard({ build, onEdit, onDelete }: PokemonBuildCardPr
                 }}
                 style={{
                   backgroundColor: 'transparent',
-                  border: `2px solid ${tierColor.background}`,
+                  border: `1px solid ${tierColor.background}`,
                   color: tierColor.background,
-                  padding: '8px 16px',
-                  borderRadius: '8px',
-                  fontSize: '0.9rem',
+                  padding: '4px 8px',
+                  borderRadius: '4px',
+                  fontSize: '0.75rem',
                   cursor: 'pointer',
                   transition: 'all 0.2s ease',
                   fontWeight: '600',
-                  minWidth: '60px',
+                  minWidth: '40px',
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.backgroundColor = `rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.2)`;
@@ -428,15 +450,15 @@ export function PokemonBuildCard({ build, onEdit, onDelete }: PokemonBuildCardPr
                 }}
                 style={{
                   backgroundColor: 'transparent',
-                  border: '2px solid #dc3545',
+                  border: '1px solid #dc3545',
                   color: '#dc3545',
-                  padding: '8px 16px',
-                  borderRadius: '8px',
-                  fontSize: '0.9rem',
+                  padding: '4px 8px',
+                  borderRadius: '4px',
+                  fontSize: '0.75rem',
                   cursor: 'pointer',
                   transition: 'all 0.2s ease',
                   fontWeight: '600',
-                  minWidth: '70px',
+                  minWidth: '45px',
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.backgroundColor = 'rgba(220, 53, 69, 0.2)';
@@ -458,21 +480,25 @@ export function PokemonBuildCard({ build, onEdit, onDelete }: PokemonBuildCardPr
       <div
         style={{
           opacity: currentView === 'stats' ? 1 : 0,
-          transform: currentView === 'stats' ? 'translateX(0)' : 'translateX(20px)',
-          transition: 'all 0.3s ease',
+          transform: currentView === 'stats' 
+            ? 'translateY(0) rotateX(0deg) scale(1)' 
+            : 'translateY(30px) rotateX(10deg) scale(0.95)',
+          transition: 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
           position: currentView === 'stats' ? 'relative' : 'absolute',
           width: '100%',
           pointerEvents: currentView === 'stats' ? 'auto' : 'none',
           height: '100%',
           display: 'flex',
           flexDirection: 'column',
+          transformOrigin: 'center center',
+          filter: currentView === 'stats' ? 'blur(0px)' : 'blur(1px)',
         }}
       >
         {/* Tab Label and Navigation - Top Right */}
         <div style={{ 
           position: 'absolute', 
-          top: '8px', 
-          right: '12px', 
+          top: '2px', 
+          right: '8px', 
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
@@ -531,42 +557,39 @@ export function PokemonBuildCard({ build, onEdit, onDelete }: PokemonBuildCardPr
           </div>
         </div>
 
-        {/* Compact Header */}
+        {/* Single Line Header */}
         <div style={{ 
           display: 'flex', 
           justifyContent: 'center', 
           alignItems: 'center', 
-          marginBottom: '16px', 
-          borderBottom: `1px solid ${tierColor.background}`,
+          marginBottom: '20px', 
           paddingBottom: '8px'
         }}>
-          <div style={{ textAlign: 'center' }}>
-            <h3 style={{ color: '#fff', margin: '0', fontSize: '1.1rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+            <h3 style={{ color: '#fff', margin: '0', fontSize: '1.1rem', fontWeight: 'bold', display: 'flex', alignItems: 'center' }}>
               {build.name}
               <GenderIcon gender={build.gender} />
             </h3>
-            <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: '4px', justifyContent: 'center' }}>
-              <span style={{
-                backgroundColor: tierColor.background,
-                color: tierColor.text,
-                padding: '2px 6px',
-                borderRadius: '4px',
-                fontSize: '0.7rem',
-                fontWeight: 'bold',
-              }}>
-                {build.tier}
-              </span>
-              <span style={{ color: '#ddd', fontSize: '0.8rem' }}>
-                Level {build.level}
-              </span>
-            </div>
+            <span style={{
+              backgroundColor: tierColor.background,
+              color: tierColor.text,
+              padding: '2px 6px',
+              borderRadius: '4px',
+              fontSize: '0.7rem',
+              fontWeight: 'bold',
+            }}>
+              {build.tier}
+            </span>
+            <span style={{ color: '#ddd', fontSize: '0.8rem' }}>
+              Level {build.level}
+            </span>
           </div>
         </div>
 
         {/* Stats Layout - Compact and Consistent */}
         <div style={{ marginBottom: '12px' }}>
           {/* IVs Section - Single Line */}
-          <div style={{ marginBottom: '16px' }}>
+          <div style={{ marginBottom: '12px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
               <h4 style={{ color: tierColor.background, margin: '0', fontSize: '0.9rem', fontWeight: 'bold' }}>Individual Values</h4>
               <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
@@ -593,7 +616,7 @@ export function PokemonBuildCard({ build, onEdit, onDelete }: PokemonBuildCardPr
 
           {/* EVs Section - Simplified 1x3 Layout */}
           <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
               <h4 style={{ color: tierColor.background, margin: '0', fontSize: '0.9rem', fontWeight: 'bold' }}>Effort Values</h4>
               <span style={{ fontSize: '0.75rem', color: '#fff', fontWeight: '600' }}>
                 Total: {Object.values(build.evs).reduce((sum, val) => sum + val, 0)}/510
@@ -602,46 +625,89 @@ export function PokemonBuildCard({ build, onEdit, onDelete }: PokemonBuildCardPr
             
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', fontSize: '0.8rem' }}>
               {[
-                { label: 'HP', value: build.evs.hp },
-                { label: 'ATK', value: build.evs.attack },
-                { label: 'DEF', value: build.evs.defense },
-              ].map((stat, index) => (
-                <div key={index} style={{ 
-                  display: 'flex', 
-                  alignItems: 'center',
-                  gap: '6px',
-                  padding: '8px 10px', 
-                  backgroundColor: `rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.2)`, 
-                  borderRadius: '6px',
-                  border: `1px solid rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.3)`,
-                  minHeight: '36px',
-                }}>
-                  <span style={{ color: tierColor.background, fontSize: '0.75rem', fontWeight: '600' }}>{stat.label}</span>
-                  <span style={{ color: '#fff', fontWeight: 'bold', fontSize: '1rem' }}>{stat.value}</span>
-                </div>
-              ))}
+                { label: 'HP', value: build.evs.hp, icon: '❤️' },
+                { label: 'ATK', value: build.evs.attack, icon: '⚔️' },
+                { label: 'DEF', value: build.evs.defense, icon: '🛡️' },
+              ].map((stat, index) => {
+                const percentage = (stat.value / 252) * 100;
+                return (
+                  <div key={index} style={{ 
+                    position: 'relative',
+                    display: 'flex', 
+                    alignItems: 'center',
+                    gap: '4px',
+                    padding: '4px 8px', 
+                    backgroundColor: `rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.2)`, 
+                    borderRadius: '6px',
+                    border: `1px solid rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.3)`,
+                    minHeight: '18px',
+                    overflow: 'hidden',
+                  }}>
+                    {/* Progress bar background */}
+                    <div style={{
+                      position: 'absolute',
+                      left: 0,
+                      top: 0,
+                      height: '100%',
+                      width: `${percentage}%`,
+                      background: `linear-gradient(90deg, rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.4) 0%, rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.1) 100%)`,
+                      borderRadius: '6px',
+                      transition: 'width 0.5s ease',
+                    }} />
+                    {/* Stat icon */}
+                    <span style={{ 
+                      fontSize: '0.7rem', 
+                      zIndex: 1,
+                      color: stat.label === 'HP' ? '#ff4444' : 'inherit'
+                    }}>{stat.icon}</span>
+                    <span style={{ color: tierColor.background, fontSize: '0.65rem', fontWeight: '600', zIndex: 1 }}>{stat.label}</span>
+                    <span style={{ color: '#fff', fontWeight: 'bold', fontSize: '0.85rem', zIndex: 1 }}>{stat.value}</span>
+                  </div>
+                );
+              })}
             </div>
             
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', fontSize: '0.8rem', marginTop: '8px' }}>
               {[
-                { label: 'SPA', value: build.evs.sp_attack },
-                { label: 'SPD', value: build.evs.sp_defense },
-                { label: 'SPE', value: build.evs.speed },
-              ].map((stat, index) => (
-                <div key={index + 3} style={{ 
-                  display: 'flex', 
-                  alignItems: 'center',
-                  gap: '6px',
-                  padding: '8px 10px', 
-                  backgroundColor: `rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.2)`, 
-                  borderRadius: '6px',
-                  border: `1px solid rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.3)`,
-                  minHeight: '36px',
-                }}>
-                  <span style={{ color: tierColor.background, fontSize: '0.75rem', fontWeight: '600' }}>{stat.label}</span>
-                  <span style={{ color: '#fff', fontWeight: 'bold', fontSize: '1rem' }}>{stat.value}</span>
-                </div>
-              ))}
+                { label: 'SPA', value: build.evs.sp_attack, icon: '🔮' },
+                { label: 'SPD', value: build.evs.sp_defense, icon: '🔰' },
+                { label: 'SPE', value: build.evs.speed, icon: '⚡' },
+              ].map((stat, index) => {
+                const percentage = (stat.value / 252) * 100;
+                return (
+                  <div key={index + 3} style={{ 
+                    position: 'relative',
+                    display: 'flex', 
+                    alignItems: 'center',
+                    gap: '4px',
+                    padding: '4px 8px', 
+                    backgroundColor: `rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.2)`, 
+                    borderRadius: '6px',
+                    border: `1px solid rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.3)`,
+                    minHeight: '18px',
+                    overflow: 'hidden',
+                  }}>
+                    {/* Progress bar background */}
+                    <div style={{
+                      position: 'absolute',
+                      left: 0,
+                      top: 0,
+                      height: '100%',
+                      width: `${percentage}%`,
+                      background: `linear-gradient(90deg, rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.4) 0%, rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.1) 100%)`,
+                      borderRadius: '6px',
+                      transition: 'width 0.5s ease',
+                    }} />
+                    {/* Stat icon */}
+                    <span style={{ 
+                      fontSize: '0.7rem', 
+                      zIndex: 1
+                    }}>{stat.icon}</span>
+                    <span style={{ color: tierColor.background, fontSize: '0.65rem', fontWeight: '600', zIndex: 1 }}>{stat.label}</span>
+                    <span style={{ color: '#fff', fontWeight: 'bold', fontSize: '0.85rem', zIndex: 1 }}>{stat.value}</span>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
@@ -651,21 +717,25 @@ export function PokemonBuildCard({ build, onEdit, onDelete }: PokemonBuildCardPr
       <div
         style={{
           opacity: currentView === 'moves' ? 1 : 0,
-          transform: currentView === 'moves' ? 'translateX(0)' : 'translateX(20px)',
-          transition: 'all 0.3s ease',
+          transform: currentView === 'moves' 
+            ? 'translateY(0) rotateX(0deg) scale(1)' 
+            : 'translateY(30px) rotateX(10deg) scale(0.95)',
+          transition: 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
           position: currentView === 'moves' ? 'relative' : 'absolute',
           width: '100%',
           pointerEvents: currentView === 'moves' ? 'auto' : 'none',
           height: '100%',
           display: 'flex',
           flexDirection: 'column',
+          transformOrigin: 'center center',
+          filter: currentView === 'moves' ? 'blur(0px)' : 'blur(1px)',
         }}
       >
         {/* Tab Label and Navigation - Top Right */}
         <div style={{ 
           position: 'absolute', 
-          top: '8px', 
-          right: '12px', 
+          top: '2px', 
+          right: '8px', 
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
@@ -724,40 +794,37 @@ export function PokemonBuildCard({ build, onEdit, onDelete }: PokemonBuildCardPr
           </div>
         </div>
 
-        {/* Compact Header */}
+        {/* Single Line Header */}
         <div style={{ 
           display: 'flex', 
           justifyContent: 'center', 
           alignItems: 'center', 
-          marginBottom: '16px', 
-          borderBottom: `1px solid ${tierColor.background}`,
+          marginBottom: '20px', 
           paddingBottom: '8px'
         }}>
-          <div style={{ textAlign: 'center' }}>
-            <h3 style={{ color: '#fff', margin: '0', fontSize: '1.1rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+            <h3 style={{ color: '#fff', margin: '0', fontSize: '1.1rem', fontWeight: 'bold', display: 'flex', alignItems: 'center' }}>
               {build.name}
               <GenderIcon gender={build.gender} />
             </h3>
-            <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: '4px', justifyContent: 'center' }}>
-              <span style={{
-                backgroundColor: tierColor.background,
-                color: tierColor.text,
-                padding: '2px 6px',
-                borderRadius: '4px',
-                fontSize: '0.7rem',
-                fontWeight: 'bold',
-              }}>
-                {build.tier}
-              </span>
-              <span style={{ color: '#ddd', fontSize: '0.8rem' }}>
-                Level {build.level}
-              </span>
-            </div>
+            <span style={{
+              backgroundColor: tierColor.background,
+              color: tierColor.text,
+              padding: '2px 6px',
+              borderRadius: '4px',
+              fontSize: '0.7rem',
+              fontWeight: 'bold',
+            }}>
+              {build.tier}
+            </span>
+            <span style={{ color: '#ddd', fontSize: '0.8rem' }}>
+              Level {build.level}
+            </span>
           </div>
         </div>
 
         {/* Moves Section */}
-        <div style={{ marginBottom: '16px' }}>
+        <div style={{ marginBottom: '20px' }}>
           <h4 style={{ color: tierColor.background, margin: '0 0 12px 0', fontSize: '1rem', fontWeight: 'bold' }}>Moveset</h4>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px' }}>
             {build.moves.slice(0, 4).map((move, index) => {
@@ -782,19 +849,41 @@ export function PokemonBuildCard({ build, onEdit, onDelete }: PokemonBuildCardPr
                 const baseGradient = typeColor.background;
                 switch (type) {
                   case 'electric':
-                    return `${baseGradient}, linear-gradient(45deg, rgba(255,255,0,0.1) 25%, transparent 25%, transparent 50%, rgba(255,255,0,0.1) 50%, rgba(255,255,0,0.1) 75%, transparent 75%)`;
+                    return `${baseGradient}`;
                   case 'water':
-                    return `${baseGradient}, linear-gradient(45deg, rgba(0,100,255,0.1) 25%, transparent 25%, transparent 50%, rgba(0,100,255,0.1) 50%, rgba(0,100,255,0.1) 75%, transparent 75%)`;
+                    return `${baseGradient}`;
                   case 'fire':
-                    return `${baseGradient}, radial-gradient(circle at 30% 70%, rgba(255,100,0,0.2) 20%, transparent 50%)`;
+                    return `${baseGradient}`;
                   case 'grass':
-                    return `${baseGradient}, linear-gradient(90deg, rgba(0,255,0,0.1) 0%, transparent 50%, rgba(0,255,0,0.1) 100%)`;
+                    return `${baseGradient}`;
                   case 'psychic':
-                    return `${baseGradient}, radial-gradient(ellipse at center, rgba(255,0,255,0.15) 30%, transparent 70%)`;
+                    return `${baseGradient}`;
                   case 'ice':
-                    return `${baseGradient}, linear-gradient(60deg, rgba(200,255,255,0.2) 25%, transparent 25%, transparent 50%, rgba(200,255,255,0.2) 50%)`;
+                    return `${baseGradient}`;
+                  case 'fighting':
+                    return `${baseGradient}`;
+                  case 'poison':
+                    return `${baseGradient}`;
+                  case 'ground':
+                    return `${baseGradient}`;
+                  case 'flying':
+                    return `${baseGradient}`;
+                  case 'bug':
+                    return `${baseGradient}`;
+                  case 'rock':
+                    return `${baseGradient}`;
+                  case 'ghost':
+                    return `${baseGradient}`;
+                  case 'dragon':
+                    return `${baseGradient}`;
+                  case 'dark':
+                    return `${baseGradient}`;
+                  case 'steel':
+                    return `${baseGradient}`;
+                  case 'fairy':
+                    return `${baseGradient}`;
                   default:
-                    return `${baseGradient}, linear-gradient(45deg, rgba(255,255,255,0.1) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.1) 75%, transparent 75%)`;
+                    return `linear-gradient(135deg, #C8C8C8 0%, #E8E8E8 25%, #C8C8C8 50%, #E8E8E8 75%, #C8C8C8 100%)`;
                 }
               };
               
@@ -804,7 +893,7 @@ export function PokemonBuildCard({ build, onEdit, onDelete }: PokemonBuildCardPr
                   className={getAnimationClass(moveType)}
                   style={{
                     background: getBackgroundPattern(moveType),
-                    backgroundSize: '20px 20px, 100% 100%',
+                    backgroundSize: '100% 100%',
                     color: typeColor.text,
                     fontSize: '0.8rem',
                     padding: '10px 12px',
@@ -819,7 +908,7 @@ export function PokemonBuildCard({ build, onEdit, onDelete }: PokemonBuildCardPr
                     alignItems: 'center',
                     justifyContent: 'center',
                     position: 'relative',
-                    border: `2px solid rgba(${typeColor.background.match(/\d+/g)?.slice(0, 3).join(', ')}, 0.6)`,
+                    border: `2px solid ${typeColor.background.includes('linear-gradient') ? '#666' : typeColor.background}`,
                     transition: 'all 0.3s ease',
                   }}
                   title={`${move} (${moveType.charAt(0).toUpperCase() + moveType.slice(1)} type)`}

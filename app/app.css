@@ -146,10 +146,98 @@ html, body {
   }
 }
 
+@keyframes normalGlow {
+  0%, 100% { 
+    background-position: 0% 50%;
+    box-shadow: 0 0 8px rgba(200, 200, 200, 0.4);
+  }
+  50% { 
+    background-position: 100% 50%;
+    box-shadow: 0 0 12px rgba(200, 200, 200, 0.6);
+  }
+}
+
 .move-electric { animation: electricPulse 3s ease-in-out infinite; }
 .move-water { animation: waterFlow 3s ease-in-out infinite; }
 .move-fire { animation: fireFlicker 2.5s ease-in-out infinite; }
 .move-grass { animation: grassSway 4s ease-in-out infinite; }
 .move-psychic { animation: psychicGlow 3.5s ease-in-out infinite; }
 .move-ice { animation: iceShimmer 3s ease-in-out infinite; }
-.move-default { animation: defaultMove 4s ease-in-out infinite; }
+.move-default { animation: normalGlow 4s ease-in-out infinite; }
+
+/* Pokemon Card Background Animations */
+@keyframes cardGlow {
+  0%, 100% { 
+    background-position: 0% 50%;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  }
+  50% { 
+    background-position: 100% 50%;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  }
+}
+
+@keyframes floatingParticles {
+  0%, 100% { 
+    transform: translateY(0px) translateX(0px);
+    opacity: 0.3;
+  }
+  33% { 
+    transform: translateY(-10px) translateX(5px);
+    opacity: 0.6;
+  }
+  66% { 
+    transform: translateY(5px) translateX(-3px);
+    opacity: 0.4;
+  }
+}
+
+@keyframes subtleShimmer {
+  0% { 
+    background-position: -200% 0;
+  }
+  100% { 
+    background-position: 200% 0;
+  }
+}
+
+.pokemon-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.pokemon-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    45deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.03) 50%,
+    transparent 70%
+  );
+  background-size: 200% 200%;
+  animation: subtleShimmer 8s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.pokemon-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.02) 2px, transparent 2px),
+    radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    radial-gradient(circle at 40% 70%, rgba(255, 255, 255, 0.01) 1px, transparent 1px);
+  background-size: 50px 50px, 80px 80px, 120px 120px;
+  animation: floatingParticles 12s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 1;
+}
