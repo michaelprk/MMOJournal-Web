@@ -6,9 +6,11 @@ import { TierFilter } from '../../components/TierFilter';
 import { PokemonBuildCard } from '../../components/PokemonBuildCard';
 import { PokemonBuildListView } from '../../components/PokemonBuildListView';
 import { ViewToggle } from '../../components/ViewToggle';
+import { SortFilter } from '../../components/SortFilter';
 import { TeamManager } from '../../components/TeamManager';
 import { TeamView } from '../../components/TeamView';
 import { AddPokemonModal } from '../../components/AddPokemonModal';
+import { ExportModal } from '../../components/ExportModal';
 
 export default function PVPPage() {
   const [builds, setBuilds] = useState<PokemonBuild[]>([]);
@@ -22,18 +24,36 @@ export default function PVPPage() {
   const [modalDefaultTab, setModalDefaultTab] = useState<'manual' | 'showdown'>('manual');
   const [currentView, setCurrentView] = useState<'cards' | 'list' | 'teams'>('cards');
   const [showTeamManager, setShowTeamManager] = useState(false);
+  const [currentSort, setCurrentSort] = useState<'tier' | 'name' | 'level' | 'newest' | 'oldest'>('tier');
+  const [showExportModal, setShowExportModal] = useState(false);
+  const [exportingPokemon, setExportingPokemon] = useState<PokemonBuild | undefined>();
 
-  // Sort builds by tier order
-  const sortBuildsByTier = (builds: PokemonBuild[]) => {
+  // Sort builds by different criteria
+  const sortBuilds = (builds: PokemonBuild[], sortBy: 'tier' | 'name' | 'level' | 'newest' | 'oldest') => {
     return [...builds].sort((a, b) => {
-      const tierIndexA = COMPETITIVE_TIERS.indexOf(a.tier);
-      const tierIndexB = COMPETITIVE_TIERS.indexOf(b.tier);
-      
-      // If tier not found, put it at the end
-      if (tierIndexA === -1) return 1;
-      if (tierIndexB === -1) return -1;
-      
-      return tierIndexA - tierIndexB;
+      switch (sortBy) {
+        case 'tier':
+          const tierIndexA = COMPETITIVE_TIERS.indexOf(a.tier);
+          const tierIndexB = COMPETITIVE_TIERS.indexOf(b.tier);
+          if (tierIndexA === -1) return 1;
+          if (tierIndexB === -1) return -1;
+          return tierIndexA - tierIndexB;
+        
+        case 'name':
+          return a.name.localeCompare(b.name);
+        
+        case 'level':
+          return b.level - a.level; // High to low
+        
+        case 'newest':
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+        
+        case 'oldest':
+          return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+        
+        default:
+          return 0;
+      }
     });
   };
 
@@ -42,16 +62,16 @@ export default function PVPPage() {
     loadBuilds();
   }, []);
 
-  // Filter and sort builds when tier changes
+  // Filter and sort builds when tier or sort changes
   useEffect(() => {
     let filtered = selectedTier 
       ? builds.filter(build => build.tier === selectedTier)
       : builds;
     
-    // Always sort by tier order
-    filtered = sortBuildsByTier(filtered);
+    // Sort by selected criteria
+    filtered = sortBuilds(filtered, currentSort);
     setFilteredBuilds(filtered);
-  }, [builds, selectedTier]);
+  }, [builds, selectedTier, currentSort]);
 
   const loadBuilds = async () => {
     try {
@@ -142,6 +162,16 @@ export default function PVPPage() {
     }
   };
 
+  const handleExportPokemon = (pokemon: PokemonBuild) => {
+    setExportingPokemon(pokemon);
+    setShowExportModal(true);
+  };
+
+  const handleCloseExportModal = () => {
+    setShowExportModal(false);
+    setExportingPokemon(undefined);
+  };
+
   // Organize builds into teams for team view
   const organizeIntoTeams = () => {
     const teamMap = new Map();
@@ -182,7 +212,7 @@ export default function PVPPage() {
 
   return (
     <>
-      {/* Sticky Utility Bar - positioned outside scrollable container */}
+      {/* Sticky Utility Bar - simplified */}
       <div
         className="sticky top-[64px] z-30 px-4 py-2 flex justify-between items-center bg-black/10 rounded-md shadow-sm"
         style={{
@@ -193,89 +223,41 @@ export default function PVPPage() {
           zIndex: 30,
           padding: '16px',
           display: 'flex',
-          justifyContent: 'space-between',
           alignItems: 'center',
           backgroundColor: 'rgba(0, 0, 0, 0.1)',
           borderRadius: '8px',
           boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-          margin: '0 32px', // Increased from 16px for better spacing
+          margin: '0 32px',
           marginBottom: '16px',
         }}
       >
-        <div style={{ display: 'flex', gap: '16px', alignItems: 'center', marginLeft: '16px' }}>
+        {/* Left Side - Tier Filter */}
+        <div style={{ display: 'flex', gap: '16px', alignItems: 'center', flex: 1 }}>
           <TierFilter selectedTier={selectedTier} onTierChange={setSelectedTier} style="dropdown" />
-          <ViewToggle 
-            currentView={currentView === 'teams' ? 'cards' : currentView} 
-            onViewChange={(view) => setCurrentView(view)} 
-          />
-          <button
-            onClick={() => setShowTeamManager(!showTeamManager)}
-            style={{
-              backgroundColor: showTeamManager ? '#ffcb05' : 'transparent',
-              color: showTeamManager ? '#000' : '#ffcb05',
-              border: '1px solid #ffcb05',
-              padding: '8px 16px',
-              borderRadius: '6px',
-              fontSize: '0.9rem',
-              fontWeight: 'bold',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-            }}
-            onMouseEnter={(e) => {
-              if (!showTeamManager) {
-                e.currentTarget.style.backgroundColor = 'rgba(255, 203, 5, 0.2)';
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (!showTeamManager) {
-                e.currentTarget.style.backgroundColor = 'transparent';
-              }
-            }}
-          >
-            🏆 Teams
-          </button>
-          <button
-            onClick={() => setCurrentView('teams')}
-            style={{
-              backgroundColor: currentView === 'teams' ? '#ffcb05' : 'transparent',
-              color: currentView === 'teams' ? '#000' : '#ffcb05',
-              border: '1px solid #ffcb05',
-              padding: '8px 16px',
-              borderRadius: '6px',
-              fontSize: '0.9rem',
-              fontWeight: 'bold',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-            }}
-            onMouseEnter={(e) => {
-              if (currentView !== 'teams') {
-                e.currentTarget.style.backgroundColor = 'rgba(255, 203, 5, 0.2)';
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (currentView !== 'teams') {
-                e.currentTarget.style.backgroundColor = 'transparent';
-              }
-            }}
-          >
-            Team View
-          </button>
         </div>
         
-        {/* Main Page Header */}
-        <h1 style={{
-          color: '#ffcb05',
-          fontSize: '1.8rem',
-          fontWeight: 'bold',
-          margin: 0,
-          textShadow: '2px 2px 4px rgba(0,0,0,0.8)',
-          display: 'flex',
-          alignItems: 'center',
-          height: '50px',
-          letterSpacing: '0.5px',
+        {/* Centered Main Page Header */}
+        <div style={{ 
+          position: 'absolute',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          pointerEvents: 'none',
         }}>
-          ⚔️ PVP Battle Builds ⚔️
-        </h1>
+          <h1 style={{
+            color: '#ffcb05',
+            fontSize: '1.8rem',
+            fontWeight: 'bold',
+            margin: 0,
+            textShadow: '2px 2px 4px rgba(0,0,0,0.8)',
+            display: 'flex',
+            alignItems: 'center',
+            height: '50px',
+            letterSpacing: '0.5px',
+            whiteSpace: 'nowrap',
+          }}>
+            ⚔️ PVP Battle Builds ⚔️
+          </h1>
+        </div>
         
         <div style={{ position: 'relative', marginRight: '16px' }}> {/* Bring inward from edge */}
           <button
@@ -404,20 +386,85 @@ export default function PVPPage() {
         }}
       >
         <div style={{ 
-          maxWidth: '1400px', 
+          maxWidth: '1600px', 
           margin: '0 auto',
           padding: '2rem',
-          minHeight: '100%', // Ensure content can fill the container
+          minHeight: '100%',
+          width: '100%',
         }}>
+          {/* Main Content Area */}
+          <div style={{ width: '100%' }}>
+            {/* Top Control Row - ViewToggle, Team Showcase, Sort Filter */}
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: '24px',
+              padding: '0 16px',
+              position: 'relative',
+            }}>
+              {/* Left: View Toggle */}
+              <div style={{ flex: '0 0 auto' }}>
+                <ViewToggle 
+                  currentView={currentView} 
+                  onViewChange={(view) => setCurrentView(view)} 
+                />
+              </div>
 
+              {/* Center: Team Showcase Link */}
+              <div style={{ 
+                position: 'absolute',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                flex: '0 0 auto',
+              }}>
+                <a
+                  href="/pvp/teams"
+                  style={{
+                    backgroundColor: 'rgba(40, 167, 69, 0.2)',
+                    color: '#28a745',
+                    border: '2px solid #28a745',
+                    padding: '10px 20px',
+                    borderRadius: '8px',
+                    fontSize: '1rem',
+                    fontWeight: 'bold',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    textDecoration: 'none',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    boxShadow: '0 2px 8px rgba(40, 167, 69, 0.3)',
+                    whiteSpace: 'nowrap',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#28a745';
+                    e.currentTarget.style.color = '#fff';
+                    e.currentTarget.style.transform = 'translateX(-50%) translateY(-1px)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'rgba(40, 167, 69, 0.2)';
+                    e.currentTarget.style.color = '#28a745';
+                    e.currentTarget.style.transform = 'translateX(-50%) translateY(0)';
+                  }}
+                >
+                  🏆 Team Showcase
+                </a>
+              </div>
 
-          {/* Team Manager (conditionally shown) */}
-          {showTeamManager && (
-            <TeamManager
-              builds={builds}
-              onUpdateBuild={handleUpdateBuildTeam}
-            />
-          )}
+              {/* Right: Sort Filter */}
+              <div style={{ flex: '0 0 auto', minWidth: '200px' }}>
+                <SortFilter currentSort={currentSort} onSortChange={setCurrentSort} />
+              </div>
+            </div>
+
+            {/* Team Manager (conditionally shown) */}
+            {showTeamManager && (
+              <TeamManager
+                builds={builds}
+                onUpdateBuild={handleUpdateBuildTeam}
+              />
+            )}
 
           {/* Content */}
           {isLoading ? (
@@ -508,15 +555,17 @@ export default function PVPPage() {
                   builds={filteredBuilds}
                   onEdit={handleEditBuild}
                   onDelete={handleDeleteBuild}
+                  onExport={handleExportPokemon}
                 />
               ) : (
                 /* Cards View */
                 <div
                   style={{
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))',
-                    gap: '2rem',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(480px, 1fr))',
+                    gap: '1.5rem',
                     marginBottom: '3rem',
+                    maxWidth: '100%',
                   }}
                 >
                   {filteredBuilds.map((build) => (
@@ -525,6 +574,7 @@ export default function PVPPage() {
                       build={build}
                       onEdit={handleEditBuild}
                       onDelete={handleDeleteBuild}
+                      onExport={handleExportPokemon}
                     />
                   ))}
                 </div>
@@ -548,6 +598,7 @@ export default function PVPPage() {
               )}
             </>
           )}
+          </div>
         </div>
       </div>
 
@@ -558,6 +609,13 @@ export default function PVPPage() {
         onSave={handleSaveBuild}
         editBuild={editingBuild}
         defaultTab={modalDefaultTab}
+      />
+
+      {/* Export Modal */}
+      <ExportModal
+        isOpen={showExportModal}
+        onClose={handleCloseExportModal}
+        pokemon={exportingPokemon}
       />
     </>
   );

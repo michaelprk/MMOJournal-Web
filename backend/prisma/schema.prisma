@@ -34,6 +34,8 @@ model PokemonBuild {
   speedEV    Int      @default(0)
   // Metadata
   description String? // Optional description
+  team_id    String? // Team ID for grouping Pokemon
+  team_name  String? // Team name for display
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 }

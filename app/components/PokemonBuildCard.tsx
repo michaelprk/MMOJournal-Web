@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 import type { PokemonBuild } from '../types/pokemon';
 import { getItemSpriteUrls } from '../utils/item-sprites';
 import { TIER_COLORS } from '../types/pokemon';
-import { buildToShowdownFormat } from '../utils/showdown-parser';
 
 interface PokemonBuildCardProps {
   build: PokemonBuild;
   onEdit?: (build: PokemonBuild) => void;
   onDelete?: (id: string) => void;
+  onExport?: (build: PokemonBuild) => void;
 }
 
 // Move type colors for moves
@@ -99,7 +99,7 @@ function ItemImage({ itemName, className, style }: { itemName: string; className
   );
 }
 
-export function PokemonBuildCard({ build, onEdit, onDelete }: PokemonBuildCardProps) {
+export function PokemonBuildCard({ build, onEdit, onDelete, onExport }: PokemonBuildCardProps) {
   const [imageError, setImageError] = useState(false);
   const [currentView, setCurrentView] = useState<'main' | 'stats' | 'moves'>('main');
   const [moveTypes, setMoveTypes] = useState<Record<string, string>>({});
@@ -191,20 +191,9 @@ export function PokemonBuildCard({ build, onEdit, onDelete }: PokemonBuildCardPr
 
   const handleExportToShowdown = (e: React.MouseEvent) => {
     e.stopPropagation();
-    const showdownFormat = buildToShowdownFormat(build);
-    navigator.clipboard.writeText(showdownFormat).then(() => {
-      // You could add a toast notification here
-      console.log('Pokemon build copied to clipboard in Showdown format!');
-    }).catch(err => {
-      console.error('Failed to copy to clipboard:', err);
-      // Fallback: create a text area and select the text
-      const textArea = document.createElement('textarea');
-      textArea.value = showdownFormat;
-      document.body.appendChild(textArea);
-      textArea.select();
-      document.execCommand('copy');
-      document.body.removeChild(textArea);
-    });
+    if (onExport) {
+      onExport(build);
+    }
   };
 
   return (
@@ -985,6 +974,7 @@ export function PokemonBuildCard({ build, onEdit, onDelete }: PokemonBuildCardPr
             </div>
           </div>
         )}
+
       </div>
     </div>
   );

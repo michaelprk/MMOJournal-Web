@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 import type { PokemonBuild } from '../types/pokemon';
 import { getItemSpriteUrls } from '../utils/item-sprites';
 import { TIER_COLORS } from '../types/pokemon';
-import { buildToShowdownFormat } from '../utils/showdown-parser';
 
 interface PokemonBuildListViewProps {
   builds: PokemonBuild[];
   onEdit?: (build: PokemonBuild) => void;
   onDelete?: (id: string) => void;
+  onExport?: (build: PokemonBuild) => void;
 }
 
 // Gender Icon Component
@@ -76,7 +76,7 @@ function ItemImage({ itemName, className, style }: { itemName: string; className
   );
 }
 
-function PokemonBuildListItem({ build, onEdit, onDelete }: { build: PokemonBuild; onEdit?: (build: PokemonBuild) => void; onDelete?: (id: string) => void; }) {
+function PokemonBuildListItem({ build, onEdit, onDelete, onExport }: { build: PokemonBuild; onEdit?: (build: PokemonBuild) => void; onDelete?: (id: string) => void; onExport?: (build: PokemonBuild) => void; }) {
   const [imageError, setImageError] = useState(false);
   const tierColor = TIER_COLORS[build.tier];
 
@@ -95,18 +95,9 @@ function PokemonBuildListItem({ build, onEdit, onDelete }: { build: PokemonBuild
 
   const handleExportToShowdown = (e: React.MouseEvent) => {
     e.stopPropagation();
-    const showdownFormat = buildToShowdownFormat(build);
-    navigator.clipboard.writeText(showdownFormat).then(() => {
-      console.log('Pokemon build copied to clipboard in Showdown format!');
-    }).catch(err => {
-      console.error('Failed to copy to clipboard:', err);
-      const textArea = document.createElement('textarea');
-      textArea.value = showdownFormat;
-      document.body.appendChild(textArea);
-      textArea.select();
-      document.execCommand('copy');
-      document.body.removeChild(textArea);
-    });
+    if (onExport) {
+      onExport(build);
+    }
   };
 
   const formatEVs = (evs: any) => {
@@ -329,11 +320,12 @@ function PokemonBuildListItem({ build, onEdit, onDelete }: { build: PokemonBuild
           </span>
         </div>
       </div>
+
     </div>
   );
 }
 
-export function PokemonBuildListView({ builds, onEdit, onDelete }: PokemonBuildListViewProps) {
+export function PokemonBuildListView({ builds, onEdit, onDelete, onExport }: PokemonBuildListViewProps) {
   return (
     <div style={{ maxWidth: '100%' }}>
       {builds.map((build) => (
@@ -342,6 +334,7 @@ export function PokemonBuildListView({ builds, onEdit, onDelete }: PokemonBuildL
           build={build}
           onEdit={onEdit}
           onDelete={onDelete}
+          onExport={onExport}
         />
       ))}
       

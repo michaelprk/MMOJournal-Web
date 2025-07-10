@@ -103,10 +103,12 @@ app.post('/api/pokemon', async (req, res) => {
         hpEV: hpEV ?? evs?.hp ?? 0,
         attackEV: attackEV ?? evs?.attack ?? 0,
         defenseEV: defenseEV ?? evs?.defense ?? 0,
-        spAttackEV: spAttackEV ?? evs?.spAttack ?? 0,
+                      spAttackEV: spAttackEV ?? evs?.spAttack ?? 0,
         spDefenseEV: spDefenseEV ?? evs?.spDefense ?? 0,
         speedEV: speedEV ?? evs?.speed ?? 0,
-        description
+        description,
+        team_id: req.body.team_id,
+        team_name: req.body.team_name
       }
     });
     
@@ -166,7 +168,9 @@ app.patch('/api/pokemon/:id', async (req, res) => {
         spAttackEV: spAttackEV ?? evs?.spAttack ?? existingBuild.spAttackEV,
         spDefenseEV: spDefenseEV ?? evs?.spDefense ?? existingBuild.spDefenseEV,
         speedEV: speedEV ?? evs?.speed ?? existingBuild.speedEV,
-        description
+        description,
+        team_id: req.body.team_id !== undefined ? req.body.team_id : existingBuild.team_id,
+        team_name: req.body.team_name !== undefined ? req.body.team_name : existingBuild.team_name
       }
     });
     

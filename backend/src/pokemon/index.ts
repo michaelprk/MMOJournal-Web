@@ -64,7 +64,9 @@ router.post('/', validatePokemonBuild, async (req, res) => {
          spAttackEV: buildData.evs.spAttack,
          spDefenseEV: buildData.evs.spDefense,
          speedEV: buildData.evs.speed,
-         description: buildData.description
+         description: buildData.description,
+         team_id: buildData.team_id,
+         team_name: buildData.team_name
       }
     });
     
@@ -112,7 +114,9 @@ router.patch('/:id', validatePokemonBuild, async (req, res) => {
          spAttackEV: buildData.evs.spAttack,
          spDefenseEV: buildData.evs.spDefense,
          speedEV: buildData.evs.speed,
-         description: buildData.description
+         description: buildData.description,
+         team_id: buildData.team_id,
+         team_name: buildData.team_name
       }
     });
     

@@ -20,6 +20,8 @@ export function AddPokemonModal({ isOpen, onClose, onSave, editBuild, defaultTab
   const [importedBuilds, setImportedBuilds] = useState<Array<Omit<PokemonBuild, 'id' | 'created_at' | 'updated_at'>>>([]);
   const [showTierPopup, setShowTierPopup] = useState(false);
   const [selectedImportTier, setSelectedImportTier] = useState<CompetitiveTier>('OU');
+  const [teamName, setTeamName] = useState('');
+  const [shouldCreateTeam, setShouldCreateTeam] = useState(false);
   
   // Autocomplete states
   const [pokemonSuggestions, setPokemonSuggestions] = useState<string[]>([]);
@@ -52,6 +54,8 @@ export function AddPokemonModal({ isOpen, onClose, onSave, editBuild, defaultTab
       speed: 0,
     },
     description: '',
+    team_id: '',
+    team_name: '',
   });
 
   // Set default tab and reset form when modal opens/closes or when editBuild changes
@@ -75,6 +79,8 @@ export function AddPokemonModal({ isOpen, onClose, onSave, editBuild, defaultTab
           ivs: editBuild.ivs,
           evs: editBuild.evs,
           description: editBuild.description || '',
+          team_id: editBuild.team_id || '',
+          team_name: editBuild.team_name || '',
         });
         setShowdownText(editBuild.showdown_import || '');
         setShowTierPopup(false);
@@ -106,8 +112,12 @@ export function AddPokemonModal({ isOpen, onClose, onSave, editBuild, defaultTab
             speed: 0,
           },
           description: '',
+          team_id: '',
+          team_name: '',
         });
         setShowdownText('');
+        setTeamName('');
+        setShouldCreateTeam(false);
         
         // Show tier popup if opening directly to showdown tab
         if (defaultTab === 'showdown') {
@@ -201,8 +211,15 @@ export function AddPokemonModal({ isOpen, onClose, onSave, editBuild, defaultTab
           ivs: build.ivs,
           evs: build.evs,
           description: build.description || '',
+          team_id: build.team_id || '',
+          team_name: build.team_name || '',
         });
         setActiveTab('manual');
+        setShouldCreateTeam(false);
+      } else if (builds.length > 1) {
+        // Multiple Pokemon - suggest team creation
+        setShouldCreateTeam(true);
+        setTeamName(`Team ${Date.now()}`); // Default team name
       }
     } catch (error) {
       console.error('Error parsing Showdown import:', error);
@@ -215,10 +232,15 @@ export function AddPokemonModal({ isOpen, onClose, onSave, editBuild, defaultTab
     try {
       if (activeTab === 'showdown' && importedBuilds.length > 1) {
         // Save multiple Pokemon builds
+        const teamId = shouldCreateTeam ? `team_${Date.now()}` : undefined;
+        const finalTeamName = shouldCreateTeam ? teamName.trim() || `Team ${Date.now()}` : undefined;
+        
         for (const build of importedBuilds) {
           await onSave({
             ...build,
             showdown_import: showdownText,
+            team_id: teamId,
+            team_name: finalTeamName,
           });
         }
       } else {
@@ -237,6 +259,8 @@ export function AddPokemonModal({ isOpen, onClose, onSave, editBuild, defaultTab
           evs: formData.evs,
           description: formData.description || undefined,
           showdown_import: showdownText || undefined,
+          team_id: formData.team_id || undefined,
+          team_name: formData.team_name || undefined,
         };
 
         await onSave(build);
@@ -497,6 +521,67 @@ Timid Nature
                 <h3 style={{ color: '#ffcb05', marginBottom: '1rem' }}>
                   Imported Pokemon ({importedBuilds.length})
                 </h3>
+                
+                {/* Team Creation Section for Multiple Pokemon */}
+                {importedBuilds.length > 1 && (
+                  <div style={{
+                    backgroundColor: 'rgba(255, 203, 5, 0.1)',
+                    border: '1px solid rgba(255, 203, 5, 0.3)',
+                    borderRadius: '8px',
+                    padding: '16px',
+                    marginBottom: '16px',
+                  }}>
+                    <h4 style={{ color: '#ffcb05', margin: '0 0 12px 0', fontSize: '1rem' }}>
+                      🏆 Team Creation
+                    </h4>
+                    
+                    <div style={{ marginBottom: '12px' }}>
+                      <label style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        color: '#fff',
+                        fontSize: '0.9rem',
+                        cursor: 'pointer',
+                      }}>
+                        <input
+                          type="checkbox"
+                          checked={shouldCreateTeam}
+                          onChange={(e) => setShouldCreateTeam(e.target.checked)}
+                          style={{ cursor: 'pointer' }}
+                        />
+                        Create a new team with these {importedBuilds.length} Pokemon
+                      </label>
+                    </div>
+                    
+                    {shouldCreateTeam && (
+                      <div>
+                        <label style={{ color: '#ffcb05', display: 'block', marginBottom: '6px', fontSize: '0.9rem' }}>
+                          Team Name:
+                        </label>
+                        <input
+                          type="text"
+                          value={teamName}
+                          onChange={(e) => setTeamName(e.target.value)}
+                          placeholder="Enter team name..."
+                          style={{
+                            width: '100%',
+                            backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                            border: '1px solid #ffcb05',
+                            borderRadius: '6px',
+                            color: '#fff',
+                            padding: '8px 12px',
+                            fontSize: '0.9rem',
+                          }}
+                        />
+                        <div style={{ color: '#ccc', fontSize: '0.8rem', marginTop: '4px' }}>
+                          This will group all {importedBuilds.length} Pokemon together as a team for easy management and export.
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+                
                 <div style={{ 
                   maxHeight: '300px', 
                   overflowY: 'auto',
@@ -711,6 +796,50 @@ Timid Nature
                       resize: 'vertical',
                     }}
                   />
+                </div>
+
+                {/* Team Assignment Section */}
+                <div style={{ marginBottom: '1rem' }}>
+                  <label style={{ color: '#ffcb05', display: 'block', marginBottom: '0.5rem' }}>
+                    🏆 Team Assignment (Optional)
+                  </label>
+                  <div style={{ 
+                    backgroundColor: 'rgba(255, 203, 5, 0.05)',
+                    border: '1px solid rgba(255, 203, 5, 0.2)',
+                    borderRadius: '8px',
+                    padding: '12px',
+                  }}>
+                    <div style={{ marginBottom: '8px' }}>
+                      <input
+                        type="text"
+                        value={formData.team_name}
+                        onChange={(e) => {
+                          const teamName = e.target.value;
+                          setFormData({ 
+                            ...formData, 
+                            team_name: teamName,
+                            team_id: teamName ? `team_${teamName.toLowerCase().replace(/\s+/g, '_')}_${Date.now()}` : ''
+                          });
+                        }}
+                        placeholder="Enter team name to assign this Pokemon to a team..."
+                        style={{
+                          width: '100%',
+                          backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                          border: '1px solid rgba(255, 203, 5, 0.3)',
+                          borderRadius: '6px',
+                          color: '#fff',
+                          padding: '8px 12px',
+                          fontSize: '0.9rem',
+                        }}
+                      />
+                    </div>
+                    <div style={{ color: '#ccc', fontSize: '0.8rem' }}>
+                      {formData.team_name ? 
+                        `This Pokemon will be added to the "${formData.team_name}" team.` :
+                        'Leave empty to add this Pokemon without a team assignment.'
+                      }
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import type { PokemonBuild } from '../types/pokemon';
 import { TIER_COLORS } from '../types/pokemon';
-import { buildToShowdownFormat } from '../utils/showdown-parser';
+import { ExportModal } from './ExportModal';
 
 interface Team {
   id: string;
@@ -16,6 +16,7 @@ interface TeamViewProps {
 }
 
 function PokemonMiniCard({ build, onEdit, onDelete }: { build: PokemonBuild; onEdit?: (build: PokemonBuild) => void; onDelete?: (id: string) => void; }) {
+  const [showExportModal, setShowExportModal] = useState(false);
   const tierColor = TIER_COLORS[build.tier];
 
   const formatPokemonName = (name: string) => {
@@ -32,18 +33,7 @@ function PokemonMiniCard({ build, onEdit, onDelete }: { build: PokemonBuild; onE
 
   const handleExportToShowdown = (e: React.MouseEvent) => {
     e.stopPropagation();
-    const showdownFormat = buildToShowdownFormat(build);
-    navigator.clipboard.writeText(showdownFormat).then(() => {
-      console.log('Pokemon build copied to clipboard in Showdown format!');
-    }).catch(err => {
-      console.error('Failed to copy to clipboard:', err);
-      const textArea = document.createElement('textarea');
-      textArea.value = showdownFormat;
-      document.body.appendChild(textArea);
-      textArea.select();
-      document.execCommand('copy');
-      document.body.removeChild(textArea);
-    });
+    setShowExportModal(true);
   };
 
   return (
@@ -205,27 +195,22 @@ function PokemonMiniCard({ build, onEdit, onDelete }: { build: PokemonBuild; onE
           </button>
         )}
       </div>
+
+      {/* Export Modal */}
+      <ExportModal
+        isOpen={showExportModal}
+        onClose={() => setShowExportModal(false)}
+        pokemon={build}
+      />
     </div>
   );
 }
 
 function TeamCard({ team, onEdit, onDelete }: { team: Team; onEdit?: (build: PokemonBuild) => void; onDelete?: (id: string) => void; }) {
+  const [showTeamExportModal, setShowTeamExportModal] = useState(false);
+
   const exportTeamToShowdown = () => {
-    const teamExport = team.pokemon
-      .map(pokemon => buildToShowdownFormat(pokemon))
-      .join('\n\n');
-    
-    navigator.clipboard.writeText(teamExport).then(() => {
-      console.log('Team exported to clipboard in Showdown format!');
-    }).catch(err => {
-      console.error('Failed to copy team to clipboard:', err);
-      const textArea = document.createElement('textarea');
-      textArea.value = teamExport;
-      document.body.appendChild(textArea);
-      textArea.select();
-      document.execCommand('copy');
-      document.body.removeChild(textArea);
-    });
+    setShowTeamExportModal(true);
   };
 
   return (
@@ -348,6 +333,14 @@ function TeamCard({ team, onEdit, onDelete }: { team: Team; onEdit?: (build: Pok
           No Pokemon in this team yet. Assign Pokemon using the Team Management section above.
         </div>
       )}
+
+      {/* Team Export Modal */}
+      <ExportModal
+        isOpen={showTeamExportModal}
+        onClose={() => setShowTeamExportModal(false)}
+        team={team.pokemon}
+        title={`${team.name} Team Export`}
+      />
     </div>
   );
 }
