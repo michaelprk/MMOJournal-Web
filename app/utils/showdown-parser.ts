@@ -179,6 +179,85 @@ export function showdownImportToBuild(showdownImport: ShowdownImport, tier: Comp
 }
 
 /**
+ * Convert a PokemonBuild to Pokemon Showdown format string
+ */
+export function buildToShowdownFormat(build: PokemonBuild): string {
+  const lines: string[] = [];
+  
+  // First line: Name (Species) (Gender) @ Item
+  let firstLine = '';
+  
+  // Add name/species
+  if (build.name !== build.species) {
+    firstLine += `${build.name} (${build.species})`;
+  } else {
+    firstLine += build.species;
+  }
+  
+  // Add gender if specified
+  if (build.gender && build.gender !== 'U') {
+    firstLine += ` (${build.gender})`;
+  }
+  
+  // Add item if present
+  if (build.item) {
+    firstLine += ` @ ${build.item}`;
+  }
+  
+  lines.push(firstLine);
+  
+  // Ability
+  if (build.ability) {
+    lines.push(`Ability: ${build.ability}`);
+  }
+  
+  // Level (only if not 50)
+  if (build.level !== 50) {
+    lines.push(`Level: ${build.level}`);
+  }
+  
+  // EVs (only include non-zero values)
+  const evEntries: string[] = [];
+  if (build.evs.hp > 0) evEntries.push(`${build.evs.hp} HP`);
+  if (build.evs.attack > 0) evEntries.push(`${build.evs.attack} Atk`);
+  if (build.evs.defense > 0) evEntries.push(`${build.evs.defense} Def`);
+  if (build.evs.sp_attack > 0) evEntries.push(`${build.evs.sp_attack} SpA`);
+  if (build.evs.sp_defense > 0) evEntries.push(`${build.evs.sp_defense} SpD`);
+  if (build.evs.speed > 0) evEntries.push(`${build.evs.speed} Spe`);
+  
+  if (evEntries.length > 0) {
+    lines.push(`EVs: ${evEntries.join(' / ')}`);
+  }
+  
+  // Nature
+  if (build.nature) {
+    lines.push(`${build.nature} Nature`);
+  }
+  
+  // IVs (only include non-31 values)
+  const ivEntries: string[] = [];
+  if (build.ivs.hp < 31) ivEntries.push(`${build.ivs.hp} HP`);
+  if (build.ivs.attack < 31) ivEntries.push(`${build.ivs.attack} Atk`);
+  if (build.ivs.defense < 31) ivEntries.push(`${build.ivs.defense} Def`);
+  if (build.ivs.sp_attack < 31) ivEntries.push(`${build.ivs.sp_attack} SpA`);
+  if (build.ivs.sp_defense < 31) ivEntries.push(`${build.ivs.sp_defense} SpD`);
+  if (build.ivs.speed < 31) ivEntries.push(`${build.ivs.speed} Spe`);
+  
+  if (ivEntries.length > 0) {
+    lines.push(`IVs: ${ivEntries.join(' / ')}`);
+  }
+  
+  // Moves
+  for (const move of build.moves) {
+    if (move) {
+      lines.push(`- ${move}`);
+    }
+  }
+  
+  return lines.join('\n');
+}
+
+/**
  * Example Showdown import formats for validation
  */
 export const EXAMPLE_SHOWDOWN_IMPORTS = [

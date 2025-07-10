@@ -13,6 +13,8 @@ export interface PokemonBuild {
   evs: PokemonStats;
   description?: string;
   showdown_import?: string;
+  team_id?: string; // New field for grouping Pokemon into teams
+  team_name?: string; // New field for team name
   user_id?: string;
   created_at: string;
   updated_at: string;

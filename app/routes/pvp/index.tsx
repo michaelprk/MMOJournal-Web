@@ -4,6 +4,10 @@ import { COMPETITIVE_TIERS } from '../../types/pokemon';
 import { PokemonBuildService } from '../../services/pokemon-backend';
 import { TierFilter } from '../../components/TierFilter';
 import { PokemonBuildCard } from '../../components/PokemonBuildCard';
+import { PokemonBuildListView } from '../../components/PokemonBuildListView';
+import { ViewToggle } from '../../components/ViewToggle';
+import { TeamManager } from '../../components/TeamManager';
+import { TeamView } from '../../components/TeamView';
 import { AddPokemonModal } from '../../components/AddPokemonModal';
 
 export default function PVPPage() {
@@ -16,6 +20,8 @@ export default function PVPPage() {
   const [editingBuild, setEditingBuild] = useState<PokemonBuild | undefined>();
   const [showAddOptions, setShowAddOptions] = useState(false);
   const [modalDefaultTab, setModalDefaultTab] = useState<'manual' | 'showdown'>('manual');
+  const [currentView, setCurrentView] = useState<'cards' | 'list' | 'teams'>('cards');
+  const [showTeamManager, setShowTeamManager] = useState(false);
 
   // Sort builds by tier order
   const sortBuildsByTier = (builds: PokemonBuild[]) => {
@@ -117,6 +123,58 @@ export default function PVPPage() {
     setModalDefaultTab('manual');
   };
 
+  const handleUpdateBuildTeam = async (buildId: string, teamId?: string, teamName?: string) => {
+    try {
+      const buildToUpdate = builds.find(b => b.id === buildId);
+      if (!buildToUpdate) return;
+
+      const updatedBuildData = {
+        ...buildToUpdate,
+        team_id: teamId,
+        team_name: teamName,
+      };
+
+      await PokemonBuildService.updateBuild(buildId, updatedBuildData);
+      await loadBuilds();
+    } catch (err) {
+      console.error('Failed to update Pokemon build team:', err);
+      alert('Failed to update Pokemon build team. Please try again.');
+    }
+  };
+
+  // Organize builds into teams for team view
+  const organizeIntoTeams = () => {
+    const teamMap = new Map();
+    const unassignedPokemon: PokemonBuild[] = [];
+
+    filteredBuilds.forEach(build => {
+      if (build.team_id && build.team_name) {
+        if (!teamMap.has(build.team_id)) {
+          teamMap.set(build.team_id, {
+            id: build.team_id,
+            name: build.team_name,
+            pokemon: []
+          });
+        }
+        teamMap.get(build.team_id).pokemon.push(build);
+      } else {
+        unassignedPokemon.push(build);
+      }
+    });
+
+    const teams = Array.from(teamMap.values());
+    
+    if (unassignedPokemon.length > 0) {
+      teams.unshift({
+        id: 'unassigned',
+        name: 'Unassigned Pokemon',
+        pokemon: unassignedPokemon
+      });
+    }
+
+    return teams;
+  };
+
   const tierCounts = builds.reduce((acc, build) => {
     acc[build.tier] = (acc[build.tier] || 0) + 1;
     return acc;
@@ -144,8 +202,64 @@ export default function PVPPage() {
           marginBottom: '16px',
         }}
       >
-        <div style={{ marginLeft: '16px' }}> {/* Bring inward from edge */}
+        <div style={{ display: 'flex', gap: '16px', alignItems: 'center', marginLeft: '16px' }}>
           <TierFilter selectedTier={selectedTier} onTierChange={setSelectedTier} style="dropdown" />
+          <ViewToggle 
+            currentView={currentView === 'teams' ? 'cards' : currentView} 
+            onViewChange={(view) => setCurrentView(view)} 
+          />
+          <button
+            onClick={() => setShowTeamManager(!showTeamManager)}
+            style={{
+              backgroundColor: showTeamManager ? '#ffcb05' : 'transparent',
+              color: showTeamManager ? '#000' : '#ffcb05',
+              border: '1px solid #ffcb05',
+              padding: '8px 16px',
+              borderRadius: '6px',
+              fontSize: '0.9rem',
+              fontWeight: 'bold',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+            }}
+            onMouseEnter={(e) => {
+              if (!showTeamManager) {
+                e.currentTarget.style.backgroundColor = 'rgba(255, 203, 5, 0.2)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!showTeamManager) {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }
+            }}
+          >
+            🏆 Teams
+          </button>
+          <button
+            onClick={() => setCurrentView('teams')}
+            style={{
+              backgroundColor: currentView === 'teams' ? '#ffcb05' : 'transparent',
+              color: currentView === 'teams' ? '#000' : '#ffcb05',
+              border: '1px solid #ffcb05',
+              padding: '8px 16px',
+              borderRadius: '6px',
+              fontSize: '0.9rem',
+              fontWeight: 'bold',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+            }}
+            onMouseEnter={(e) => {
+              if (currentView !== 'teams') {
+                e.currentTarget.style.backgroundColor = 'rgba(255, 203, 5, 0.2)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (currentView !== 'teams') {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }
+            }}
+          >
+            Team View
+          </button>
         </div>
         
         {/* Main Page Header */}
@@ -297,6 +411,14 @@ export default function PVPPage() {
         }}>
 
 
+          {/* Team Manager (conditionally shown) */}
+          {showTeamManager && (
+            <TeamManager
+              builds={builds}
+              onUpdateBuild={handleUpdateBuildTeam}
+            />
+          )}
+
           {/* Content */}
           {isLoading ? (
             <div style={{ textAlign: 'center', padding: '4rem' }}>
@@ -338,7 +460,7 @@ export default function PVPPage() {
                 Try Again
               </button>
             </div>
-          ) : filteredBuilds.length === 0 ? (
+          ) : filteredBuilds.length === 0 && currentView !== 'teams' ? (
             <div style={{ textAlign: 'center', padding: '4rem' }}>
               <div
                 style={{
@@ -374,39 +496,56 @@ export default function PVPPage() {
             </div>
           ) : (
             <>
-              {/* Pokemon Cards Grid */}
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))',
-                  gap: '2rem',
-                  marginBottom: '3rem',
-                }}
-              >
-                {filteredBuilds.map((build) => (
-                  <PokemonBuildCard
-                    key={build.id}
-                    build={build}
-                    onEdit={handleEditBuild}
-                    onDelete={handleDeleteBuild}
-                  />
-                ))}
-              </div>
+              {/* Conditional View Rendering */}
+              {currentView === 'teams' ? (
+                <TeamView
+                  teams={organizeIntoTeams()}
+                  onEdit={handleEditBuild}
+                  onDelete={handleDeleteBuild}
+                />
+              ) : currentView === 'list' ? (
+                <PokemonBuildListView
+                  builds={filteredBuilds}
+                  onEdit={handleEditBuild}
+                  onDelete={handleDeleteBuild}
+                />
+              ) : (
+                /* Cards View */
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))',
+                    gap: '2rem',
+                    marginBottom: '3rem',
+                  }}
+                >
+                  {filteredBuilds.map((build) => (
+                    <PokemonBuildCard
+                      key={build.id}
+                      build={build}
+                      onEdit={handleEditBuild}
+                      onDelete={handleDeleteBuild}
+                    />
+                  ))}
+                </div>
+              )}
 
-              {/* Build Count - Moved to Bottom */}
-              <p 
-                className="text-center mt-10 text-sm text-white/60"
-                style={{ 
-                  textAlign: 'center', 
-                  marginTop: '2rem', 
-                  fontSize: '0.875rem', 
-                  color: 'rgba(255, 255, 255, 0.6)',
-                  paddingBottom: '2rem',
-                }}
-              >
-                {filteredBuilds.length} total builds
-                {selectedTier && ` in ${selectedTier}`}
-              </p>
+              {/* Build Count - Only for non-team views */}
+              {currentView !== 'teams' && (
+                <p 
+                  className="text-center mt-10 text-sm text-white/60"
+                  style={{ 
+                    textAlign: 'center', 
+                    marginTop: '2rem', 
+                    fontSize: '0.875rem', 
+                    color: 'rgba(255, 255, 255, 0.6)',
+                    paddingBottom: '2rem',
+                  }}
+                >
+                  {filteredBuilds.length} total builds
+                  {selectedTier && ` in ${selectedTier}`}
+                </p>
+              )}
             </>
           )}
         </div>

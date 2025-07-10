@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import type { PokemonBuild } from '../types/pokemon';
 import { getItemSpriteUrls } from '../utils/item-sprites';
 import { TIER_COLORS } from '../types/pokemon';
+import { buildToShowdownFormat } from '../utils/showdown-parser';
 
 interface PokemonBuildCardProps {
   build: PokemonBuild;
@@ -186,6 +187,24 @@ export function PokemonBuildCard({ build, onEdit, onDelete }: PokemonBuildCardPr
     if (view === 'main') return 'Overview';
     if (view === 'stats') return 'Stats';
     return 'Moves';
+  };
+
+  const handleExportToShowdown = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const showdownFormat = buildToShowdownFormat(build);
+    navigator.clipboard.writeText(showdownFormat).then(() => {
+      // You could add a toast notification here
+      console.log('Pokemon build copied to clipboard in Showdown format!');
+    }).catch(err => {
+      console.error('Failed to copy to clipboard:', err);
+      // Fallback: create a text area and select the text
+      const textArea = document.createElement('textarea');
+      textArea.value = showdownFormat;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+    });
   };
 
   return (
@@ -404,7 +423,7 @@ export function PokemonBuildCard({ build, onEdit, onDelete }: PokemonBuildCardPr
             </div>
           )}
 
-          {/* Edit/Delete Buttons - Bottom Right Corner */}
+          {/* Action Buttons - Bottom Right Corner */}
           <div style={{ 
             position: 'absolute',
             bottom: '6px',
@@ -412,6 +431,32 @@ export function PokemonBuildCard({ build, onEdit, onDelete }: PokemonBuildCardPr
             display: 'flex',
             gap: '6px',
           }}>
+            <button
+              onClick={handleExportToShowdown}
+              style={{
+                backgroundColor: 'transparent',
+                border: '1px solid #28a745',
+                color: '#28a745',
+                padding: '4px 8px',
+                borderRadius: '4px',
+                fontSize: '0.75rem',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                fontWeight: '600',
+                minWidth: '50px',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(40, 167, 69, 0.2)';
+                e.currentTarget.style.transform = 'translateY(-1px)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+                e.currentTarget.style.transform = 'translateY(0)';
+              }}
+              title="Export to Pokemon Showdown format"
+            >
+              📋 Export
+            </button>
             {onEdit && (
               <button
                 onClick={(e) => {
