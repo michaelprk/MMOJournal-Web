@@ -161,36 +161,115 @@ export default function ShinyShowcase() {
   };
 
   return (
-    <div
-      style={{
-        position: 'fixed',
-        top: '220px', // Start below the navbar
-        left: 0,
-        right: 0,
-        height: 'calc(100vh - 220px)', // Take remaining viewport height
-        backgroundColor: 'transparent',
-        overflowY: 'auto', // Allow scrolling within this container
-        overflowX: 'hidden',
-      }}
-    >
-      {/* Sticky Header */}
-      <div className="sticky-header">
-        <h1>✨ Shiny Hunt Tracker ✨</h1>
+    <>
+      {/* Sticky Utility Bar - positioned outside scrollable container */}
+      <div
+        style={{
+          position: 'sticky',
+          top: '280px', // Below navbar (200px navbar + 80px spacing)
+          left: 0,
+          right: 0,
+          zIndex: 30,
+          padding: '16px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          backgroundColor: 'rgba(0, 0, 0, 0.1)',
+          borderRadius: '8px',
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+          margin: '0 32px', // Increased from 16px for better spacing
+          marginBottom: '16px',
+        }}
+      >
+        <div style={{ marginLeft: '16px' }}> {/* Bring inward from edge */}
+          {/* Left side stats */}
+          <div style={{ display: 'flex', gap: '2rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem' }}>
+              <span style={{ fontSize: '0.875rem', color: 'rgba(255, 255, 255, 0.7)' }}>Active Hunts:</span>
+              <span style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#ffd700', textShadow: '0 0 5px rgba(255, 215, 0, 0.5)' }}>
+                {currentHunts.length}
+              </span>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem' }}>
+              <span style={{ fontSize: '0.875rem', color: 'rgba(255, 255, 255, 0.7)' }}>Total Shinies:</span>
+              <span style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#ffd700', textShadow: '0 0 5px rgba(255, 215, 0, 0.5)' }}>
+                {portfolio.length}
+              </span>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem' }}>
+              <span style={{ fontSize: '0.875rem', color: 'rgba(255, 255, 255, 0.7)' }}>Total Encounters:</span>
+              <span style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#ffd700', textShadow: '0 0 5px rgba(255, 215, 0, 0.5)' }}>
+                {currentHunts.reduce((sum, hunt) => sum + hunt.totalEncounters, 0).toLocaleString()}
+              </span>
+            </div>
+          </div>
+        </div>
+        
+        {/* Main Page Header */}
+        <h1 style={{
+          color: '#ffd700',
+          fontSize: '1.8rem',
+          fontWeight: 'bold',
+          margin: 0,
+          textShadow: '2px 2px 4px rgba(0,0,0,0.8)',
+          display: 'flex',
+          alignItems: 'center',
+          height: '50px',
+          letterSpacing: '0.5px',
+        }}>
+          ✨ Shiny Hunt Tracker ✨
+        </h1>
+        
+        <div style={{ marginRight: '16px' }}> {/* Bring inward from edge */}
+          <button
+            onClick={handleStartNewHunt}
+            style={{
+              backgroundColor: '#ffd700',
+              color: '#000',
+              border: 'none',
+              padding: '12px 24px',
+              borderRadius: '8px',
+              fontSize: '1rem',
+              fontWeight: 'bold',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#e6c200';
+              e.currentTarget.style.transform = 'translateY(-1px)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = '#ffd700';
+              e.currentTarget.style.transform = 'translateY(0)';
+            }}
+          >
+            ✨ Start New Hunt
+          </button>
+        </div>
       </div>
 
-      {/* Utility Bar */}
-      <ShinyUtilityBar
-        currentHunts={currentHunts}
-        portfolio={portfolio}
-        onStartNewHunt={handleStartNewHunt}
-      />
-
-      <main style={{ 
-        maxWidth: '1400px',
-        margin: '0 auto',
-        padding: "2rem", 
-        minHeight: "100%" 
-      }}>
+      {/* Main Content Container - Scrollable */}
+      <div
+        style={{
+          position: 'fixed',
+          top: '350px', // Start below navbar + utility bar (280px + 70px)
+          left: 0,
+          right: 0,
+          height: 'calc(100vh - 350px)', // Take remaining viewport height
+          backgroundColor: 'transparent',
+          overflowY: 'auto', // Allow scrolling within this container
+          overflowX: 'hidden',
+        }}
+      >
+        <main style={{ 
+          maxWidth: '1400px',
+          margin: '0 auto',
+          padding: "2rem", 
+          minHeight: "100%" 
+        }}>
         {/* Current Hunts Section */}
         <section className="current-hunts-section">
           <h2>🎯 Current Hunts</h2>
@@ -242,6 +321,7 @@ export default function ShinyShowcase() {
         mode={huntModalMode}
         huntForPhase={huntForPhase || undefined}
       />
-    </div>
+      </div>
+    </>
   );
 }

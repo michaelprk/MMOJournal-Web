@@ -382,7 +382,7 @@ html, body {
 }
 
 .shiny-hunt-card {
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.4);
   border: 2px solid transparent;
   border-radius: 16px;
   padding: 1.5rem;
@@ -621,7 +621,7 @@ html, body {
   padding: 0.5rem;
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 6px;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.4);
   color: white;
   resize: vertical;
   min-height: 80px;
@@ -651,7 +651,7 @@ html, body {
 }
 
 .portfolio-card {
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.4);
   border: 2px solid rgba(255, 215, 0, 0.3);
   border-radius: 16px;
   padding: 1.5rem;
@@ -803,7 +803,7 @@ html, body {
   padding: 0.75rem;
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 6px;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.4);
   color: white;
 }
 
@@ -985,7 +985,7 @@ html, body {
   padding: 0.75rem;
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 6px;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.4);
   color: white;
 }
 
@@ -999,7 +999,7 @@ html, body {
   overflow-y: auto;
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 6px;
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.4);
 }
 
 .pokemon-option {
