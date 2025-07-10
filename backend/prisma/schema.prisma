@@ -37,3 +37,38 @@ model PokemonBuild {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 }
+
+model ShinyHunt {
+  id            Int      @id @default(autoincrement())
+  pokemonId     Int      // National Dex ID (1-649 for Gen 1-5)
+  pokemonName   String   // Pokemon name
+  method        String   // Hunting method: "Hordes 5x", "Hordes 3x", "Singles / Lures", "Safari", "Egg (including Alphas)", "Honey"
+  startDate     DateTime @default(now())
+  phaseCount    Int      @default(1) // Current phase number
+  totalEncounters Int    @default(0) // Total encounters across all phases
+  isCompleted   Boolean  @default(false)
+  notes         String?  // User notes
+  phasePokemon  String?  // JSON array of Pokemon encountered in each phase
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model ShinyPortfolio {
+  id            Int      @id @default(autoincrement())
+  pokemonId     Int      // National Dex ID (1-649 for Gen 1-5)
+  pokemonName   String   // Pokemon name
+  method        String   // Method used to find this shiny
+  dateFound     DateTime @default(now())
+  nature        String?  // Pokemon nature
+  encounterCount Int?    // Optional encounter count
+  // IVs (Individual Values) - 0-31 for each stat
+  hpIV          Int?     // Optional IV tracking
+  attackIV      Int?
+  defenseIV     Int?
+  spAttackIV    Int?
+  spDefenseIV   Int?
+  speedIV       Int?
+  notes         String?  // Optional notes
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}

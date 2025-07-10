@@ -132,4 +132,87 @@ export const MOVE_TYPE_COLORS: Record<string, { background: string; text: string
   'dragon': { background: 'linear-gradient(45deg, #7986cb, #5c6bc0)', text: '#fff' },
   'dark': { background: 'linear-gradient(45deg, #616161, #424242)', text: '#fff' },
   'fairy': { background: 'linear-gradient(45deg, #f8bbd9, #f48fb1)', text: '#000' },
-}; 
+};
+
+// =============================================================================
+// SHINY HUNT TYPES
+// =============================================================================
+
+export type HuntingMethod = 
+  | 'Hordes 5x'
+  | 'Hordes 3x'
+  | 'Singles / Lures'
+  | 'Safari'
+  | 'Egg (including Alphas)'
+  | 'Honey';
+
+export interface ShinyHunt {
+  id: number;
+  pokemonId: number; // National Dex ID (1-649 for Gen 1-5)
+  pokemonName: string;
+  method: HuntingMethod;
+  startDate: string;
+  phaseCount: number;
+  totalEncounters: number;
+  isCompleted: boolean;
+  notes?: string;
+  phasePokemon?: PhasePokemon[]; // Array of Pokemon encountered in each phase
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PhasePokemon {
+  phase: number;
+  pokemonId: number;
+  pokemonName: string;
+  encounters: number;
+}
+
+export interface ShinyPortfolio {
+  id: number;
+  pokemonId: number; // National Dex ID (1-649 for Gen 1-5)
+  pokemonName: string;
+  method: HuntingMethod;
+  dateFound: string;
+  nature?: string;
+  encounterCount?: number;
+  // IVs (Individual Values) - 0-31 for each stat
+  ivs?: Partial<PokemonStats>;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export const HUNTING_METHODS: HuntingMethod[] = [
+  'Hordes 5x',
+  'Hordes 3x',
+  'Singles / Lures',
+  'Safari',
+  'Egg (including Alphas)',
+  'Honey'
+];
+
+export const HUNTING_METHOD_COLORS: Record<HuntingMethod, { background: string; text: string }> = {
+  'Hordes 5x': { background: 'linear-gradient(45deg, #ff6b35, #f7931e)', text: '#fff' },
+  'Hordes 3x': { background: 'linear-gradient(45deg, #ff9800, #ffb74d)', text: '#fff' },
+  'Singles / Lures': { background: 'linear-gradient(45deg, #4fc3f7, #29b6f6)', text: '#fff' },
+  'Safari': { background: 'linear-gradient(45deg, #81c784, #66bb6a)', text: '#fff' },
+  'Egg (including Alphas)': { background: 'linear-gradient(45deg, #ba68c8, #ab47bc)', text: '#fff' },
+  'Honey': { background: 'linear-gradient(45deg, #ffd54f, #ffcc02)', text: '#000' }
+};
+
+// Pokemon data for Gen 1-5 (IDs 1-649)
+export interface PokemonData {
+  id: number;
+  name: string;
+  sprite: string; // Path to shiny sprite
+}
+
+// Helper function to get shiny sprite path
+export const getShinySpritePath = (pokemonId: number, pokemonName: string): string => {
+  const paddedId = pokemonId.toString().padStart(3, '0');
+  return `/images/shiny-sprites/${paddedId}_${pokemonName}.gif`;
+};
+
+// Shiny odds for PokeMMO (1 in 30,000)
+export const SHINY_ODDS = 30000; 

@@ -241,3 +241,822 @@ html, body {
   pointer-events: none;
   z-index: 1;
 }
+
+/* =============================================================================
+   SHINY HUNT STYLING
+   ============================================================================= */
+
+/* Shiny specific animations */
+@keyframes shinySparkle {
+  0%, 100% { 
+    opacity: 0.3;
+    transform: scale(0.8) rotate(0deg);
+  }
+  50% { 
+    opacity: 1;
+    transform: scale(1.2) rotate(180deg);
+  }
+}
+
+@keyframes shinyGlow {
+  0%, 100% { 
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.3), 0 0 20px rgba(255, 215, 0, 0.2);
+  }
+  50% { 
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.6), 0 0 30px rgba(255, 215, 0, 0.4);
+  }
+}
+
+@keyframes floatingShiny {
+  0%, 100% { 
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% { 
+    transform: translateY(-10px) rotate(5deg);
+  }
+}
+
+@keyframes portfolioShimmer {
+  0% { 
+    background-position: -100% 0;
+  }
+  100% { 
+    background-position: 100% 0;
+  }
+}
+
+/* Sticky header for shiny hunt page */
+.sticky-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.8), rgba(20, 20, 20, 0.8));
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 215, 0, 0.3);
+  padding: 1rem;
+  text-align: center;
+}
+
+.sticky-header h1 {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: bold;
+  color: #ffd700;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+  animation: shinyGlow 3s ease-in-out infinite;
+}
+
+/* Shiny Utility Bar */
+.shiny-utility-bar {
+  position: sticky;
+  top: 60px;
+  z-index: 9;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  margin: 1rem;
+  padding: 1rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.utility-bar-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.hunt-stats {
+  display: flex;
+  gap: 2rem;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.stat-label {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.stat-value {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #ffd700;
+  text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+}
+
+.start-hunt-btn {
+  background: linear-gradient(45deg, #ffd700, #ffed4a);
+  color: #000;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+}
+
+.start-hunt-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 215, 0, 0.5);
+}
+
+/* Hunt Cards */
+.current-hunts-section {
+  margin: 2rem 0;
+}
+
+.hunts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.shiny-hunt-card {
+  background: rgba(0, 0, 0, 0.5);
+  border: 2px solid transparent;
+  border-radius: 16px;
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  animation: shinyGlow 4s ease-in-out infinite;
+}
+
+.shiny-hunt-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(255, 215, 0, 0.5);
+}
+
+.shiny-hunt-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    45deg,
+    transparent 30%,
+    rgba(255, 215, 0, 0.05) 50%,
+    transparent 70%
+  );
+  background-size: 200% 200%;
+  animation: portfolioShimmer 6s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.hunt-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  position: relative;
+  z-index: 2;
+}
+
+.edit-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 0.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.edit-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.method-badge {
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: bold;
+  color: white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.hunt-card-content {
+  position: relative;
+  z-index: 2;
+}
+
+.shiny-sprite-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.shiny-sprite {
+  width: 80px;
+  height: 80px;
+  filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.6));
+  animation: floatingShiny 3s ease-in-out infinite;
+}
+
+.pokemon-name {
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #ffd700;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+  margin-bottom: 1rem;
+}
+
+.hunt-stats {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-label {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.stat-value {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: white;
+}
+
+.hunt-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.phase-btn {
+  background: linear-gradient(45deg, #4f46e5, #7c3aed);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.phase-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3);
+}
+
+.info-btn {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 0.5rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.info-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.found-btn {
+  background: linear-gradient(45deg, #10b981, #059669);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.found-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
+}
+
+.hunt-details {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.detail-label {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.detail-value {
+  color: white;
+  font-weight: bold;
+}
+
+.phase-timeline {
+  margin-top: 1rem;
+}
+
+.phase-timeline h4 {
+  margin-bottom: 0.5rem;
+  color: #ffd700;
+}
+
+.phase-sprites {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.phase-sprite-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.phase-sprite {
+  width: 40px;
+  height: 40px;
+  filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.4));
+}
+
+.phase-encounters {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.notes-section {
+  margin-top: 1rem;
+}
+
+.notes-section label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.notes-textarea {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  resize: vertical;
+  min-height: 80px;
+}
+
+.notes-textarea:focus {
+  outline: none;
+  border-color: #ffd700;
+}
+
+/* Portfolio Section */
+.portfolio-section {
+  margin: 3rem 0;
+}
+
+.portfolio-section h2 {
+  color: #ffd700;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+  margin-bottom: 1rem;
+}
+
+.portfolio-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.portfolio-card {
+  background: rgba(0, 0, 0, 0.5);
+  border: 2px solid rgba(255, 215, 0, 0.3);
+  border-radius: 16px;
+  padding: 1.5rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  animation: shinyGlow 5s ease-in-out infinite;
+}
+
+.portfolio-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(255, 215, 0, 0.6);
+}
+
+.portfolio-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    45deg,
+    transparent 30%,
+    rgba(255, 215, 0, 0.1) 50%,
+    transparent 70%
+  );
+  background-size: 200% 200%;
+  animation: portfolioShimmer 8s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.portfolio-sprite-container {
+  position: relative;
+  z-index: 2;
+  margin-bottom: 1rem;
+}
+
+.portfolio-sprite {
+  width: 80px;
+  height: 80px;
+  filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.8));
+  animation: floatingShiny 4s ease-in-out infinite;
+}
+
+.portfolio-pokemon-name {
+  position: relative;
+  z-index: 2;
+  color: #ffd700;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+  margin-bottom: 1rem;
+}
+
+.portfolio-info {
+  position: relative;
+  z-index: 2;
+}
+
+.portfolio-method {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  font-weight: bold;
+  color: white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  margin-bottom: 0.5rem;
+}
+
+.portfolio-date, .portfolio-nature, .portfolio-encounters {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 0.25rem;
+}
+
+.portfolio-ivs {
+  margin-top: 0.5rem;
+}
+
+.iv-display {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.empty-portfolio {
+  text-align: center;
+  padding: 3rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Completion Modal */
+.completion-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.completion-modal {
+  background: linear-gradient(135deg, rgba(20, 20, 20, 0.95), rgba(40, 40, 40, 0.95));
+  border: 2px solid rgba(255, 215, 0, 0.3);
+  border-radius: 16px;
+  padding: 2rem;
+  max-width: 500px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.completion-modal h3 {
+  color: #ffd700;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.completion-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: bold;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  padding: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #ffd700;
+}
+
+.iv-inputs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+
+.iv-input {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.iv-input label {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.iv-input input {
+  padding: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.cancel-btn {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.cancel-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.submit-btn {
+  background: linear-gradient(45deg, #ffd700, #ffed4a);
+  color: #000;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.submit-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(255, 215, 0, 0.3);
+}
+
+.submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Shiny Play Area */
+.shiny-play-area {
+  margin: 3rem 0;
+}
+
+.shiny-play-area h3 {
+  color: #ffd700;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+  margin-bottom: 1rem;
+}
+
+.play-area-container {
+  position: relative;
+  height: 200px;
+  border: 2px solid rgba(255, 215, 0, 0.3);
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.3), rgba(20, 20, 20, 0.3));
+  overflow: hidden;
+}
+
+.floating-shiny {
+  position: absolute;
+  cursor: pointer;
+  transition: all 0.05s linear;
+}
+
+.floating-shiny:hover .shiny-name-tooltip {
+  opacity: 1;
+  visibility: visible;
+}
+
+.floating-shiny-sprite {
+  width: 50px;
+  height: 50px;
+  filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.6));
+  animation: shinySparkle 3s ease-in-out infinite;
+}
+
+.shiny-name-tooltip {
+  position: absolute;
+  bottom: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.8);
+  color: #ffd700;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.empty-play-area {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 150px;
+  color: rgba(255, 255, 255, 0.7);
+  text-align: center;
+}
+
+/* Hunt Modal */
+.hunt-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.hunt-modal {
+  background: linear-gradient(135deg, rgba(20, 20, 20, 0.95), rgba(40, 40, 40, 0.95));
+  border: 2px solid rgba(255, 215, 0, 0.3);
+  border-radius: 16px;
+  padding: 2rem;
+  max-width: 400px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.hunt-modal h3 {
+  color: #ffd700;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.pokemon-search-input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+}
+
+.pokemon-search-input:focus {
+  outline: none;
+  border-color: #ffd700;
+}
+
+.pokemon-dropdown {
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.pokemon-option {
+  padding: 0.75rem;
+  cursor: pointer;
+  color: white;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.pokemon-option:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.pokemon-option.selected {
+  background: rgba(255, 215, 0, 0.2);
+  color: #ffd700;
+}
+
+.pokemon-option:last-child {
+  border-bottom: none;
+}
+
+/* Empty states */
+.empty-hunts {
+  text-align: center;
+  padding: 3rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .utility-bar-content {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .hunt-stats {
+    gap: 1rem;
+  }
+  
+  .hunts-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .portfolio-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .hunt-card-footer {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .phase-btn,
+  .info-btn,
+  .found-btn {
+    width: 100%;
+  }
+}
