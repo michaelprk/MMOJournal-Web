@@ -1,13 +1,7 @@
 import { NavLink, useNavigate } from "react-router-dom";
-import { useState } from "react";
 
 export function Navbar() {
   const navigate = useNavigate();
-  const [isMenuExpanded, setIsMenuExpanded] = useState(false);
-
-  const toggleMenu = () => {
-    setIsMenuExpanded(!isMenuExpanded);
-  };
 
   return (
     <nav
@@ -24,194 +18,218 @@ export function Navbar() {
         boxSizing: "border-box",
         zIndex: 1000,
         borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
-        transition: "all 0.4s ease",
       }}
       className="navbar"
     >
-              <div
+      <div
+        style={{
+          maxWidth: "1400px",
+          margin: "0 auto",
+          position: "relative",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: "1.5rem",
+        }}
+      >
+        {/* Navigation Links - Elegant floating bar above logo */}
+        <div
           style={{
             display: "flex",
-            justifyContent: "center",
             alignItems: "center",
-            maxWidth: "1200px",
-            margin: "0 auto",
-            gap: isMenuExpanded ? "3rem" : "0",
-            transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
-            position: "relative",
-            width: "100%",
+            gap: "2rem",
+            padding: "0.75rem 2rem",
+            background: "rgba(0, 0, 0, 0.3)",
+            backdropFilter: "blur(15px)",
+            borderRadius: "50px",
+            border: "1px solid rgba(255, 255, 255, 0.1)",
+            fontSize: "0.9rem",
+            fontWeight: "500",
+            textTransform: "lowercase",
+            letterSpacing: "0.025em",
+            boxShadow: "0 8px 32px rgba(0, 0, 0, 0.3)",
+            transition: "all 0.3s ease",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = "translateY(-2px)";
+            e.currentTarget.style.boxShadow = "0 12px 40px rgba(0, 0, 0, 0.4)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = "translateY(0)";
+            e.currentTarget.style.boxShadow = "0 8px 32px rgba(0, 0, 0, 0.3)";
           }}
         >
-                  {/* Logo Container */}
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              cursor: "pointer",
-              transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
-              transform: isMenuExpanded 
-                ? "translateX(-200px) scale(0.85)" 
-                : "translateX(0) scale(1)",
-              position: "relative",
-              zIndex: 10,
-            }}
-            onClick={toggleMenu}
-          >
-          <img
-            src="/images/MMOJournal_logo.svg"
-            alt="MMO Journal Logo"
-            style={{ 
-              height: "120px",
-              transition: "all 0.4s ease",
-              filter: isMenuExpanded ? "drop-shadow(0 0 10px rgba(255, 203, 5, 0.3))" : "none",
-            }}
-          />
-          
-          {/* Subtitle - Hidden when menu is expanded */}
-          <div
-            style={{
-              marginTop: "0.5rem",
-              fontSize: "0.75rem",
-              color: "rgba(255, 255, 255, 0.6)",
-              fontStyle: "italic",
-              opacity: isMenuExpanded ? 0 : 1,
-              transform: isMenuExpanded ? "translateY(-10px)" : "translateY(0)",
-              transition: "all 0.3s ease",
-              pointerEvents: isMenuExpanded ? "none" : "auto",
-              whiteSpace: "nowrap",
-            }}
-          >
-            Click the logo to open navigation menu
-          </div>
-        </div>
-
-                  {/* Navigation Links - Slide in from right */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "2rem",
-              opacity: isMenuExpanded ? 1 : 0,
-              transform: isMenuExpanded ? "translateX(0)" : "translateX(100px)",
-              transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
-              transitionDelay: isMenuExpanded ? "0.1s" : "0s",
-              pointerEvents: isMenuExpanded ? "auto" : "none",
-              fontSize: "0.95rem",
-              fontWeight: "500",
-              textTransform: "lowercase",
-              letterSpacing: "0.025em",
-              position: "absolute",
-              right: "2rem",
-            }}
-          >
           <NavLink
             to="/pvp"
             style={({ isActive }) => ({
-              color: isActive ? "#ffcb05" : "white",
+              color: isActive ? "#ffcb05" : "rgba(255, 255, 255, 0.9)",
               textDecoration: "none",
-              padding: "0.75rem 1.5rem",
-              transition: "all 0.2s ease",
-              borderRadius: "6px",
+              padding: "0.5rem 1.25rem",
+              borderRadius: "25px",
+              transition: "all 0.3s ease",
               whiteSpace: "nowrap",
-              border: "1px solid rgba(255, 255, 255, 0.1)",
-              backgroundColor: isActive ? "rgba(255, 203, 5, 0.1)" : "rgba(255, 255, 255, 0.05)",
-              backdropFilter: "blur(10px)",
+              position: "relative",
+              overflow: "hidden",
+              background: isActive 
+                ? "linear-gradient(135deg, rgba(255, 203, 5, 0.2), rgba(255, 203, 5, 0.1))" 
+                : "transparent",
+              border: isActive ? "1px solid rgba(255, 203, 5, 0.3)" : "1px solid transparent",
             })}
             onMouseEnter={(e) => {
-              if (!e.currentTarget.style.color.includes("#ffcb05")) {
-                e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.1)";
-                e.currentTarget.style.transform = "translateY(-2px)";
+              if (!e.currentTarget.getAttribute("aria-current")) {
+                e.currentTarget.style.background = "rgba(255, 255, 255, 0.1)";
+                e.currentTarget.style.color = "#ffcb05";
+                e.currentTarget.style.transform = "scale(1.05)";
               }
             }}
             onMouseLeave={(e) => {
-              if (!e.currentTarget.style.color.includes("#ffcb05")) {
-                e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.05)";
-                e.currentTarget.style.transform = "translateY(0)";
+              if (!e.currentTarget.getAttribute("aria-current")) {
+                e.currentTarget.style.background = "transparent";
+                e.currentTarget.style.color = "rgba(255, 255, 255, 0.9)";
+                e.currentTarget.style.transform = "scale(1)";
               }
             }}
           >
             competitive compendium
           </NavLink>
 
+          <div style={{ 
+            width: "1px",
+            height: "20px",
+            background: "linear-gradient(180deg, transparent, rgba(255, 255, 255, 0.2), transparent)",
+          }} />
+
           <NavLink
             to="/shiny-hunt"
             style={({ isActive }) => ({
-              color: isActive ? "#ffcb05" : "white",
+              color: isActive ? "#ffcb05" : "rgba(255, 255, 255, 0.9)",
               textDecoration: "none",
-              padding: "0.75rem 1.5rem",
-              transition: "all 0.2s ease",
-              borderRadius: "6px",
+              padding: "0.5rem 1.25rem",
+              borderRadius: "25px",
+              transition: "all 0.3s ease",
               whiteSpace: "nowrap",
-              border: "1px solid rgba(255, 255, 255, 0.1)",
-              backgroundColor: isActive ? "rgba(255, 203, 5, 0.1)" : "rgba(255, 255, 255, 0.05)",
-              backdropFilter: "blur(10px)",
+              position: "relative",
+              overflow: "hidden",
+              background: isActive 
+                ? "linear-gradient(135deg, rgba(255, 203, 5, 0.2), rgba(255, 203, 5, 0.1))" 
+                : "transparent",
+              border: isActive ? "1px solid rgba(255, 203, 5, 0.3)" : "1px solid transparent",
             })}
             onMouseEnter={(e) => {
-              if (!e.currentTarget.style.color.includes("#ffcb05")) {
-                e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.1)";
-                e.currentTarget.style.transform = "translateY(-2px)";
+              if (!e.currentTarget.getAttribute("aria-current")) {
+                e.currentTarget.style.background = "rgba(255, 255, 255, 0.1)";
+                e.currentTarget.style.color = "#ffcb05";
+                e.currentTarget.style.transform = "scale(1.05)";
               }
             }}
             onMouseLeave={(e) => {
-              if (!e.currentTarget.style.color.includes("#ffcb05")) {
-                e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.05)";
-                e.currentTarget.style.transform = "translateY(0)";
+              if (!e.currentTarget.getAttribute("aria-current")) {
+                e.currentTarget.style.background = "transparent";
+                e.currentTarget.style.color = "rgba(255, 255, 255, 0.9)";
+                e.currentTarget.style.transform = "scale(1)";
               }
             }}
           >
             shiny showcase
           </NavLink>
 
+          <div style={{ 
+            width: "1px",
+            height: "20px",
+            background: "linear-gradient(180deg, transparent, rgba(255, 255, 255, 0.2), transparent)",
+          }} />
+
           <NavLink
             to="/journey"
             style={({ isActive }) => ({
-              color: isActive ? "#ffcb05" : "white",
+              color: isActive ? "#ffcb05" : "rgba(255, 255, 255, 0.9)",
               textDecoration: "none",
-              padding: "0.75rem 1.5rem",
-              transition: "all 0.2s ease",
-              borderRadius: "6px",
+              padding: "0.5rem 1.25rem",
+              borderRadius: "25px",
+              transition: "all 0.3s ease",
               whiteSpace: "nowrap",
-              border: "1px solid rgba(255, 255, 255, 0.1)",
-              backgroundColor: isActive ? "rgba(255, 203, 5, 0.1)" : "rgba(255, 255, 255, 0.05)",
-              backdropFilter: "blur(10px)",
+              position: "relative",
+              overflow: "hidden",
+              background: isActive 
+                ? "linear-gradient(135deg, rgba(255, 203, 5, 0.2), rgba(255, 203, 5, 0.1))" 
+                : "transparent",
+              border: isActive ? "1px solid rgba(255, 203, 5, 0.3)" : "1px solid transparent",
             })}
             onMouseEnter={(e) => {
-              if (!e.currentTarget.style.color.includes("#ffcb05")) {
-                e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.1)";
-                e.currentTarget.style.transform = "translateY(-2px)";
+              if (!e.currentTarget.getAttribute("aria-current")) {
+                e.currentTarget.style.background = "rgba(255, 255, 255, 0.1)";
+                e.currentTarget.style.color = "#ffcb05";
+                e.currentTarget.style.transform = "scale(1.05)";
               }
             }}
             onMouseLeave={(e) => {
-              if (!e.currentTarget.style.color.includes("#ffcb05")) {
-                e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.05)";
-                e.currentTarget.style.transform = "translateY(0)";
+              if (!e.currentTarget.getAttribute("aria-current")) {
+                e.currentTarget.style.background = "transparent";
+                e.currentTarget.style.color = "rgba(255, 255, 255, 0.9)";
+                e.currentTarget.style.transform = "scale(1)";
               }
             }}
           >
             journal
           </NavLink>
         </div>
+
+        {/* Logo - Centered below navigation */}
+        <div
+          style={{
+            cursor: "pointer",
+            transition: "all 0.3s ease",
+            filter: "drop-shadow(0 0 20px rgba(255, 203, 5, 0.2))",
+          }}
+          onClick={() => navigate("/")}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = "scale(1.05)";
+            e.currentTarget.style.filter = "drop-shadow(0 0 30px rgba(255, 203, 5, 0.4))";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = "scale(1)";
+            e.currentTarget.style.filter = "drop-shadow(0 0 20px rgba(255, 203, 5, 0.2))";
+          }}
+        >
+          <img
+            src="/images/MMOJournal_logo.svg"
+            alt="MMO Journal Logo"
+            style={{ 
+              height: "110px",
+              transition: "all 0.3s ease",
+            }}
+          />
+        </div>
       </div>
 
-      {/* Responsive behavior for smaller screens */}
+      {/* Responsive Design */}
       <style>{`
         @media (max-width: 768px) {
-          .navbar div[style*="position: absolute"] {
-            position: static !important;
-            transform: translateX(0) !important;
-            margin-top: 1.5rem;
-            justify-content: center !important;
-            right: auto !important;
+          .navbar div[style*="gap: 2rem"] {
+            gap: 1rem !important;
+            padding: 0.5rem 1rem !important;
+            flex-wrap: wrap;
+            justify-content: center;
           }
           
-          .navbar div[style*="translateX"] {
-            transform: translateX(0) scale(0.9) !important;
+          .navbar div[style*="gap: 1.5rem"] {
+            gap: 1rem !important;
           }
-          
+        }
+        
+        @media (max-width: 640px) {
           .navbar div[style*="gap: 2rem"] {
             flex-direction: column !important;
-            gap: 1rem !important;
-            align-items: center !important;
+            gap: 0.5rem !important;
+            padding: 1rem 1.5rem !important;
+          }
+          
+          .navbar div[style*="width: 1px"] {
+            display: none !important;
+          }
+          
+          .navbar img {
+            height: 90px !important;
           }
         }
         
@@ -221,11 +239,12 @@ export function Navbar() {
           }
           
           .navbar img {
-            height: 100px !important;
+            height: 80px !important;
           }
           
-          .navbar div[style*="translateX"] {
-            transform: translateX(0) scale(0.85) !important;
+          .navbar a {
+            padding: 0.4rem 1rem !important;
+            font-size: 0.85rem !important;
           }
         }
       `}</style>
