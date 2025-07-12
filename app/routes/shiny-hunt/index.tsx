@@ -436,12 +436,7 @@ export default function ShinyShowcase() {
                 {portfolio.length}
               </span>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem' }}>
-              <span style={{ fontSize: '0.875rem', color: 'rgba(255, 255, 255, 0.7)' }}>Total Encounters:</span>
-              <span style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#ffd700', textShadow: '0 0 5px rgba(255, 215, 0, 0.5)' }}>
-                {currentHunts.reduce((sum, hunt) => sum + hunt.totalEncounters, 0).toLocaleString()}
-              </span>
-            </div>
+
           </div>
         </div>
         
@@ -462,36 +457,6 @@ export default function ShinyShowcase() {
         
         <div style={{ marginRight: '16px' }}> {/* Bring inward from edge */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-            {/* View Mode Controls */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontSize: '0.875rem', color: 'rgba(255, 255, 255, 0.7)' }}>View:</span>
-              <button
-                onClick={() => setHuntsViewMode(huntsViewMode === 'grid' ? 'compact' : 'grid')}
-                style={{
-                  backgroundColor: 'rgba(255, 215, 0, 0.2)',
-                  color: '#ffd700',
-                  border: '1px solid #ffd700',
-                  padding: '8px 16px',
-                  borderRadius: '6px',
-                  fontSize: '0.875rem',
-                  fontWeight: 'bold',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '4px',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = 'rgba(255, 215, 0, 0.3)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'rgba(255, 215, 0, 0.2)';
-                }}
-              >
-                {huntsViewMode === 'grid' ? '⊞' : '☰'} {huntsViewMode === 'grid' ? 'Grid' : 'Compact'}
-              </button>
-            </div>
-            
             <button
               onClick={handleStartNewHunt}
               style={{
@@ -541,25 +506,7 @@ export default function ShinyShowcase() {
           flexWrap: 'wrap',
           justifyContent: 'space-between',
         }}>
-          {/* Search */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '0.875rem', color: 'rgba(255, 255, 255, 0.7)' }}>🔍</span>
-            <input
-              type="text"
-              placeholder="Search Pokemon..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              style={{
-                padding: '8px 12px',
-                borderRadius: '4px',
-                border: '1px solid rgba(255, 215, 0, 0.3)',
-                background: 'rgba(0, 0, 0, 0.4)',
-                color: 'white',
-                fontSize: '0.875rem',
-                minWidth: '200px',
-              }}
-            />
-          </div>
+
           
           {/* Method Filter */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -604,10 +551,7 @@ export default function ShinyShowcase() {
             </select>
           </div>
           
-          {/* Results Count */}
-          <div style={{ fontSize: '0.875rem', color: 'rgba(255, 255, 255, 0.7)' }}>
-            {filteredHunts.length} hunts, {portfolio.length} shinies
-          </div>
+
         </div>
       </div>
 
