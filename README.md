@@ -8,16 +8,32 @@ MMOJournal-Web is the web-based evolution of the MMOJournal CLI app — a person
 - **Full CRUD Operations**: Complete data management for Pokémon builds with add, edit, delete, and view functionality
 - **Pokemon Build Cards**: Responsive card displays featuring sprites, stats, moves, abilities, and items
 - **Tier Filtering**: Dynamic filtering system for competitive tiers (OU, UU, Doubles, RU, NU, LC)
+- **Advanced Sorting**: Sort builds by tier, name, type, newest, or oldest with intuitive dropdown interface
 - **Sticky Utility Bar**: Fixed navigation bar with tier filtering and add Pokemon options that stays visible while scrolling
 - **Optimized Layout**: Proper spacing and positioning ensuring no overlap between navigation elements
 - **Card Navigation**: Intuitive tab navigation between main view, stats, and moves with forward/back arrows
 
+### ✅ **Team Management System**
+- **Team Organization**: Group Pokemon builds into teams with unique team IDs and names
+- **Team View**: Dedicated team showcase page displaying organized teams with detailed Pokemon information
+- **Team Manager**: Interactive team creation and management with drag-and-drop functionality
+- **Team Export**: Export entire teams to Pokemon Showdown format with batch export capabilities
+- **Team Navigation**: Seamless navigation between individual builds and team collections
+
+### ✅ **Export & Import System**
+- **Pokemon Showdown Export**: Export individual Pokemon or entire teams to Showdown format
+- **Copy to Clipboard**: One-click copying with visual feedback and fallback support
+- **Modal Interface**: Clean, focused export modal with syntax highlighting and easy selection
+- **Batch Operations**: Export multiple Pokemon or complete teams simultaneously
+- **Format Validation**: Ensures exported data is compatible with Pokemon Showdown
+
 ### ✅ **Enhanced UI/UX Design**
-- **Sticky Navigation**: Utility bar positioned below navbar with transparent background for clean aesthetics
+- **Multiple View Modes**: Switch between card view, list view, and team view
 - **Responsive Layout**: Cards scroll cleanly underneath navigation without obstruction
 - **Build Count Display**: Total build count shown at bottom of card list for better organization
 - **Consistent Spacing**: Proper margins and padding throughout the application
 - **Visual Hierarchy**: Clear separation between navigation, content, and supplementary information
+- **Interactive Elements**: Hover effects, transitions, and visual feedback for all interactions
 
 ### ✅ **Enhanced Item & Image System**
 - **Local Item Images**: 32+ competitive item images stored locally for instant loading
@@ -29,59 +45,67 @@ MMOJournal-Web is the web-based evolution of the MMOJournal CLI app — a person
 - **Gender Support**: Full (M)/(F) gender parsing and display with gender icons
 - **Improved Parser**: Enhanced Showdown format parsing with better error handling
 - **Team Import**: Batch import functionality with automatic gender detection and species separation
-- **Export Compatibility**: Generate Showdown-compatible team strings
+- **Export Compatibility**: Generate Showdown-compatible team strings with proper formatting
+- **Bidirectional Support**: Import from Showdown and export back to Showdown seamlessly
 
 ### ✅ **PokeAPI Integration** 
 - **Real-time Data**: Fetch official Pokémon data including sprites, moves, abilities, and types
 - **Autocomplete**: Smart suggestions for Pokémon names, moves, and items during input
 - **Move Type Colors**: Dynamic color-coded moves with animated gradients for all 18 types
 - **Expanded Item Database**: 1000+ items from all generations with proper mapping
-
-### ✅ **Showdown Import/Export**
-- **Team Import**: Parse entire teams from Pokémon Showdown format with automatic processing
-- **Manual Entry**: Comprehensive form with IV/EV editing, nature selection, and move management
-- **Batch Creation**: Import multiple Pokémon from a single Showdown paste
-- **Gender Detection**: Automatic parsing of (M)/(F) gender indicators
+- **Data Caching**: Efficient caching system for improved performance and reduced API calls
 
 ### ✅ **Full Backend Implementation**
 - **Node.js/Express API**: RESTful endpoints for all CRUD operations
 - **SQLite Database**: Lightweight database with Prisma ORM for type-safe queries
 - **Data Validation**: Server-side validation for IV/EV limits and Pokémon data integrity
 - **PokeAPI Proxy**: Backend integration with PokeAPI for cached data retrieval
+- **Team Management**: Backend support for team creation, updating, and organization
 
 ### ✅ **Modern Navigation & Routing**
 - **React Router v7**: Latest routing system with improved navigation performance
 - **Fixed Navigation**: Resolved routing conflicts and navigation issues between pages
 - **Seamless Transitions**: Smooth page transitions without overlap or layout issues
 - **TypeScript**: Full type safety across frontend and backend
+- **Multi-page Support**: Dedicated pages for builds, teams, and specialized views
 
 ## 🆕 Recent Development Progress
 
-### **Sticky Utility Bar Implementation** (Latest)
-- **Fixed Navigation**: Utility bar positioned below navbar that stays visible while scrolling
-- **Transparent Design**: Clean aesthetic with semi-transparent background and no blur effects
-- **Optimal Positioning**: Carefully positioned to avoid overlap with navbar or content
-- **Dropdown Integration**: Tier filtering and Add Pokemon options easily accessible
+### **Team Management & Organization** (Latest)
+- **Team Creation**: Create and manage teams with unique identifiers and names
+- **Team View Page**: Dedicated showcase page for displaying organized teams
+- **Team Manager Component**: Interactive interface for team building and organization
+- **Team Export**: Export complete teams to Pokemon Showdown format
+- **Team Navigation**: Seamless switching between individual builds and team collections
 
-### **PVP Page Layout Improvements**
-- **Proper Content Spacing**: Fixed layout ensuring cards never overlap with navigation elements
-- **Bottom Build Count**: Moved total build count to bottom of page for better visual flow
-- **Container Optimization**: Scrollable content area with proper height calculations
-- **Responsive Grid**: Pokemon cards display in optimized grid layout with consistent spacing
+### **Export & Import Enhancements**
+- **Modal Export System**: Clean, focused export interface with syntax highlighting
+- **Clipboard Integration**: One-click copying with visual feedback and error handling
+- **Batch Export**: Export multiple Pokemon or entire teams simultaneously
+- **Format Compatibility**: Ensures exported data works seamlessly with Pokemon Showdown
 
-### **Navigation System Fixes**
-- **Router Compatibility**: Fixed React Router v7 import issues and navigation conflicts
-- **Page Transitions**: Smooth navigation between PVP, Shiny Hunt, and Journal pages
-- **Component Organization**: Better separation of navigation and content components
+### **Advanced Sorting & Filtering**
+- **Multi-criteria Sorting**: Sort by tier, name, type, creation date (newest/oldest)
+- **Type-based Sorting**: Intelligent sorting by Pokemon types (placeholder for future type data integration)
+- **Tier Organization**: Logical tier ordering (OU → UU → Doubles → RU → NU → LC)
+- **Date Sorting**: Sort by creation date for chronological organization
 
-### **Enhanced User Experience**
-- **No Visual Conflicts**: Eliminated overlap issues between different UI elements
-- **Consistent Behavior**: Reliable navigation and interaction patterns across all pages
-- **Performance Optimized**: Faster page loads and smoother interactions
+### **UI/UX Improvements**
+- **View Toggle System**: Switch between card view, list view, and team view
+- **Responsive Design**: Optimized layouts for different screen sizes and content types
+- **Interactive Feedback**: Hover effects, transitions, and visual confirmation for all actions
+- **Modal System**: Consistent modal design patterns across all popup interfaces
+
+### **Backend Enhancements**
+- **Team Data Management**: Database schema and API endpoints for team organization
+- **Enhanced Validation**: Improved server-side validation for team and build data
+- **Performance Optimization**: Efficient queries and data fetching for team operations
+- **Error Handling**: Comprehensive error handling and user feedback systems
 
 ## 🎯 Development Goals
 
 ### 🔄 **Next Steps**
+- **Journal System**: Rich text journaling with media uploads and tagging
 - **Shiny Hunt Tracker**: Complete implementation with sprites, progress tracking, and portfolio management
 - **User Authentication**: Login and account creation system
 - **Personal Collections**: User-specific build management and privacy controls
@@ -89,12 +113,11 @@ MMOJournal-Web is the web-based evolution of the MMOJournal CLI app — a person
 ### 📋 **Planned Features**
 - **Enhanced Shiny Hunt System**: Sprite integration, progress tracking, and portfolio showcase
 - **Progress Journal**: Rich text journaling with media uploads and gameplay stories
-- **Team Management**: Group builds into teams with strategic analysis
 - **AI Team Suggestions**: Smart team building recommendations and synergy analysis
 - **Community Features**: Share builds, comment on teams, and social interaction
 - **Advanced Filtering**: Search by moves, abilities, stats, and custom criteria
-- **Import/Export**: Multiple format support and team sharing
 - **Theme Customization**: Dark/light modes and personalized UI preferences
+- **Mobile Optimization**: Enhanced mobile experience with touch-friendly interfaces
 
 ## 🛠️ Built With
 
@@ -167,8 +190,11 @@ The backend provides the following endpoints:
 2. **Add New Pokémon**: Use the dropdown in utility bar for manual form or Showdown import
 3. **Edit Builds**: Click edit on any card to modify stats, moves, or details
 4. **Filter by Tier**: Use the tier dropdown in utility bar to view builds by competitive tier
-5. **Seamless Navigation**: Navigate between pages using the improved router system
-6. **Import Teams**: Paste entire teams from Showdown for quick batch import
+5. **Sort & Organize**: Sort builds by multiple criteria and organize into teams
+6. **Team Management**: Create, view, and manage teams with the dedicated team system
+7. **Export Functionality**: Export individual Pokemon or entire teams to Showdown format
+8. **View Modes**: Switch between card view, list view, and team view for different perspectives
+9. **Import Teams**: Paste entire teams from Showdown for quick batch import
 
 ## 🤝 Contributing
 
@@ -187,4 +213,4 @@ MIT License — free to use and modify.
 
 ---
 
-**Note**: This project showcases full-stack development skills while creating a tool specifically designed for PokeMMO players, though it can be adapted for general competitive Pokémon team building.
+**Note**: This project showcases full-stack development skills while creating a tool specifically designed for PokeMMO players, though it can be adapted for general competitive Pokémon team building. The project is currently in active development as a learning exercise with plans for future online deployment.
