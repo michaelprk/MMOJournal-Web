@@ -27,6 +27,8 @@ interface BackendPokemonBuild {
   spDefenseEV: number;
   speedEV: number;
   description?: string;
+  team_id?: string;
+  team_name?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -61,6 +63,8 @@ function transformBackendToFrontend(backendBuild: BackendPokemonBuild): PokemonB
       speed: backendBuild.speedEV,
     },
     description: backendBuild.description,
+    team_id: backendBuild.team_id,
+    team_name: backendBuild.team_name,
     created_at: backendBuild.createdAt,
     updated_at: backendBuild.updatedAt,
   };
@@ -96,6 +100,8 @@ function transformFrontendToBackend(frontendBuild: Omit<PokemonBuild, 'id' | 'cr
       speed: frontendBuild.evs.speed,
     },
     description: frontendBuild.description,
+    team_id: frontendBuild.team_id,
+    team_name: frontendBuild.team_name,
   };
 }
 
@@ -195,6 +201,8 @@ export class PokemonBuildService {
       if (updates.nature !== undefined) backendUpdates.nature = updates.nature;
       if (updates.ability !== undefined) backendUpdates.ability = updates.ability;
       if (updates.description !== undefined) backendUpdates.description = updates.description;
+      if (updates.team_id !== undefined) backendUpdates.team_id = updates.team_id;
+      if (updates.team_name !== undefined) backendUpdates.team_name = updates.team_name;
       
       if (updates.ivs) {
         backendUpdates.ivs = {

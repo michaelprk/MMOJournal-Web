@@ -24,12 +24,12 @@ export default function PVPPage() {
   const [modalDefaultTab, setModalDefaultTab] = useState<'manual' | 'showdown'>('manual');
   const [currentView, setCurrentView] = useState<'cards' | 'list' | 'teams'>('cards');
   const [showTeamManager, setShowTeamManager] = useState(false);
-  const [currentSort, setCurrentSort] = useState<'tier' | 'name' | 'level' | 'newest' | 'oldest'>('tier');
+  const [currentSort, setCurrentSort] = useState<'tier' | 'name' | 'type' | 'newest' | 'oldest'>('tier');
   const [showExportModal, setShowExportModal] = useState(false);
   const [exportingPokemon, setExportingPokemon] = useState<PokemonBuild | undefined>();
 
   // Sort builds by different criteria
-  const sortBuilds = (builds: PokemonBuild[], sortBy: 'tier' | 'name' | 'level' | 'newest' | 'oldest') => {
+  const sortBuilds = (builds: PokemonBuild[], sortBy: 'tier' | 'name' | 'type' | 'newest' | 'oldest') => {
     return [...builds].sort((a, b) => {
       switch (sortBy) {
         case 'tier':
@@ -42,8 +42,120 @@ export default function PVPPage() {
         case 'name':
           return a.name.localeCompare(b.name);
         
-        case 'level':
-          return b.level - a.level; // High to low
+        case 'type':
+          // Get primary types for comparison
+          const getTypeOrder = (species: string) => {
+            // Pokemon type mapping for common competitive Pokemon
+            const pokemonTypes: Record<string, string> = {
+              // Fire types
+              'charizard': 'fire',
+              'arcanine': 'fire',
+              'rapidash': 'fire',
+              'flareon': 'fire',
+              'moltres': 'fire',
+              'typhlosion': 'fire',
+              'entei': 'fire',
+              'blaziken': 'fire',
+              'torchic': 'fire',
+              'combusken': 'fire',
+              
+              // Water types
+              'blastoise': 'water',
+              'gyarados': 'water',
+              'lapras': 'water',
+              'vaporeon': 'water',
+              'starmie': 'water',
+              'feraligatr': 'water',
+              'suicune': 'water',
+              'swampert': 'water',
+              'mudkip': 'water',
+              'marshtomp': 'water',
+              
+              // Grass types
+              'venusaur': 'grass',
+              'exeggutor': 'grass',
+              'victreebel': 'grass',
+              'vileplume': 'grass',
+              'meganium': 'grass',
+              'sceptile': 'grass',
+              'treecko': 'grass',
+              'grovyle': 'grass',
+              
+              // Electric types
+              'pikachu': 'electric',
+              'raichu': 'electric',
+              'jolteon': 'electric',
+              'zapdos': 'electric',
+              'ampharos': 'electric',
+              'raikou': 'electric',
+              'manectric': 'electric',
+              'electrode': 'electric',
+              
+              // Psychic types
+              'alakazam': 'psychic',
+              'mewtwo': 'psychic',
+              'mew': 'psychic',
+              'espeon': 'psychic',
+              'lugia': 'psychic',
+              'celebi': 'psychic',
+              'gardevoir': 'psychic',
+              'metagross': 'psychic',
+              
+              // Dragon types
+              'dragonite': 'dragon',
+              'dragonair': 'dragon',
+              'dratini': 'dragon',
+              'kingdra': 'dragon',
+              'flygon': 'dragon',
+              'altaria': 'dragon',
+              'salamence': 'dragon',
+              'rayquaza': 'dragon',
+              
+              // Steel types
+              'magnezone': 'steel',
+              'magneton': 'steel',
+              'magnemite': 'steel',
+              'steelix': 'steel',
+              'skarmory': 'steel',
+              'forretress': 'steel',
+              'scizor': 'steel',
+              
+              // Dark types
+              'umbreon': 'dark',
+              'houndoom': 'dark',
+              'tyranitar': 'dark',
+              'absol': 'dark',
+              'mightyena': 'dark',
+              'sableye': 'dark',
+              
+              // Fighting types
+              'machamp': 'fighting',
+              'hitmonlee': 'fighting',
+              'hitmonchan': 'fighting',
+              'primeape': 'fighting',
+              'heracross': 'fighting',
+              'hariyama': 'fighting',
+              
+              // Normal types
+              'snorlax': 'normal',
+              'tauros': 'normal',
+              'kangaskhan': 'normal',
+              'chansey': 'normal',
+              'ditto': 'normal',
+              'eevee': 'normal',
+              'slaking': 'normal',
+              
+              // Add more as needed...
+            };
+            
+            const typeOrder = ['normal', 'fire', 'water', 'electric', 'grass', 'ice', 'fighting', 'poison', 
+                              'ground', 'flying', 'psychic', 'bug', 'rock', 'ghost', 'dragon', 'dark', 'steel', 'fairy'];
+            
+            const pokemonName = species.toLowerCase().replace(/[^a-z]/g, '');
+            const pokemonType = pokemonTypes[pokemonName] || 'normal';
+            return typeOrder.indexOf(pokemonType);
+          };
+          return getTypeOrder(a.species) - getTypeOrder(b.species);
         
         case 'newest':
           return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
@@ -227,8 +339,9 @@ export default function PVPPage() {
           backgroundColor: 'rgba(0, 0, 0, 0.1)',
           borderRadius: '8px',
           boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-          margin: '0 32px',
+          margin: '0 auto',
           marginBottom: '16px',
+          maxWidth: '1400px',
         }}
       >
         {/* Left Side - Tier Filter */}
@@ -386,9 +499,9 @@ export default function PVPPage() {
         }}
       >
         <div style={{ 
-          maxWidth: '1600px', 
+          maxWidth: '1400px', 
           margin: '0 auto',
-          padding: '2rem',
+          padding: '1.5rem',
           minHeight: '100%',
           width: '100%',
         }}>
@@ -440,12 +553,10 @@ export default function PVPPage() {
                   onMouseEnter={(e) => {
                     e.currentTarget.style.backgroundColor = '#28a745';
                     e.currentTarget.style.color = '#fff';
-                    e.currentTarget.style.transform = 'translateX(-50%) translateY(-1px)';
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.backgroundColor = 'rgba(40, 167, 69, 0.2)';
                     e.currentTarget.style.color = '#28a745';
-                    e.currentTarget.style.transform = 'translateX(-50%) translateY(0)';
                   }}
                 >
                   🏆 Team Showcase
@@ -562,7 +673,7 @@ export default function PVPPage() {
                 <div
                   style={{
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(480px, 1fr))',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(420px, 1fr))',
                     gap: '1.5rem',
                     marginBottom: '3rem',
                     maxWidth: '100%',
@@ -609,6 +720,7 @@ export default function PVPPage() {
         onSave={handleSaveBuild}
         editBuild={editingBuild}
         defaultTab={modalDefaultTab}
+        existingBuilds={builds}
       />
 
       {/* Export Modal */}

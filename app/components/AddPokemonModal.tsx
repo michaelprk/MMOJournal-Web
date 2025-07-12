@@ -11,9 +11,10 @@ interface AddPokemonModalProps {
   onSave: (build: Omit<PokemonBuild, 'id' | 'created_at' | 'updated_at'>) => Promise<void>;
   editBuild?: PokemonBuild;
   defaultTab?: 'manual' | 'showdown';
+  existingBuilds?: PokemonBuild[];
 }
 
-export function AddPokemonModal({ isOpen, onClose, onSave, editBuild, defaultTab = 'manual' }: AddPokemonModalProps) {
+export function AddPokemonModal({ isOpen, onClose, onSave, editBuild, defaultTab = 'manual', existingBuilds = [] }: AddPokemonModalProps) {
   const [activeTab, setActiveTab] = useState<'manual' | 'showdown'>(defaultTab);
   const [isLoading, setIsLoading] = useState(false);
   const [showdownText, setShowdownText] = useState('');
@@ -27,6 +28,23 @@ export function AddPokemonModal({ isOpen, onClose, onSave, editBuild, defaultTab
   const [pokemonSuggestions, setPokemonSuggestions] = useState<string[]>([]);
   const [moveSuggestions, setMoveSuggestions] = useState<string[]>([]);
   const [itemSuggestions, setItemSuggestions] = useState<string[]>([]);
+
+  // Helper function to find existing team by name (case-insensitive)
+  const findExistingTeam = (teamName: string): { team_id: string; team_name: string } | null => {
+    const normalizedName = teamName.trim().toLowerCase();
+    const existingTeam = existingBuilds.find(build => 
+      build.team_name && build.team_id && build.team_name.toLowerCase() === normalizedName
+    );
+    return existingTeam ? { team_id: existingTeam.team_id!, team_name: existingTeam.team_name! } : null;
+  };
+
+  // Helper function to check if team name already exists
+  const teamNameExists = (teamName: string): boolean => {
+    const normalizedName = teamName.trim().toLowerCase();
+    return existingBuilds.some(build => 
+      build.team_name && build.team_name.toLowerCase() === normalizedName
+    );
+  };
   
   const [formData, setFormData] = useState({
     name: '',
@@ -230,11 +248,25 @@ export function AddPokemonModal({ isOpen, onClose, onSave, editBuild, defaultTab
   const handleSave = async () => {
     setIsLoading(true);
     try {
-      if (activeTab === 'showdown' && importedBuilds.length > 1) {
-        // Save multiple Pokemon builds
-        const teamId = shouldCreateTeam ? `team_${Date.now()}` : undefined;
-        const finalTeamName = shouldCreateTeam ? teamName.trim() || `Team ${Date.now()}` : undefined;
+      if (activeTab === 'showdown' && importedBuilds.length > 0) {
+        // Handle team creation for Showdown imports
+        let teamId: string | undefined;
+        let finalTeamName: string | undefined;
         
+        if (shouldCreateTeam && teamName.trim()) {
+          // Check if team already exists
+          const existingTeam = findExistingTeam(teamName.trim());
+          if (existingTeam) {
+            teamId = existingTeam.team_id;
+            finalTeamName = existingTeam.team_name;
+          } else {
+            // Create new team
+            teamId = `team_${teamName.toLowerCase().replace(/\s+/g, '_')}_${Date.now()}`;
+            finalTeamName = teamName.trim();
+          }
+        }
+        
+        // Save all imported Pokemon builds
         for (const build of importedBuilds) {
           await onSave({
             ...build,
@@ -244,7 +276,7 @@ export function AddPokemonModal({ isOpen, onClose, onSave, editBuild, defaultTab
           });
         }
       } else {
-        // Save single Pokemon build
+        // Save single Pokemon build (manual input)
         const build = {
           name: formData.name,
           species: formData.name,
@@ -522,8 +554,8 @@ Timid Nature
                   Imported Pokemon ({importedBuilds.length})
                 </h3>
                 
-                {/* Team Creation Section for Multiple Pokemon */}
-                {importedBuilds.length > 1 && (
+                {/* Team Creation Section - Always Available */}
+                {(
                   <div style={{
                     backgroundColor: 'rgba(255, 203, 5, 0.1)',
                     border: '1px solid rgba(255, 203, 5, 0.3)',
@@ -550,7 +582,9 @@ Timid Nature
                           onChange={(e) => setShouldCreateTeam(e.target.checked)}
                           style={{ cursor: 'pointer' }}
                         />
-                        Create a new team with these {importedBuilds.length} Pokemon
+                        {importedBuilds.length === 0 ? 'Create a new team with imported Pokemon' :
+                         importedBuilds.length === 1 ? 'Create a new team with this Pokemon' :
+                         `Create a new team with these ${importedBuilds.length} Pokemon`}
                       </label>
                     </div>
                     
@@ -562,12 +596,16 @@ Timid Nature
                         <input
                           type="text"
                           value={teamName}
-                          onChange={(e) => setTeamName(e.target.value)}
+                          onChange={(e) => {
+                            const newTeamName = e.target.value;
+                            setTeamName(newTeamName);
+                          }}
                           placeholder="Enter team name..."
                           style={{
                             width: '100%',
                             backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                            border: '1px solid #ffcb05',
+                            border: teamName.trim() && teamNameExists(teamName) ? 
+                              '1px solid #ffc107' : '1px solid #ffcb05',
                             borderRadius: '6px',
                             color: '#fff',
                             padding: '8px 12px',
@@ -575,7 +613,12 @@ Timid Nature
                           }}
                         />
                         <div style={{ color: '#ccc', fontSize: '0.8rem', marginTop: '4px' }}>
-                          This will group all {importedBuilds.length} Pokemon together as a team for easy management and export.
+                          {teamName.trim() && teamNameExists(teamName) ? 
+                            `⚠️ A team named "${teamName}" already exists. Pokemon will be added to the existing team.` :
+                            teamName.trim() ?
+                            `This will create a new team called "${teamName}" for easy management and export.` :
+                            'Enter a team name to group Pokemon together for easy management and export.'
+                          }
                         </div>
                       </div>
                     )}
@@ -815,11 +858,32 @@ Timid Nature
                         value={formData.team_name}
                         onChange={(e) => {
                           const teamName = e.target.value;
-                          setFormData({ 
-                            ...formData, 
-                            team_name: teamName,
-                            team_id: teamName ? `team_${teamName.toLowerCase().replace(/\s+/g, '_')}_${Date.now()}` : ''
-                          });
+                          if (teamName.trim()) {
+                            // Check if team already exists
+                            const existingTeam = findExistingTeam(teamName);
+                            if (existingTeam) {
+                              // Use existing team
+                              setFormData({ 
+                                ...formData, 
+                                team_name: existingTeam.team_name,
+                                team_id: existingTeam.team_id
+                              });
+                            } else {
+                              // Create new team
+                              setFormData({ 
+                                ...formData, 
+                                team_name: teamName,
+                                team_id: `team_${teamName.toLowerCase().replace(/\s+/g, '_')}_${Date.now()}`
+                              });
+                            }
+                          } else {
+                            // Clear team assignment
+                            setFormData({ 
+                              ...formData, 
+                              team_name: '',
+                              team_id: ''
+                            });
+                          }
                         }}
                         placeholder="Enter team name to assign this Pokemon to a team..."
                         style={{
@@ -835,7 +899,12 @@ Timid Nature
                     </div>
                     <div style={{ color: '#ccc', fontSize: '0.8rem' }}>
                       {formData.team_name ? 
-                        `This Pokemon will be added to the "${formData.team_name}" team.` :
+                        (() => {
+                          const existingTeam = findExistingTeam(formData.team_name);
+                          return existingTeam ? 
+                            `This Pokemon will be added to the existing "${formData.team_name}" team.` :
+                            `This Pokemon will be added to a new "${formData.team_name}" team.`;
+                        })() :
                         'Leave empty to add this Pokemon without a team assignment.'
                       }
                     </div>

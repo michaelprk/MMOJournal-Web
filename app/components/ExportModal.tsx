@@ -54,7 +54,7 @@ export function ExportModal({ isOpen, onClose, pokemon, team, title }: ExportMod
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        zIndex: 99999,
+        zIndex: 10000,
         padding: '20px',
       }}
       onClick={(e) => {

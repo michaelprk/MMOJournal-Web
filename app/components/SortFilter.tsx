@@ -1,8 +1,8 @@
 import React from 'react';
 
 interface SortFilterProps {
-  currentSort: 'tier' | 'name' | 'level' | 'newest' | 'oldest';
-  onSortChange: (sort: 'tier' | 'name' | 'level' | 'newest' | 'oldest') => void;
+  currentSort: 'tier' | 'name' | 'type' | 'newest' | 'oldest';
+  onSortChange: (sort: 'tier' | 'name' | 'type' | 'newest' | 'oldest') => void;
 }
 
 export function SortFilter({ currentSort, onSortChange }: SortFilterProps) {
@@ -23,7 +23,7 @@ export function SortFilter({ currentSort, onSortChange }: SortFilterProps) {
       <select
         id="sort-select"
         value={currentSort}
-        onChange={(e) => onSortChange(e.target.value as 'tier' | 'name' | 'level' | 'newest' | 'oldest')}
+        onChange={(e) => onSortChange(e.target.value as 'tier' | 'name' | 'type' | 'newest' | 'oldest')}
         style={{
           backgroundColor: 'rgba(0, 0, 0, 0.7)',
           border: '1px solid #ffcb05',
@@ -54,8 +54,8 @@ export function SortFilter({ currentSort, onSortChange }: SortFilterProps) {
         <option value="name" style={{ backgroundColor: '#000', color: '#fff' }}>
           🔤 Name (A-Z)
         </option>
-        <option value="level" style={{ backgroundColor: '#000', color: '#fff' }}>
-          📊 Level (High to Low)
+        <option value="type" style={{ backgroundColor: '#000', color: '#fff' }}>
+          🔥 Type (Fire → Water → Electric...)
         </option>
         <option value="newest" style={{ backgroundColor: '#000', color: '#fff' }}>
           🕒 Newest First

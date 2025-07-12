@@ -113,6 +113,46 @@ function PokemonMiniCard({ build, onEdit, onDelete }: { build: PokemonBuild; onE
         <div><strong>Nature:</strong> {build.nature}</div>
         <div><strong>Ability:</strong> {build.ability}</div>
         {build.item && <div><strong>Item:</strong> {build.item}</div>}
+        
+        {/* EVs */}
+        <div style={{ marginTop: '4px' }}>
+          <strong>EVs:</strong> {(() => {
+            const evs = build.evs;
+            const evEntries: string[] = [];
+            if (evs.hp > 0) evEntries.push(`${evs.hp} HP`);
+            if (evs.attack > 0) evEntries.push(`${evs.attack} Atk`);
+            if (evs.defense > 0) evEntries.push(`${evs.defense} Def`);
+            if (evs.sp_attack > 0) evEntries.push(`${evs.sp_attack} SpA`);
+            if (evs.sp_defense > 0) evEntries.push(`${evs.sp_defense} SpD`);
+            if (evs.speed > 0) evEntries.push(`${evs.speed} Spe`);
+            return evEntries.length > 0 ? evEntries.join(' / ') : 'No EVs';
+          })()}
+        </div>
+        
+        {/* Moves */}
+        <div style={{ marginTop: '4px' }}>
+          <strong>Moves:</strong>
+          <div style={{ marginTop: '2px' }}>
+            {build.moves.filter(move => move.trim()).map((move, index) => (
+              <div key={index} style={{ 
+                fontSize: '0.7rem', 
+                color: '#aaa',
+                marginLeft: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px'
+              }}>
+                <span>•</span>
+                <span>{move}</span>
+              </div>
+            ))}
+            {build.moves.filter(move => move.trim()).length === 0 && (
+              <div style={{ fontSize: '0.7rem', color: '#777', marginLeft: '8px' }}>
+                No moves set
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Action Buttons */}
