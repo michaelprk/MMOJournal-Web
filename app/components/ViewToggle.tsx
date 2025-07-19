@@ -1,8 +1,8 @@
 import React from 'react';
 
 interface ViewToggleProps {
-  currentView: 'cards' | 'list' | 'teams';
-  onViewChange: (view: 'cards' | 'list' | 'teams') => void;
+  currentView: 'cards' | 'list';
+  onViewChange: (view: 'cards' | 'list') => void;
 }
 
 export function ViewToggle({ currentView, onViewChange }: ViewToggleProps) {
@@ -22,8 +22,8 @@ export function ViewToggle({ currentView, onViewChange }: ViewToggleProps) {
         style={{
           position: 'absolute',
           top: '2px',
-          left: currentView === 'cards' ? '2px' : currentView === 'list' ? '33.33%' : '66.66%',
-          width: 'calc(33.33% - 2px)',
+          left: currentView === 'cards' ? '2px' : '50%',
+          width: 'calc(50% - 2px)',
           height: 'calc(100% - 4px)',
           backgroundColor: '#ffcb05',
           borderRadius: '20px',
@@ -82,30 +82,7 @@ export function ViewToggle({ currentView, onViewChange }: ViewToggleProps) {
         List
       </button>
 
-      {/* Teams view button */}
-      <button
-        onClick={() => onViewChange('teams')}
-        style={{
-          position: 'relative',
-          zIndex: 2,
-          backgroundColor: 'transparent',
-          border: 'none',
-          padding: '10px 20px',
-          color: currentView === 'teams' ? '#000' : 'rgba(255, 255, 255, 0.9)',
-          fontSize: '0.9rem',
-          fontWeight: '600',
-          cursor: 'pointer',
-          transition: 'color 0.3s ease',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '6px',
-          minWidth: '80px',
-          justifyContent: 'center',
-        }}
-      >
-        <span style={{ fontSize: '1rem' }}>🏆</span>
-        Teams
-      </button>
+
     </div>
   );
 } 

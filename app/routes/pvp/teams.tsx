@@ -78,19 +78,20 @@ export default function TeamsPage() {
       <div
         style={{
           position: 'fixed',
-          top: '240px', // Below navbar
-          left: 0,
-          right: 0,
+          top: '280px', // Below navbar with extra spacing
+          left: '50%',
+          transform: 'translateX(-50%)',
           zIndex: 30,
           padding: '20px',
           backgroundColor: 'rgba(0, 0, 0, 0.1)',
           borderRadius: '8px',
           boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-          margin: '0 32px',
           marginBottom: '20px',
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
+          maxWidth: '1400px',
+          width: 'calc(100% - 64px)',
         }}
       >
         <div style={{ textAlign: 'center' }}>
@@ -119,8 +120,9 @@ export default function TeamsPage() {
       <div
         style={{
           position: 'fixed',
-          top: '240px',
-          right: '48px',
+          top: '280px',
+          right: '50%',
+          transform: 'translateX(calc(700px - 48px))', // Position relative to centered container
           zIndex: 31,
         }}
       >
@@ -157,10 +159,10 @@ export default function TeamsPage() {
       <div
         style={{
           position: 'fixed',
-          top: '340px', // Below header
+          top: '380px', // Below header with adjusted spacing
           left: 0,
           right: 0,
-          height: 'calc(100vh - 340px)',
+          height: 'calc(100vh - 380px)',
           backgroundColor: 'transparent',
           overflowY: 'auto',
           overflowX: 'hidden',
@@ -169,8 +171,9 @@ export default function TeamsPage() {
         <div style={{ 
           maxWidth: '1400px', 
           margin: '0 auto',
-          padding: '2rem',
+          padding: '1.5rem',
           minHeight: '100%',
+          width: '100%',
         }}>
           {isLoading ? (
             <div style={{ textAlign: 'center', padding: '4rem' }}>

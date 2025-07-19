@@ -43,7 +43,7 @@ export interface PokemonStats {
   speed: number;
 }
 
-export type CompetitiveTier = 'OU' | 'UU' | 'NU' | 'Doubles' | 'RU' | 'LC';
+export type CompetitiveTier = 'OU' | 'UU' | 'NU' | 'Doubles' | 'UT' | 'LC';
 
 export interface PokemonApiData {
   id: number;
@@ -76,7 +76,7 @@ export interface ShowdownImport {
 }
 
 export const COMPETITIVE_TIERS: CompetitiveTier[] = [
-  'OU', 'UU', 'NU', 'Doubles', 'RU', 'LC'
+  'OU', 'UU', 'NU', 'Doubles', 'UT', 'LC'
 ];
 
 export const TIER_FULL_NAMES: Record<CompetitiveTier, string> = {
@@ -84,7 +84,7 @@ export const TIER_FULL_NAMES: Record<CompetitiveTier, string> = {
   'UU': 'Under Used',
   'NU': 'Never Used',
   'Doubles': 'Doubles/VGC',
-  'RU': 'Rarely Used',
+  'UT': 'Untiered',
   'LC': 'Little Cup'
 };
 
@@ -99,7 +99,7 @@ export const TIER_COLORS: Record<CompetitiveTier, { background: string; text: st
     text: '#fff', 
     gradient: 'linear-gradient(135deg, #4caf50, #66bb6a)' 
   },
-  'RU': { 
+  'UT': { 
     background: '#ff9800', 
     text: '#fff', 
     gradient: 'linear-gradient(135deg, #ff9800, #ffb74d)' 

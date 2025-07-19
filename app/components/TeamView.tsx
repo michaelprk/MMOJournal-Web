@@ -253,21 +253,31 @@ function QuickPokemonEditModal({ isOpen, onClose, pokemon, onSave }: {
           <label style={{ color: '#ffcb05', display: 'block', marginBottom: '8px' }}>EVs</label>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
             {[
-              { key: 'hpEV', label: 'HP' },
-              { key: 'attackEV', label: 'Atk' },
-              { key: 'defenseEV', label: 'Def' },
-              { key: 'spAttackEV', label: 'SpA' },
-              { key: 'spDefenseEV', label: 'SpD' },
-              { key: 'speedEV', label: 'Spe' }
-            ].map(({ key, label }) => (
+              { key: 'hp', label: 'HP', flatKey: 'hpEV' },
+              { key: 'attack', label: 'Atk', flatKey: 'attackEV' },
+              { key: 'defense', label: 'Def', flatKey: 'defenseEV' },
+              { key: 'sp_attack', label: 'SpA', flatKey: 'spAttackEV' },
+              { key: 'sp_defense', label: 'SpD', flatKey: 'spDefenseEV' },
+              { key: 'speed', label: 'Spe', flatKey: 'speedEV' }
+            ].map(({ key, label, flatKey }) => (
               <div key={key}>
                 <label style={{ color: '#ccc', fontSize: '0.8rem', display: 'block', marginBottom: '4px' }}>{label}</label>
                 <input
                   type="number"
                   min="0"
                   max="252"
-                  value={editedPokemon[key as keyof PokemonBuild] as number || 0}
-                  onChange={(e) => setEditedPokemon({...editedPokemon, [key]: parseInt(e.target.value) || 0})}
+                  value={editedPokemon[flatKey as keyof PokemonBuild] as number || editedPokemon.evs?.[key as keyof typeof editedPokemon.evs] || 0}
+                  onChange={(e) => {
+                    const value = parseInt(e.target.value) || 0;
+                    setEditedPokemon({
+                      ...editedPokemon,
+                      [flatKey]: value,
+                      evs: {
+                        ...editedPokemon.evs,
+                        [key]: value
+                      }
+                    });
+                  }}
                   style={{
                     width: '100%',
                     padding: '6px',
@@ -358,6 +368,16 @@ function PokemonMiniCard({ build, onEdit, onDelete, onQuickEdit }: {
   const tierColor = TIER_COLORS[build.tier];
 
   const formatPokemonName = (name: string) => {
+    // Handle Rotom forms specifically
+    if (name.toLowerCase().includes('rotom')) {
+      if (name.toLowerCase().includes('heat')) return 'rotom-heat';
+      if (name.toLowerCase().includes('wash')) return 'rotom-wash';
+      if (name.toLowerCase().includes('frost')) return 'rotom-frost';
+      if (name.toLowerCase().includes('fan')) return 'rotom-fan';
+      if (name.toLowerCase().includes('mow')) return 'rotom-mow';
+      return 'rotom'; // Base form
+    }
+    
     return name.toLowerCase()
       .replace(/[^a-z0-9]/g, '')
       .replace(/nidoranf/g, 'nidoran-f')
@@ -455,13 +475,14 @@ function PokemonMiniCard({ build, onEdit, onDelete, onQuickEdit }: {
         {/* EVs */}
         <div style={{ marginTop: '4px' }}>
           <strong>EVs:</strong> {(() => {
+            // Handle both flat and nested EV formats for compatibility
             const evs = {
-              hp: build.hpEV || 0,
-              attack: build.attackEV || 0,
-              defense: build.defenseEV || 0,
-              sp_attack: build.spAttackEV || 0,
-              sp_defense: build.spDefenseEV || 0,
-              speed: build.speedEV || 0
+              hp: build.hpEV || build.evs?.hp || 0,
+              attack: build.attackEV || build.evs?.attack || 0,
+              defense: build.defenseEV || build.evs?.defense || 0,
+              sp_attack: build.spAttackEV || build.evs?.sp_attack || 0,
+              sp_defense: build.spDefenseEV || build.evs?.sp_defense || 0,
+              speed: build.speedEV || build.evs?.speed || 0
             };
             const evEntries: string[] = [];
             if (evs.hp > 0) evEntries.push(`${evs.hp} HP`);
@@ -642,6 +663,17 @@ function TeamCard({ team, onEdit, onDelete, onEditTeamName, onQuickEdit }: {
     }
   };
 
+  const handleDeleteTeam = () => {
+    if (window.confirm(`Are you sure you want to delete the entire "${team.name}" team? This will delete all ${team.pokemon.length} Pokemon in this team.`)) {
+      // Delete all Pokemon in the team
+      team.pokemon.forEach(pokemon => {
+        if (onDelete) {
+          onDelete(pokemon.id);
+        }
+      });
+    }
+  };
+
   return (
     <div
       style={{
@@ -738,6 +770,38 @@ function TeamCard({ team, onEdit, onDelete, onEditTeamName, onQuickEdit }: {
           >
             📋 Export Team
           </button>
+          
+          {/* Delete Team Button */}
+          {team.pokemon.length > 0 && (
+            <button
+              onClick={handleDeleteTeam}
+              style={{
+                backgroundColor: 'transparent',
+                border: '1px solid #dc3545',
+                color: '#dc3545',
+                padding: '8px 16px',
+                borderRadius: '6px',
+                fontSize: '0.9rem',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(220, 53, 69, 0.2)';
+                e.currentTarget.style.borderColor = '#dc3545';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+                e.currentTarget.style.borderColor = '#dc3545';
+              }}
+              title="Delete entire team (all Pokemon)"
+            >
+              🗑️ Delete Team
+            </button>
+          )}
         </div>
       </div>
 

@@ -8,7 +8,7 @@ import { PokemonBuildListView } from '../../components/PokemonBuildListView';
 import { ViewToggle } from '../../components/ViewToggle';
 import { SortFilter } from '../../components/SortFilter';
 import { TeamManager } from '../../components/TeamManager';
-import { TeamView } from '../../components/TeamView';
+
 import { AddPokemonModal } from '../../components/AddPokemonModal';
 import { ExportModal } from '../../components/ExportModal';
 
@@ -22,7 +22,7 @@ export default function PVPPage() {
   const [editingBuild, setEditingBuild] = useState<PokemonBuild | undefined>();
   const [showAddOptions, setShowAddOptions] = useState(false);
   const [modalDefaultTab, setModalDefaultTab] = useState<'manual' | 'showdown'>('manual');
-  const [currentView, setCurrentView] = useState<'cards' | 'list' | 'teams'>('cards');
+  const [currentView, setCurrentView] = useState<'cards' | 'list'>('cards');
   const [showTeamManager, setShowTeamManager] = useState(false);
   const [currentSort, setCurrentSort] = useState<'tier' | 'name' | 'type' | 'newest' | 'oldest'>('tier');
   const [showExportModal, setShowExportModal] = useState(false);
@@ -602,14 +602,6 @@ export default function PVPPage() {
                 onUpdateBuild={handleUpdateBuildTeam}
               />
             )}
-            {currentView === 'teams' && (
-              <TeamView
-                teams={organizeIntoTeams()}
-                onEdit={handleEditBuild}
-                onDelete={handleDeleteBuild}
-                onEditTeamName={handleEditTeamName}
-              />
-            )}
 
           {/* Content */}
           {isLoading ? (
@@ -652,7 +644,7 @@ export default function PVPPage() {
                 Try Again
               </button>
             </div>
-          ) : filteredBuilds.length === 0 && currentView !== 'teams' ? (
+          ) : filteredBuilds.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '4rem' }}>
               <div
                 style={{
@@ -689,13 +681,7 @@ export default function PVPPage() {
           ) : (
             <>
               {/* Conditional View Rendering */}
-              {currentView === 'teams' ? (
-                <TeamView
-                  teams={organizeIntoTeams()}
-                  onEdit={handleEditBuild}
-                  onDelete={handleDeleteBuild}
-                />
-              ) : currentView === 'list' ? (
+              {currentView === 'list' ? (
                 <PokemonBuildListView
                   builds={filteredBuilds}
                   onEdit={handleEditBuild}
@@ -725,8 +711,8 @@ export default function PVPPage() {
                 </div>
               )}
 
-              {/* Build Count - Only for non-team views */}
-              {currentView !== 'teams' && (
+              {/* Build Count */}
+              {(
                 <p 
                   className="text-center mt-10 text-sm text-white/60"
                   style={{ 
