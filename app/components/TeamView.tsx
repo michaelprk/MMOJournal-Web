@@ -13,9 +13,347 @@ interface TeamViewProps {
   teams: Team[];
   onEdit?: (build: PokemonBuild) => void;
   onDelete?: (id: string) => void;
+  onEditTeamName?: (teamId: string, newName: string) => void;
 }
 
-function PokemonMiniCard({ build, onEdit, onDelete }: { build: PokemonBuild; onEdit?: (build: PokemonBuild) => void; onDelete?: (id: string) => void; }) {
+// Team Name Edit Modal
+function TeamNameEditModal({ isOpen, onClose, team, onSave }: { 
+  isOpen: boolean; 
+  onClose: () => void; 
+  team: Team; 
+  onSave: (newName: string) => void; 
+}) {
+  const [newName, setNewName] = useState(team.name);
+
+  const handleSave = () => {
+    if (newName.trim()) {
+      onSave(newName.trim());
+      onClose();
+    }
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0, 0, 0, 0.95)',
+      zIndex: 10000,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '20px',
+    }}>
+      <div style={{
+        background: 'rgba(0, 0, 0, 0.95)',
+        border: '2px solid #ffcb05',
+        borderRadius: '12px',
+        padding: '24px',
+        maxWidth: '500px',
+        width: '100%',
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+          <h3 style={{ color: '#ffcb05', margin: 0 }}>Edit Team Name</h3>
+          <button
+            onClick={onClose}
+            style={{
+              background: 'transparent',
+              border: '1px solid #dc3545',
+              color: '#dc3545',
+              width: '32px',
+              height: '32px',
+              borderRadius: '50%',
+              cursor: 'pointer',
+              fontSize: '1.2rem',
+            }}
+          >
+            ✕
+          </button>
+        </div>
+
+        <div style={{ marginBottom: '20px' }}>
+          <label style={{ color: '#ffcb05', display: 'block', marginBottom: '8px' }}>Team Name</label>
+          <input
+            type="text"
+            value={newName}
+            onChange={(e) => setNewName(e.target.value)}
+            placeholder="Enter team name..."
+            style={{
+              width: '100%',
+              padding: '12px',
+              border: '1px solid rgba(255, 203, 5, 0.3)',
+              borderRadius: '6px',
+              background: 'rgba(0, 0, 0, 0.4)',
+              color: '#fff',
+              fontSize: '1rem',
+            }}
+            autoFocus
+          />
+        </div>
+
+        <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+          <button
+            onClick={onClose}
+            style={{
+              background: 'transparent',
+              border: '1px solid #ccc',
+              color: '#ccc',
+              padding: '10px 20px',
+              borderRadius: '6px',
+              cursor: 'pointer',
+            }}
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleSave}
+            style={{
+              background: '#ffcb05',
+              color: '#000',
+              border: 'none',
+              padding: '10px 20px',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontWeight: 'bold',
+            }}
+          >
+            Save
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Quick Pokemon Edit Modal
+function QuickPokemonEditModal({ isOpen, onClose, pokemon, onSave }: { 
+  isOpen: boolean; 
+  onClose: () => void; 
+  pokemon: PokemonBuild; 
+  onSave: (updatedPokemon: PokemonBuild) => void; 
+}) {
+  const [editedPokemon, setEditedPokemon] = useState(pokemon);
+
+  const handleSave = () => {
+    onSave(editedPokemon);
+    onClose();
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0, 0, 0, 0.95)',
+      zIndex: 10000,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '20px',
+    }}>
+      <div style={{
+        background: 'rgba(0, 0, 0, 0.95)',
+        border: '2px solid #ffcb05',
+        borderRadius: '12px',
+        padding: '24px',
+        maxWidth: '600px',
+        width: '100%',
+        maxHeight: '90vh',
+        overflowY: 'auto',
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+          <h3 style={{ color: '#ffcb05', margin: 0 }}>Quick Edit: {pokemon.name}</h3>
+          <button
+            onClick={onClose}
+            style={{
+              background: 'transparent',
+              border: '1px solid #dc3545',
+              color: '#dc3545',
+              width: '32px',
+              height: '32px',
+              borderRadius: '50%',
+              cursor: 'pointer',
+              fontSize: '1.2rem',
+            }}
+          >
+            ✕
+          </button>
+        </div>
+
+        {/* Nature and Ability */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
+          <div>
+            <label style={{ color: '#ffcb05', display: 'block', marginBottom: '8px' }}>Nature</label>
+            <input
+              type="text"
+              value={editedPokemon.nature || ''}
+              onChange={(e) => setEditedPokemon({...editedPokemon, nature: e.target.value})}
+              placeholder="e.g., Adamant"
+              style={{
+                width: '100%',
+                padding: '8px',
+                border: '1px solid rgba(255, 203, 5, 0.3)',
+                borderRadius: '6px',
+                background: 'rgba(0, 0, 0, 0.4)',
+                color: '#fff',
+                fontSize: '0.9rem',
+              }}
+            />
+          </div>
+          <div>
+            <label style={{ color: '#ffcb05', display: 'block', marginBottom: '8px' }}>Ability</label>
+            <input
+              type="text"
+              value={editedPokemon.ability || ''}
+              onChange={(e) => setEditedPokemon({...editedPokemon, ability: e.target.value})}
+              placeholder="e.g., Intimidate"
+              style={{
+                width: '100%',
+                padding: '8px',
+                border: '1px solid rgba(255, 203, 5, 0.3)',
+                borderRadius: '6px',
+                background: 'rgba(0, 0, 0, 0.4)',
+                color: '#fff',
+                fontSize: '0.9rem',
+              }}
+            />
+          </div>
+        </div>
+
+        {/* Item */}
+        <div style={{ marginBottom: '16px' }}>
+          <label style={{ color: '#ffcb05', display: 'block', marginBottom: '8px' }}>Item</label>
+          <input
+            type="text"
+            value={editedPokemon.item || ''}
+            onChange={(e) => setEditedPokemon({...editedPokemon, item: e.target.value})}
+            placeholder="e.g., Choice Band"
+            style={{
+              width: '100%',
+              padding: '8px',
+              border: '1px solid rgba(255, 203, 5, 0.3)',
+              borderRadius: '6px',
+              background: 'rgba(0, 0, 0, 0.4)',
+              color: '#fff',
+              fontSize: '0.9rem',
+            }}
+          />
+        </div>
+
+        {/* EVs */}
+        <div style={{ marginBottom: '16px' }}>
+          <label style={{ color: '#ffcb05', display: 'block', marginBottom: '8px' }}>EVs</label>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
+            {[
+              { key: 'hpEV', label: 'HP' },
+              { key: 'attackEV', label: 'Atk' },
+              { key: 'defenseEV', label: 'Def' },
+              { key: 'spAttackEV', label: 'SpA' },
+              { key: 'spDefenseEV', label: 'SpD' },
+              { key: 'speedEV', label: 'Spe' }
+            ].map(({ key, label }) => (
+              <div key={key}>
+                <label style={{ color: '#ccc', fontSize: '0.8rem', display: 'block', marginBottom: '4px' }}>{label}</label>
+                <input
+                  type="number"
+                  min="0"
+                  max="252"
+                  value={editedPokemon[key as keyof PokemonBuild] as number || 0}
+                  onChange={(e) => setEditedPokemon({...editedPokemon, [key]: parseInt(e.target.value) || 0})}
+                  style={{
+                    width: '100%',
+                    padding: '6px',
+                    border: '1px solid rgba(255, 203, 5, 0.3)',
+                    borderRadius: '4px',
+                    background: 'rgba(0, 0, 0, 0.4)',
+                    color: '#fff',
+                    fontSize: '0.8rem',
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Moves */}
+        <div style={{ marginBottom: '20px' }}>
+          <label style={{ color: '#ffcb05', display: 'block', marginBottom: '8px' }}>Moves</label>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+            {[0, 1, 2, 3].map(index => (
+              <div key={index}>
+                <label style={{ color: '#ccc', fontSize: '0.8rem', display: 'block', marginBottom: '4px' }}>Move {index + 1}</label>
+                <input
+                  type="text"
+                  value={editedPokemon.moves[index] || ''}
+                  onChange={(e) => {
+                    const newMoves = [...editedPokemon.moves];
+                    newMoves[index] = e.target.value;
+                    setEditedPokemon({...editedPokemon, moves: newMoves});
+                  }}
+                  placeholder={`Move ${index + 1}`}
+                  style={{
+                    width: '100%',
+                    padding: '6px',
+                    border: '1px solid rgba(255, 203, 5, 0.3)',
+                    borderRadius: '4px',
+                    background: 'rgba(0, 0, 0, 0.4)',
+                    color: '#fff',
+                    fontSize: '0.8rem',
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+          <button
+            onClick={onClose}
+            style={{
+              background: 'transparent',
+              border: '1px solid #ccc',
+              color: '#ccc',
+              padding: '10px 20px',
+              borderRadius: '6px',
+              cursor: 'pointer',
+            }}
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleSave}
+            style={{
+              background: '#ffcb05',
+              color: '#000',
+              border: 'none',
+              padding: '10px 20px',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontWeight: 'bold',
+            }}
+          >
+            Save Changes
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function PokemonMiniCard({ build, onEdit, onDelete, onQuickEdit }: { 
+  build: PokemonBuild; 
+  onEdit?: (build: PokemonBuild) => void; 
+  onDelete?: (id: string) => void; 
+  onQuickEdit?: (build: PokemonBuild) => void;
+}) {
   const [showExportModal, setShowExportModal] = useState(false);
   const tierColor = TIER_COLORS[build.tier];
 
@@ -117,7 +455,14 @@ function PokemonMiniCard({ build, onEdit, onDelete }: { build: PokemonBuild; onE
         {/* EVs */}
         <div style={{ marginTop: '4px' }}>
           <strong>EVs:</strong> {(() => {
-            const evs = build.evs;
+            const evs = {
+              hp: build.hpEV || 0,
+              attack: build.attackEV || 0,
+              defense: build.defenseEV || 0,
+              sp_attack: build.spAttackEV || 0,
+              sp_defense: build.spDefenseEV || 0,
+              speed: build.speedEV || 0
+            };
             const evEntries: string[] = [];
             if (evs.hp > 0) evEntries.push(`${evs.hp} HP`);
             if (evs.attack > 0) evEntries.push(`${evs.attack} Atk`);
@@ -180,6 +525,37 @@ function PokemonMiniCard({ build, onEdit, onDelete }: { build: PokemonBuild; onE
         >
           📋
         </button>
+        
+        {/* Quick Edit Button */}
+        {onQuickEdit && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onQuickEdit(build);
+            }}
+            style={{
+              backgroundColor: 'transparent',
+              border: '1px solid #ffc107',
+              color: '#ffc107',
+              padding: '2px 6px',
+              borderRadius: '3px',
+              fontSize: '0.65rem',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              fontWeight: '600',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'rgba(255, 193, 7, 0.2)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'transparent';
+            }}
+            title="Quick edit EVs, moves, nature, etc."
+          >
+            ⚡
+          </button>
+        )}
+        
         {onEdit && (
           <button
             onClick={(e) => {
@@ -246,11 +622,24 @@ function PokemonMiniCard({ build, onEdit, onDelete }: { build: PokemonBuild; onE
   );
 }
 
-function TeamCard({ team, onEdit, onDelete }: { team: Team; onEdit?: (build: PokemonBuild) => void; onDelete?: (id: string) => void; }) {
+function TeamCard({ team, onEdit, onDelete, onEditTeamName, onQuickEdit }: { 
+  team: Team; 
+  onEdit?: (build: PokemonBuild) => void; 
+  onDelete?: (id: string) => void; 
+  onEditTeamName?: (teamId: string, newName: string) => void;
+  onQuickEdit?: (build: PokemonBuild) => void;
+}) {
   const [showTeamExportModal, setShowTeamExportModal] = useState(false);
+  const [showTeamNameEdit, setShowTeamNameEdit] = useState(false);
 
   const exportTeamToShowdown = () => {
     setShowTeamExportModal(true);
+  };
+
+  const handleEditTeamName = (newName: string) => {
+    if (onEditTeamName) {
+      onEditTeamName(team.id, newName);
+    }
   };
 
   return (
@@ -270,22 +659,51 @@ function TeamCard({ team, onEdit, onDelete }: { team: Team; onEdit?: (build: Pok
         alignItems: 'center', 
         marginBottom: '16px' 
       }}>
-        <div>
-          <h3 style={{ 
-            color: '#ffcb05', 
-            margin: 0, 
-            fontSize: '1.3rem', 
-            fontWeight: 'bold' 
-          }}>
-            {team.name}
-          </h3>
-          <p style={{ 
-            color: '#ccc', 
-            margin: '4px 0 0 0', 
-            fontSize: '0.9rem' 
-          }}>
-            {team.pokemon.length}/6 Pokemon
-          </p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div>
+            <h3 style={{ 
+              color: '#ffcb05', 
+              margin: 0, 
+              fontSize: '1.3rem', 
+              fontWeight: 'bold' 
+            }}>
+              {team.name}
+            </h3>
+            <p style={{ 
+              color: '#ccc', 
+              margin: '4px 0 0 0', 
+              fontSize: '0.9rem' 
+            }}>
+              {team.pokemon.length}/6 Pokemon
+            </p>
+          </div>
+          
+          {/* Edit Team Name Button */}
+          {onEditTeamName && (
+            <button
+              onClick={() => setShowTeamNameEdit(true)}
+              style={{
+                backgroundColor: 'transparent',
+                border: '1px solid #ffcb05',
+                color: '#ffcb05',
+                padding: '6px 12px',
+                borderRadius: '6px',
+                fontSize: '0.8rem',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                fontWeight: '600',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(255, 203, 5, 0.2)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
+              title="Edit team name"
+            >
+              ✏️ Edit Name
+            </button>
+          )}
         </div>
 
         <div style={{ display: 'flex', gap: '8px' }}>
@@ -336,6 +754,7 @@ function TeamCard({ team, onEdit, onDelete }: { team: Team; onEdit?: (build: Pok
             build={pokemon}
             onEdit={onEdit}
             onDelete={onDelete}
+            onQuickEdit={onQuickEdit}
           />
         ))}
         
@@ -381,12 +800,34 @@ function TeamCard({ team, onEdit, onDelete }: { team: Team; onEdit?: (build: Pok
         team={team.pokemon}
         title={`${team.name} Team Export`}
       />
+      
+      {/* Team Name Edit Modal */}
+      <TeamNameEditModal
+        isOpen={showTeamNameEdit}
+        onClose={() => setShowTeamNameEdit(false)}
+        team={team}
+        onSave={handleEditTeamName}
+      />
     </div>
   );
 }
 
-export function TeamView({ teams, onEdit, onDelete }: TeamViewProps) {
+export function TeamView({ teams, onEdit, onDelete, onEditTeamName }: TeamViewProps) {
+  const [showQuickEdit, setShowQuickEdit] = useState(false);
+  const [quickEditPokemon, setQuickEditPokemon] = useState<PokemonBuild | null>(null);
+  
   const realTeams = teams.filter(team => team.id !== 'unassigned');
+
+  const handleQuickEdit = (pokemon: PokemonBuild) => {
+    setQuickEditPokemon(pokemon);
+    setShowQuickEdit(true);
+  };
+
+  const handleQuickEditSave = (updatedPokemon: PokemonBuild) => {
+    if (onEdit) {
+      onEdit(updatedPokemon);
+    }
+  };
 
   return (
     <div>
@@ -420,8 +861,20 @@ export function TeamView({ teams, onEdit, onDelete }: TeamViewProps) {
             team={team}
             onEdit={onEdit}
             onDelete={onDelete}
+            onEditTeamName={onEditTeamName}
+            onQuickEdit={handleQuickEdit}
           />
         ))
+      )}
+      
+      {/* Quick Edit Modal */}
+      {showQuickEdit && quickEditPokemon && (
+        <QuickPokemonEditModal
+          isOpen={showQuickEdit}
+          onClose={() => setShowQuickEdit(false)}
+          pokemon={quickEditPokemon}
+          onSave={handleQuickEditSave}
+        />
       )}
     </div>
   );

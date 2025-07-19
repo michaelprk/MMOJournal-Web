@@ -257,20 +257,46 @@ export default function PVPPage() {
 
   const handleUpdateBuildTeam = async (buildId: string, teamId?: string, teamName?: string) => {
     try {
-      const buildToUpdate = builds.find(b => b.id === buildId);
-      if (!buildToUpdate) return;
+      const response = await PokemonBuildService.updateBuild(buildId, {
+        team_id: teamId || undefined,
+        team_name: teamName || undefined
+      });
+      
+      if (response) {
+        // Update the builds array with the updated Pokemon
+        setBuilds(prevBuilds => 
+          prevBuilds.map(build => 
+            build.id === buildId ? response : build
+          )
+        );
+        console.log('✅ Updated Pokemon team assignment');
+      }
+    } catch (error) {
+      console.error('❌ Error updating Pokemon team:', error);
+    }
+  };
 
-      const updatedBuildData = {
-        ...buildToUpdate,
-        team_id: teamId,
-        team_name: teamName,
-      };
-
-      await PokemonBuildService.updateBuild(buildId, updatedBuildData);
-      await loadBuilds();
-    } catch (err) {
-      console.error('Failed to update Pokemon build team:', err);
-      alert('Failed to update Pokemon build team. Please try again.');
+  const handleEditTeamName = async (teamId: string, newName: string) => {
+    try {
+      // Update all Pokemon in the team with the new team name
+      const pokemonInTeam = builds.filter(build => build.team_id === teamId);
+      
+      for (const pokemon of pokemonInTeam) {
+        await PokemonBuildService.updateBuild(pokemon.id, {
+          team_name: newName
+        });
+      }
+      
+      // Update the local state
+      setBuilds(prevBuilds => 
+        prevBuilds.map(build => 
+          build.team_id === teamId ? { ...build, team_name: newName } : build
+        )
+      );
+      
+      console.log('✅ Updated team name');
+    } catch (error) {
+      console.error('❌ Error updating team name:', error);
     }
   };
 
@@ -574,6 +600,14 @@ export default function PVPPage() {
               <TeamManager
                 builds={builds}
                 onUpdateBuild={handleUpdateBuildTeam}
+              />
+            )}
+            {currentView === 'teams' && (
+              <TeamView
+                teams={organizeIntoTeams()}
+                onEdit={handleEditBuild}
+                onDelete={handleDeleteBuild}
+                onEditTeamName={handleEditTeamName}
               />
             )}
 

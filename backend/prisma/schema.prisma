@@ -74,3 +74,41 @@ model ShinyPortfolio {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 }
+
+model JournalEntry {
+  id          Int      @id @default(autoincrement())
+  title       String   // Entry title
+  content     String   // Rich text content (HTML)
+  plainText   String?  // Plain text version for searching
+  tags        String?  // JSON array of tag names
+  isPublic    Boolean  @default(false) // For future social features
+  mediaUrls   String?  // JSON array of media file URLs
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("journal_entries")
+}
+
+model JournalTag {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique // Tag name (e.g., "competitive", "shiny hunt")
+  color       String?  // Optional color for the tag
+  description String?  // Optional description
+  useCount    Int      @default(0) // How many entries use this tag
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("journal_tags")
+}
+
+model JournalMedia {
+  id          Int      @id @default(autoincrement())
+  filename    String   // Original filename
+  filePath    String   // Path to stored file
+  fileType    String   // MIME type
+  fileSize    Int      // File size in bytes
+  entryId     Int?     // Optional - which entry this belongs to
+  createdAt   DateTime @default(now())
+  
+  @@map("journal_media")
+}

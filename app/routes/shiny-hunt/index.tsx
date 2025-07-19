@@ -5,12 +5,13 @@ import type {
   PokemonStats, 
   HuntingMethod
 } from '../../types/pokemon';
-import { HUNTING_METHODS } from '../../types/pokemon';
+import { HUNTING_METHODS, POKEMON_NATURES } from '../../types/pokemon';
 import ShinyUtilityBar from '../../components/ShinyUtilityBar';
 import ShinyHuntCard from '../../components/ShinyHuntCard';
 
 import ShinyCalendar from '../../components/ShinyPlayArea';
 import HuntModal from '../../components/HuntModal';
+import CompletionModal from '../../components/CompletionModal';
 
 export default function ShinyShowcase() {
   // Mock data for demonstration - in a real app, this would come from an API
@@ -681,6 +682,14 @@ export default function ShinyShowcase() {
         onAddPhase={handleAddPhaseData}
         mode={huntModalMode}
         huntForPhase={huntForPhase || undefined}
+      />
+
+      {/* Completion Modal */}
+      <CompletionModal
+        isOpen={showCompletionModal}
+        onClose={() => setShowCompletionModal(false)}
+        hunt={completingHunt}
+        onCompleteHunt={handleCompleteHunt}
       />
       </div>
     </>

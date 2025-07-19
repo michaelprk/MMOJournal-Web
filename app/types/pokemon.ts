@@ -11,6 +11,20 @@ export interface PokemonBuild {
   moves: string[];
   ivs: PokemonStats;
   evs: PokemonStats;
+  // Flat EV fields from backend
+  hpEV?: number;
+  attackEV?: number;
+  defenseEV?: number;
+  spAttackEV?: number;
+  spDefenseEV?: number;
+  speedEV?: number;
+  // Flat IV fields from backend
+  hpIV?: number;
+  attackIV?: number;
+  defenseIV?: number;
+  spAttackIV?: number;
+  spDefenseIV?: number;
+  speedIV?: number;
   description?: string;
   showdown_import?: string;
   team_id?: string; // New field for grouping Pokemon into teams

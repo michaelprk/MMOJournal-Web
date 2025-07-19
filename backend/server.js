@@ -2,6 +2,9 @@ const express = require('express');
 const cors = require('cors');
 const { PrismaClient } = require('@prisma/client');
 const fetch = require('node-fetch');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
 
 const app = express();
 const prisma = new PrismaClient();
@@ -10,6 +13,37 @@ const PORT = process.env.PORT || 4000;
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Configure multer for file uploads
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadDir = path.join(__dirname, 'uploads/journal');
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    cb(null, uploadDir);
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({ 
+  storage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = /jpeg|jpg|png|gif|webp/;
+    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = allowedTypes.test(file.mimetype);
+    
+    if (mimetype && extname) {
+      return cb(null, true);
+    } else {
+      cb(new Error('Only image files are allowed!'));
+    }
+  }
+});
 
 // Health check endpoint
 app.get('/health', (req, res) => {
@@ -211,6 +245,206 @@ app.delete('/api/pokemon/:id', async (req, res) => {
   } catch (error) {
     console.error('❌ Error deleting Pokemon build:', error);
     res.status(500).json({ error: 'Failed to delete Pokemon build' });
+  }
+});
+
+// ========================================
+// JOURNAL API ENDPOINTS
+// ========================================
+
+// Get all journal entries
+app.get('/api/journal/entries', async (req, res) => {
+  try {
+    console.log('📖 Journal entries endpoint called');
+    
+    // For now, return empty data to test the frontend
+    const response = {
+      entries: [],
+      pagination: {
+        page: 1,
+        limit: 20,
+        total: 0,
+        pages: 0
+      }
+    };
+    
+    res.json(response);
+    console.log('✅ Journal entries returned successfully');
+  } catch (error) {
+    console.error('❌ Error in journal entries endpoint:', error);
+    res.status(500).json({ error: 'Failed to fetch journal entries' });
+  }
+});
+
+// Get single journal entry
+app.get('/api/journal/entries/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const entry = await prisma.journalEntry.findUnique({
+      where: { id: parseInt(id) }
+    });
+    
+    if (!entry) {
+      return res.status(404).json({ error: 'Journal entry not found' });
+    }
+    
+    // Parse JSON fields
+    const parsedEntry = {
+      ...entry,
+      tags: entry.tags ? JSON.parse(entry.tags) : [],
+      mediaUrls: entry.mediaUrls ? JSON.parse(entry.mediaUrls) : []
+    };
+    
+    res.json(parsedEntry);
+    console.log(`✅ Fetched journal entry: ${entry.title}`);
+  } catch (error) {
+    console.error('❌ Error fetching journal entry:', error);
+    res.status(500).json({ error: 'Failed to fetch journal entry' });
+  }
+});
+
+// Create new journal entry
+app.post('/api/journal/entries', async (req, res) => {
+  try {
+    console.log('📖 Create journal entry endpoint called');
+    const { title, content, tags } = req.body;
+    
+    // For now, return a mock response to test the frontend
+    const mockEntry = {
+      id: Date.now(),
+      title,
+      content,
+      plainText: content.replace(/<[^>]*>/g, ''),
+      tags: tags || [],
+      isPublic: false,
+      mediaUrls: [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    
+    res.status(201).json(mockEntry);
+    console.log('✅ Journal entry created successfully');
+  } catch (error) {
+    console.error('❌ Error creating journal entry:', error);
+    res.status(500).json({ error: 'Failed to create journal entry' });
+  }
+});
+
+// Update journal entry
+app.put('/api/journal/entries/:id', async (req, res) => {
+  try {
+    console.log('📖 Update journal entry endpoint called');
+    const { id } = req.params;
+    const { title, content, tags } = req.body;
+    
+    // For now, return a mock response to test the frontend
+    const mockEntry = {
+      id: parseInt(id),
+      title,
+      content,
+      plainText: content.replace(/<[^>]*>/g, ''),
+      tags: tags || [],
+      isPublic: false,
+      mediaUrls: [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    
+    res.json(mockEntry);
+    console.log('✅ Journal entry updated successfully');
+  } catch (error) {
+    console.error('❌ Error updating journal entry:', error);
+    res.status(500).json({ error: 'Failed to update journal entry' });
+  }
+});
+
+// Delete journal entry
+app.delete('/api/journal/entries/:id', async (req, res) => {
+  try {
+    console.log('📖 Delete journal entry endpoint called');
+    const { id } = req.params;
+    
+    res.json({ message: 'Journal entry deleted successfully' });
+    console.log('✅ Journal entry deleted successfully');
+  } catch (error) {
+    console.error('❌ Error deleting journal entry:', error);
+    res.status(500).json({ error: 'Failed to delete journal entry' });
+  }
+});
+
+// Get all tags
+app.get('/api/journal/tags', async (req, res) => {
+  try {
+    console.log('📖 Journal tags endpoint called');
+    
+    // For now, return empty data to test the frontend
+    const response = [];
+    
+    res.json(response);
+    console.log('✅ Journal tags returned successfully');
+  } catch (error) {
+    console.error('❌ Error in journal tags endpoint:', error);
+    res.status(500).json({ error: 'Failed to fetch tags' });
+  }
+});
+
+// Create new tag
+app.post('/api/journal/tags', async (req, res) => {
+  try {
+    console.log('📖 Create journal tag endpoint called');
+    const { name } = req.body;
+    
+    // For now, return a mock response to test the frontend
+    const mockTag = {
+      id: Date.now(),
+      name,
+      useCount: 1,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    
+    res.status(201).json(mockTag);
+    console.log('✅ Journal tag created successfully');
+  } catch (error) {
+    console.error('❌ Error creating journal tag:', error);
+    res.status(500).json({ error: 'Failed to create tag' });
+  }
+});
+
+// Upload media (simplified for now)
+app.post('/api/journal/media', upload.single('file'), async (req, res) => {
+  try {
+    console.log('📖 Upload media endpoint called');
+    
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file uploaded' });
+    }
+    
+    // For now, return a mock response
+    const mockMedia = {
+      id: Date.now(),
+      url: `/api/journal/media/${Date.now()}`,
+      filename: req.file.originalname,
+      fileType: req.file.mimetype,
+      fileSize: req.file.size
+    };
+    
+    res.status(201).json(mockMedia);
+    console.log('✅ Media uploaded successfully');
+  } catch (error) {
+    console.error('❌ Error uploading media:', error);
+    res.status(500).json({ error: 'Failed to upload media' });
+  }
+});
+
+// Serve media files (simplified)
+app.get('/api/journal/media/:id', async (req, res) => {
+  try {
+    console.log('📖 Serve media endpoint called');
+    res.status(404).json({ error: 'Media not found' });
+  } catch (error) {
+    console.error('❌ Error serving media:', error);
+    res.status(500).json({ error: 'Failed to serve media' });
   }
 });
 
