@@ -42,23 +42,34 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </head>
       <body style={{ margin: 0, minHeight: "100vh", position: "relative" }}>
         <AuthProvider>
-        {/* Background image container */}
-        <div
+        {/* Background video container (replaces static image) */}
+        <video
           aria-hidden="true"
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
           style={{
             position: "fixed",
             inset: 0,
-            backgroundImage: "url('/images/cave-bg.png')",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            objectPosition: "center",
             filter:
               location.pathname === "/login" || location.pathname === "/create-account"
                 ? "grayscale(50%) brightness(80%) contrast(95%) blur(4px)"
                 : "grayscale(70%) brightness(40%) contrast(90%) blur(1px)",
             zIndex: -1,
-            pointerEvents: "none", // Allow clicks through background
+            pointerEvents: "none",
           }}
-        />
+        >
+          {/* MP4 default source */}
+          <source src="/images/Recording%202025-08-10%20004639.mp4" type="video/mp4" />
+          {/* Optional WebM source for broader compatibility */}
+          <source src="/images/Recording%202025-08-10%20004639.webm" type="video/webm" />
+        </video>
 
         {showNavbar && <Navbar />}
         <AuthBar />
