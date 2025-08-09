@@ -194,12 +194,38 @@ export default function ShinyShowcase() {
     (async () => {
       try {
         const data = await shinyHuntService.list();
-        setPortfolio(data as any);
+        const mapped = data.map((r) => ({
+          id: r.id,
+          pokemonId: r.pokemon_id,
+          pokemonName: r.pokemon_name,
+          method: r.method as any,
+          dateFound: (r.start_date || r.created_at) as string,
+          nature: undefined,
+          encounterCount: r.total_encounters,
+          ivs: undefined,
+          notes: null,
+          createdAt: r.created_at,
+          updatedAt: r.created_at,
+        }));
+        setPortfolio(mapped as any);
       } catch (err: any) {
         console.error('[shiny:list] error', err);
       }
       cleanup = shinyHuntService.subscribe(String(user.id), (row) => {
-        setPortfolio((prev) => [row as any, ...prev]);
+        const mapped = {
+          id: row.id,
+          pokemonId: row.pokemon_id,
+          pokemonName: row.pokemon_name,
+          method: row.method as any,
+          dateFound: (row.start_date || row.created_at) as string,
+          nature: undefined,
+          encounterCount: row.total_encounters,
+          ivs: undefined,
+          notes: null,
+          createdAt: row.created_at,
+          updatedAt: row.created_at,
+        };
+        setPortfolio((prev) => [mapped as any, ...prev]);
       });
     })();
     return () => {
@@ -508,7 +534,20 @@ export default function ShinyShowcase() {
         onCreated={async () => {
           try {
             const data = await shinyHuntService.list();
-            setPortfolio(data as any);
+            const mapped = data.map((r) => ({
+              id: r.id,
+              pokemonId: r.pokemon_id,
+              pokemonName: r.pokemon_name,
+              method: r.method as any,
+              dateFound: (r.start_date || r.created_at) as string,
+              nature: undefined,
+              encounterCount: r.total_encounters,
+              ivs: undefined,
+              notes: null,
+              createdAt: r.created_at,
+              updatedAt: r.created_at,
+            }));
+            setPortfolio(mapped as any);
           } catch (e) {
             console.error('[shiny:list] error after create', e);
           }
