@@ -569,33 +569,34 @@ export default function ShinyShowcase() {
         <section className="current-hunts-section">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
             <h2>🎯 Current Hunts</h2>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <span style={{ fontSize: '0.875rem', color: 'rgba(255, 255, 255, 0.7)' }}>View:</span>
-              <button
-                onClick={() => setHuntsViewMode(huntsViewMode === 'grid' ? 'compact' : 'grid')}
-                style={{
-                  backgroundColor: 'rgba(255, 215, 0, 0.2)',
-                  color: '#ffd700',
-                  border: '1px solid #ffd700',
-                  padding: '6px 12px',
-                  borderRadius: '4px',
-                  fontSize: '0.75rem',
-                  fontWeight: 'bold',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '4px',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = 'rgba(255, 215, 0, 0.3)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'rgba(255, 215, 0, 0.2)';
-                }}
-              >
-                {huntsViewMode === 'grid' ? '☰' : '⊞'} {huntsViewMode === 'grid' ? 'Compact' : 'Grid'}
-              </button>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ fontSize: '0.8rem', color: '#ccc', minWidth: 70, textAlign: 'right' }}>
+                  {huntsViewMode === 'grid' ? 'Grid' : 'Compact'}
+                </span>
+                <label style={{ position: 'relative', display: 'inline-block', width: 46, height: 24 }}>
+                  <input
+                    type="checkbox"
+                    checked={huntsViewMode === 'compact'}
+                    onChange={() => setHuntsViewMode(huntsViewMode === 'grid' ? 'compact' : 'grid')}
+                    style={{ opacity: 0, width: 0, height: 0 }}
+                  />
+                  <span
+                    style={{
+                      position: 'absolute', cursor: 'pointer', top: 0, left: 0, right: 0, bottom: 0,
+                      backgroundColor: 'rgba(255, 215, 0, 0.25)', border: '1px solid #ffd700', borderRadius: 999,
+                      transition: '0.2s'
+                    }}
+                  />
+                  <span
+                    style={{
+                      position: 'absolute', height: 18, width: 18, left: huntsViewMode === 'compact' ? 26 : 4, bottom: 3,
+                      backgroundColor: '#ffd700', borderRadius: '50%', transition: '0.2s'
+                    }}
+                  />
+                </label>
+              </div>
             </div>
           </div>
           {filteredHunts.length === 0 ? (
@@ -604,7 +605,14 @@ export default function ShinyShowcase() {
             </div>
           ) : (
             <>
-              <div className={huntsViewMode === 'grid' ? 'hunts-grid' : 'hunts-compact'}>
+              <div
+                className={huntsViewMode === 'grid' ? 'hunts-grid' : 'hunts-compact'}
+                style={huntsViewMode === 'grid' ? {
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
+                  gap: '14px',
+                } : {}}
+              >
                 {filteredHunts.slice(0, displayHuntsLimit).map(hunt => (
                   <ShinyHuntCard
                     key={hunt.id}
