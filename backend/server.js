@@ -1,5 +1,8 @@
 const express = require('express');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 const { PrismaClient } = require('@prisma/client');
 const fetch = require('node-fetch');
 const multer = require('multer');
@@ -11,8 +14,140 @@ const prisma = new PrismaClient();
 const PORT = process.env.PORT || 4000;
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: [
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    'http://localhost:5173',
+    'http://127.0.0.1:5173'
+  ],
+  credentials: true
+}));
 app.use(express.json());
+app.use(cookieParser());
+
+// ===========================
+// AUTH HELPERS
+// ===========================
+const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-change-me';
+const TOKEN_COOKIE_NAME = 'mmojournal_token';
+
+function signToken(payload) {
+  return jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
+}
+
+function setAuthCookie(res, token) {
+  res.cookie(TOKEN_COOKIE_NAME, token, {
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: false,
+    maxAge: 7 * 24 * 60 * 60 * 1000
+  });
+}
+
+function clearAuthCookie(res) {
+  res.clearCookie(TOKEN_COOKIE_NAME, { httpOnly: true, sameSite: 'lax', secure: false });
+}
+
+function requireAuth(req, res, next) {
+  try {
+    const token = req.cookies[TOKEN_COOKIE_NAME];
+    if (!token) return res.status(401).json({ error: 'Unauthorized' });
+    const decoded = jwt.verify(token, JWT_SECRET);
+    req.user = decoded;
+    next();
+  } catch (err) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+}
+
+// ===========================
+// AUTH ROUTES
+// ===========================
+app.post('/api/auth/register', async (req, res) => {
+  try {
+    const { username, email, password } = req.body;
+    if (!username || !password) {
+      return res.status(400).json({ error: 'Username and password are required' });
+    }
+
+    const existing = await prisma.user.findFirst({
+      where: {
+        OR: [
+          { username: username.toLowerCase() },
+          email ? { email: email.toLowerCase() } : undefined
+        ].filter(Boolean)
+      }
+    });
+    if (existing) {
+      return res.status(409).json({ error: 'User already exists' });
+    }
+
+    const passwordHash = await bcrypt.hash(password, 10);
+    const user = await prisma.user.create({
+      data: {
+        username: username.toLowerCase(),
+        email: email ? email.toLowerCase() : null,
+        passwordHash
+      },
+      select: { id: true, username: true, email: true, createdAt: true }
+    });
+
+    const token = signToken({ id: user.id, username: user.username });
+    setAuthCookie(res, token);
+    return res.status(201).json({ user });
+  } catch (err) {
+    console.error('Error in register:', err);
+    return res.status(500).json({ error: 'Failed to register' });
+  }
+});
+
+app.post('/api/auth/login', async (req, res) => {
+  try {
+    const { usernameOrEmail, password } = req.body;
+    if (!usernameOrEmail || !password) {
+      return res.status(400).json({ error: 'Missing credentials' });
+    }
+
+    const query = usernameOrEmail.includes('@')
+      ? { email: usernameOrEmail.toLowerCase() }
+      : { username: usernameOrEmail.toLowerCase() };
+
+    const userRecord = await prisma.user.findUnique({
+      where: query
+    });
+    if (!userRecord) return res.status(401).json({ error: 'Invalid credentials' });
+
+    const ok = await bcrypt.compare(password, userRecord.passwordHash);
+    if (!ok) return res.status(401).json({ error: 'Invalid credentials' });
+
+    const token = signToken({ id: userRecord.id, username: userRecord.username });
+    setAuthCookie(res, token);
+    const user = { id: userRecord.id, username: userRecord.username, email: userRecord.email, createdAt: userRecord.createdAt };
+    return res.json({ user });
+  } catch (err) {
+    console.error('Error in login:', err);
+    return res.status(500).json({ error: 'Failed to login' });
+  }
+});
+
+app.post('/api/auth/logout', (req, res) => {
+  clearAuthCookie(res);
+  return res.json({ ok: true });
+});
+
+app.get('/api/auth/me', requireAuth, async (req, res) => {
+  try {
+    const current = await prisma.user.findUnique({
+      where: { id: req.user.id },
+      select: { id: true, username: true, email: true, createdAt: true }
+    });
+    if (!current) return res.status(401).json({ error: 'Unauthorized' });
+    return res.json({ user: current });
+  } catch (err) {
+    return res.status(500).json({ error: 'Failed to load user' });
+  }
+});
 
 // Configure multer for file uploads
 const storage = multer.diskStorage({

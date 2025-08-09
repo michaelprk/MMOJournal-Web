@@ -418,8 +418,9 @@ export default function ShinyShowcase() {
           backgroundColor: 'rgba(0, 0, 0, 0.1)',
           borderRadius: '8px',
           boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-          margin: '0 32px', // Increased from 16px for better spacing
+          margin: '0 auto',
           marginBottom: '16px',
+          maxWidth: '1400px',
         }}
       >
         <div style={{ marginLeft: '16px' }}> {/* Bring inward from edge */}
@@ -489,26 +490,38 @@ export default function ShinyShowcase() {
         </div>
       </div>
 
-      {/* Filter and Search Bar - Fixed */}
-      <div style={{
-        position: 'fixed',
-        top: '350px', // Start below navbar + utility bar
-        left: 0,
-        right: 0,
-        zIndex: 20,
-        backgroundColor: 'transparent',
-        padding: '16px 32px',
-        borderBottom: '1px solid rgba(255, 215, 0, 0.2)',
-      }}>
+      {/* Main Content Container - Scrollable */}
+      <div
+        style={{
+          position: 'fixed',
+          top: '350px', // Start below navbar + utility bar
+          left: 0,
+          right: 0,
+          height: 'calc(100vh - 350px)', // Take remaining viewport height
+          backgroundColor: 'transparent',
+          overflowY: 'auto', // Allow scrolling within this container
+          overflowX: 'hidden',
+        }}
+      >
+        
+        <main style={{ 
+          maxWidth: '1400px',
+          margin: '0 auto',
+          padding: "2rem", 
+          minHeight: "100%" 
+        }}>
+
+        {/* Filter and Sort Controls - moved from fixed bar to content area */}
         <div style={{
           display: 'flex',
           alignItems: 'center',
-          gap: '16px',
-          flexWrap: 'wrap',
+          gap: '24px',
           justifyContent: 'space-between',
+          marginBottom: '32px',
+          paddingTop: '16px',
+          paddingBottom: '16px',
+          borderBottom: '1px solid rgba(255, 215, 0, 0.2)',
         }}>
-
-          
           {/* Method Filter */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <span style={{ fontSize: '0.875rem', color: 'rgba(255, 255, 255, 0.7)' }}>Method:</span>
@@ -551,31 +564,8 @@ export default function ShinyShowcase() {
               <option value="name">Name (A-Z)</option>
             </select>
           </div>
-          
-
         </div>
-      </div>
 
-      {/* Main Content Container - Scrollable */}
-      <div
-        style={{
-          position: 'fixed',
-          top: '420px', // Start below navbar + utility bar + filter bar
-          left: 0,
-          right: 0,
-          height: 'calc(100vh - 420px)', // Take remaining viewport height
-          backgroundColor: 'transparent',
-          overflowY: 'auto', // Allow scrolling within this container
-          overflowX: 'hidden',
-        }}
-      >
-        
-        <main style={{ 
-          maxWidth: '1400px',
-          margin: '0 auto',
-          padding: "2rem", 
-          minHeight: "100%" 
-        }}>
         {/* Current Hunts Section */}
         <section className="current-hunts-section">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
@@ -667,8 +657,31 @@ export default function ShinyShowcase() {
           )}
         </section>
 
-        {/* Shiny Calendar */}
-        <ShinyCalendar portfolio={portfolio} />
+        {/* Showcase/Calendar Section - added proper separation and heading */}
+        <section style={{ 
+          marginTop: '48px',
+          paddingTop: '32px',
+          borderTop: '2px solid rgba(255, 215, 0, 0.3)',
+        }}>
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center', 
+            marginBottom: '24px' 
+          }}>
+            <h2 style={{
+              color: '#ffd700',
+              fontSize: '1.5rem',
+              fontWeight: 'bold',
+              margin: 0,
+              textShadow: '1px 1px 2px rgba(0,0,0,0.8)',
+            }}>
+              📅 Shiny Showcase & Calendar
+            </h2>
+          </div>
+          
+          <ShinyCalendar portfolio={portfolio} />
+        </section>
       </main>
 
       {/* Hunt Modal */}

@@ -1,12 +1,13 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import type { ReactNode } from "react";
 
 
-type User = { username: string } | null;
+type User = { id: number; username: string; email?: string | null } | null;
 
 type AuthContextType = {
   user: User;
-  login: (username: string, password: string) => Promise<boolean>;
+  login: (usernameOrEmail: string, password: string) => Promise<boolean>;
+  register: (data: { username: string; email?: string; password: string }) => Promise<boolean>;
   logout: () => void;
 };
 
@@ -14,22 +15,61 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User>(null);
+  const API_BASE_URL = 'http://localhost:4000/api';
 
-  const login = async (username: string, password: string) => {
-    // For now, just mock login (accept any non-empty username/password)
-    if (username && password) {
-      setUser({ username });
+  useEffect(() => {
+    // Try to restore session
+    (async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/auth/me`, { credentials: 'include' });
+        if (res.ok) {
+          const data = await res.json();
+          setUser(data.user);
+        }
+      } catch {}
+    })();
+  }, []);
+
+  const login = async (usernameOrEmail: string, password: string) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ usernameOrEmail, password })
+      });
+      if (!res.ok) return false;
+      const data = await res.json();
+      setUser(data.user);
       return true;
+    } catch {
+      return false;
     }
-    return false;
+  };
+
+  const register = async (data: { username: string; email?: string; password: string }) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(data)
+      });
+      if (!res.ok) return false;
+      const payload = await res.json();
+      setUser(payload.user);
+      return true;
+    } catch {
+      return false;
+    }
   };
 
   const logout = () => {
-    setUser(null);
+    fetch(`${API_BASE_URL}/auth/logout`, { method: 'POST', credentials: 'include' }).finally(() => setUser(null));
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1022,6 +1022,9 @@ html, body {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
   gap: 0.8rem;
+  justify-items: start;
+  align-items: start;
+  text-align: left;
 }
 
 .calendar-shiny {
@@ -1038,6 +1041,8 @@ html, body {
   opacity: 0;
   transform: translateY(20px);
   backdrop-filter: blur(3px);
+  width: 100%;
+  max-width: 120px;
 }
 
 @keyframes calendarShinyAppear {
