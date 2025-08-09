@@ -15,6 +15,7 @@ import { shinyHuntService, type ShinyHuntRow } from '../../services/shinyHuntSer
 import { useAuth } from '../../contexts/AuthContext';
 import HuntModal from '../../components/HuntModal';
 import { StartHuntModal } from '../../components/shiny/StartHuntModal';
+import { EditShinyModal } from '../../components/shiny/EditShinyModal';
 import CompletionModal from '../../components/CompletionModal';
 
 export default function ShinyShowcase() {
@@ -26,6 +27,7 @@ export default function ShinyShowcase() {
 
   const [showHuntModal, setShowHuntModal] = useState(false);
   const [showCompletionModal, setShowCompletionModal] = useState(false);
+  const [editingShiny, setEditingShiny] = useState<ShinyPortfolio | null>(null);
   const [huntModalMode, setHuntModalMode] = useState<'create' | 'phase'>('create');
   const [huntForPhase, setHuntForPhase] = useState<ShinyHunt | null>(null);
   const [completingHunt, setCompletingHunt] = useState<ShinyHunt | null>(null);
@@ -549,7 +551,7 @@ export default function ShinyShowcase() {
             </h2>
           </div>
           
-          <ShinyCalendar portfolio={portfolio} />
+          <ShinyCalendar portfolio={portfolio} onEdit={(row) => setEditingShiny(row)} />
         </section>
       </main>
 
@@ -599,6 +601,37 @@ export default function ShinyShowcase() {
         onClose={() => setShowCompletionModal(false)}
         hunt={completingHunt}
         onCompleteHunt={handleCompleteHunt}
+      />
+
+      {/* Edit Shiny Modal */}
+      <EditShinyModal
+        isOpen={!!editingShiny}
+        onClose={() => setEditingShiny(null)}
+        initial={{
+          id: editingShiny?.id || 0,
+          phase_count: 0,
+          total_encounters: editingShiny?.encounterCount || 0,
+          meta: { ivs: editingShiny?.ivs, nature: (editingShiny as any)?.nature },
+          pokemonName: editingShiny?.pokemonName || ''
+        }}
+        onSave={async ({ id, phase_count, total_encounters, meta }) => {
+          await shinyHuntService.updateCounters(id, { phase_count, total_encounters });
+          await shinyHuntService.updateMeta(id, meta);
+          // Refresh completed list
+          const completed = await shinyHuntService.listCompleted();
+          setPortfolio(completed.map((r: any) => ({
+            id: r.id,
+            pokemonId: r.pokemon_id,
+            pokemonName: r.pokemon_name,
+            method: r.method as any,
+            dateFound: (r.found_at || r.start_date || r.created_at) as string,
+            nature: r.meta?.nature,
+            encounterCount: r.total_encounters,
+            ivs: r.meta?.ivs,
+            createdAt: r.created_at,
+            updatedAt: r.created_at,
+          })) as any);
+        }}
       />
       </div>
     </>

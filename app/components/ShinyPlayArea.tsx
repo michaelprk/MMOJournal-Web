@@ -4,6 +4,7 @@ import { getShinySpritePath, getPokemonColors } from '../types/pokemon';
 
 interface ShinyCalendarProps {
   portfolio: ShinyPortfolio[];
+  onEdit?: (row: ShinyPortfolio) => void;
 }
 
 interface MonthData {
@@ -13,7 +14,7 @@ interface MonthData {
   shinies: ShinyPortfolio[];
 }
 
-export default function ShinyCalendar({ portfolio }: ShinyCalendarProps) {
+export default function ShinyCalendar({ portfolio, onEdit }: ShinyCalendarProps) {
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const [viewMode, setViewMode] = useState<'calendar' | 'showcase'>('calendar');
   const [sortBy, setSortBy] = useState<'date' | 'type' | 'rarity'>('date');
@@ -321,7 +322,7 @@ export default function ShinyCalendar({ portfolio }: ShinyCalendarProps) {
           
            {/* Hover Information Tooltip */}
           {hoveredShiny && (
-            <div style={{
+              <div style={{
               position: 'fixed',
               top: '50%',
               right: '20px',
@@ -393,6 +394,17 @@ export default function ShinyCalendar({ portfolio }: ShinyCalendarProps) {
                     <em style={{ color: '#aaa' }}>{hoveredShiny.notes}</em>
                   </div>
                 )}
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 8 }}>
+                <button
+                  onClick={() => onEdit && onEdit(hoveredShiny)}
+                  style={{
+                    background: 'transparent', color: '#fff', border: '1px solid rgba(255,255,255,0.3)',
+                    borderRadius: 6, padding: '6px 10px', fontSize: '0.85rem', cursor: 'pointer'
+                  }}
+                >
+                  ✏️ Edit
+                </button>
               </div>
             </div>
           )}
