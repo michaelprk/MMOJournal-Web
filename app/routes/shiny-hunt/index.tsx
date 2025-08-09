@@ -11,6 +11,7 @@ import ShinyHuntCard from '../../components/ShinyHuntCard';
 
 import ShinyCalendar from '../../components/ShinyPlayArea';
 import HuntModal from '../../components/HuntModal';
+import { StartHuntModal } from '../../components/shiny/StartHuntModal';
 import CompletionModal from '../../components/CompletionModal';
 
 export default function ShinyShowcase() {
@@ -253,10 +254,8 @@ export default function ShinyShowcase() {
 
   const [searchTerm, setSearchTerm] = useState('');
 
-  const handleStartNewHunt = () => {
-    setHuntModalMode('create');
-    setShowHuntModal(true);
-  };
+  const [showStartHunt, setShowStartHunt] = useState(false);
+  const handleStartNewHunt = () => setShowStartHunt(true);
 
   const handleCreateHunt = (data: {
     pokemonId: number;
@@ -684,7 +683,17 @@ export default function ShinyShowcase() {
         </section>
       </main>
 
-      {/* Hunt Modal */}
+      {/* Start Hunt Modal (Supabase-backed, PVP modal pattern) */}
+      <StartHuntModal
+        isOpen={showStartHunt}
+        onClose={() => setShowStartHunt(false)}
+        onCreated={() => {
+          // For now, refresh list from local state; real app would refetch from Supabase
+          // No-op here; user will see new hunt on next load if persisted
+        }}
+      />
+
+      {/* Legacy Hunt Modal (phase/add) */}
       <HuntModal
         isOpen={showHuntModal}
         onClose={() => {
