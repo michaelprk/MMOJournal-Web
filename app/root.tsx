@@ -41,6 +41,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body style={{ margin: 0, minHeight: "100vh", position: "relative" }}>
+        <AuthProvider>
         {/* Background image container */}
         <div
           aria-hidden="true"
@@ -86,7 +87,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         </main>
 
         <footer style={{ position: "relative", zIndex: 1 }}>{/* Optional footer */}</footer>
-
+        </AuthProvider>
         <ScrollRestoration />
         <Scripts />
       </body>
@@ -95,11 +96,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  return (
-    <AuthProvider>
-      <Outlet />
-    </AuthProvider>
-  );
+  return <Outlet />;
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
