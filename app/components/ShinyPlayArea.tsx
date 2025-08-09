@@ -319,7 +319,7 @@ export default function ShinyCalendar({ portfolio }: ShinyCalendarProps) {
             })}
           </div>
           
-          {/* Hover Information Tooltip */}
+           {/* Hover Information Tooltip */}
           {hoveredShiny && (
             <div style={{
               position: 'fixed',
@@ -364,6 +364,16 @@ export default function ShinyCalendar({ portfolio }: ShinyCalendarProps) {
                 <div style={{ marginBottom: '6px' }}>
                   <strong style={{ color: '#ffd700' }}>Method:</strong> {hoveredShiny.method}
                 </div>
+                  {(hoveredShiny as any).region && (hoveredShiny as any).area && (
+                    <div style={{ marginBottom: '6px' }}>
+                      <strong style={{ color: '#ffd700' }}>Location:</strong> {(hoveredShiny as any).region} — {((hoveredShiny as any).area as string).toUpperCase?.() || (hoveredShiny as any).area}
+                    </div>
+                  )}
+                  {(hoveredShiny as any).rarity && (
+                    <div style={{ marginBottom: '6px' }}>
+                      <strong style={{ color: '#ffd700' }}>Rarity:</strong> {(hoveredShiny as any).rarity}
+                    </div>
+                  )}
                 <div style={{ marginBottom: '6px' }}>
                   <strong style={{ color: '#ffd700' }}>Date Found:</strong> {new Date(hoveredShiny.dateFound).toLocaleDateString()}
                 </div>

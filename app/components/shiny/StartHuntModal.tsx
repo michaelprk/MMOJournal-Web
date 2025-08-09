@@ -37,6 +37,9 @@ export function StartHuntModal({ isOpen, onClose, onCreated, mode = 'create', in
   const [notes, setNotes] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [invalidCombo, setInvalidCombo] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [methodOpen, setMethodOpen] = useState(false);
+  const [methodActiveIdx, setMethodActiveIdx] = useState<number>(-1);
 
   useEffect(() => {
     setMounted(true);
@@ -221,31 +224,71 @@ export function StartHuntModal({ isOpen, onClose, onCreated, mode = 'create', in
           )}
         </div>
 
-        {/* Method */}
-        <div style={{ marginBottom: '1rem' }}>
+        {/* Method - themed headless select */}
+        <div style={{ marginBottom: '1rem', position: 'relative' }}>
           <label style={{ display: 'block', color: '#ffcb05', marginBottom: 6 }}>Method</label>
-          <select
-            value={method}
-            onChange={(e) => setMethod(e.target.value)}
+          <button
+            type="button"
             disabled={mode === 'edit' || !species || methodOptions.length === 0}
+            aria-haspopup="listbox"
+            aria-expanded={methodOpen}
+            onClick={() => setMethodOpen(!methodOpen)}
+            onKeyDown={(e) => {
+              if (!methodOpen && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); setMethodOpen(true); return; }
+              if (methodOpen) {
+                if (e.key === 'Escape') setMethodOpen(false);
+                if (e.key === 'ArrowDown') { e.preventDefault(); setMethodActiveIdx((i) => Math.min(i + 1, methodOptions.length - 1)); }
+                if (e.key === 'ArrowUp') { e.preventDefault(); setMethodActiveIdx((i) => Math.max(i - 1, 0)); }
+                if (e.key === 'Enter') { e.preventDefault(); const m = methodOptions[methodActiveIdx]; if (m) { setMethod(m); setMethodOpen(false); } }
+              }
+            }}
             style={{
               width: '100%',
-              backgroundColor: 'rgba(255,255,255,0.1)',
-              border: '1px solid #ffcb05',
-              borderRadius: 8,
+              textAlign: 'left',
+              backgroundColor: 'rgba(0,0,0,0.85)',
               color: '#fff',
+              border: '1px solid rgba(255,203,5,0.5)',
+              borderRadius: 8,
               padding: '10px 12px',
+              cursor: 'pointer'
             }}
           >
-            <option value="" disabled>
-              {species ? (methodOptions.length ? 'Select method' : 'No methods available') : 'Pick a species first'}
-            </option>
-            {methodOptions.map((m) => (
-              <option key={m} value={m}>
-                {m}
-              </option>
-            ))}
-          </select>
+            {species ? (method || (methodOptions.length ? 'Select method' : 'No methods available')) : 'Pick a species first'}
+          </button>
+          {methodOpen && (
+            <div
+              role="listbox"
+              aria-activedescendant={methodActiveIdx >= 0 ? `method-opt-${methodActiveIdx}` : undefined}
+              style={{
+                position: 'absolute', zIndex: 10001, width: '100%', marginTop: 6,
+                backgroundColor: 'rgba(6,6,6,0.98)', color: '#fff',
+                border: '1px solid #27272a', borderRadius: 8, boxShadow: '0 10px 25px rgba(0,0,0,0.6)',
+                maxHeight: 240, overflowY: 'auto'
+              }}
+              onMouseLeave={() => setMethodActiveIdx(-1)}
+            >
+              {methodOptions.map((m, idx) => {
+                const active = idx === methodActiveIdx || m === method;
+                return (
+                  <div
+                    id={`method-opt-${idx}`}
+                    key={m}
+                    role="option"
+                    aria-selected={m === method}
+                    onMouseEnter={() => setMethodActiveIdx(idx)}
+                    onClick={() => { setMethod(m); setMethodOpen(false); }}
+                    style={{
+                      padding: '8px 10px', cursor: 'pointer',
+                      backgroundColor: active ? 'rgba(255,203,5,0.2)' : 'transparent',
+                      color: active ? '#fde68a' : '#fff'
+                    }}
+                  >
+                    {m}
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         {/* Location */}
@@ -332,6 +375,20 @@ export function StartHuntModal({ isOpen, onClose, onCreated, mode = 'create', in
             }}
           />
         </div>
+
+        {/* Error Block */}
+        {errorMsg && (
+          <div style={{
+            background: 'rgba(127,29,29,0.3)',
+            color: '#fecaca',
+            border: '1px solid rgba(248,113,113,0.5)',
+            borderRadius: 8,
+            padding: '8px 12px',
+            marginBottom: '10px'
+          }}>
+            {errorMsg}
+          </div>
+        )}
 
         {/* Actions */}
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>

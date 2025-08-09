@@ -10,11 +10,14 @@ import ShinyUtilityBar from '../../components/ShinyUtilityBar';
 import ShinyHuntCard from '../../components/ShinyHuntCard';
 
 import ShinyCalendar from '../../components/ShinyPlayArea';
+import { supabase } from '../../services/supabase';
+import { useAuth } from '../../contexts/AuthContext';
 import HuntModal from '../../components/HuntModal';
 import { StartHuntModal } from '../../components/shiny/StartHuntModal';
 import CompletionModal from '../../components/CompletionModal';
 
 export default function ShinyShowcase() {
+  const { user, initializing } = useAuth();
   // Mock data for demonstration - in a real app, this would come from an API
   const [currentHunts, setCurrentHunts] = useState<ShinyHunt[]>([]);
 
@@ -182,6 +185,23 @@ export default function ShinyShowcase() {
   };
 
 
+
+  // Load hunts from Supabase
+  useEffect(() => {
+    if (initializing || !user) return;
+    (async () => {
+      const { data, error } = await supabase
+        .from('shiny_hunts')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (!error && data) {
+        // Map DB rows to ShinyHunt shape if needed
+        setCurrentHunts([]); // Active hunts list could be separate; placeholder
+        // Portfolio represents caught shinies
+        setPortfolio(data as any);
+      }
+    })();
+  }, [initializing, user]);
 
   // Get filtered data
   const filteredHunts = getFilteredAndSortedHunts();
