@@ -15,9 +15,17 @@ interface StartHuntModalProps {
     startDate: string;
     notes?: string;
   }) => void;
+  mode?: 'create' | 'edit';
+  initial?: {
+    species?: SpeciesOption;
+    method?: string;
+    location?: LocationOption | null;
+    startDate?: string;
+    notes?: string;
+  };
 }
 
-export function StartHuntModal({ isOpen, onClose, onCreated }: StartHuntModalProps) {
+export function StartHuntModal({ isOpen, onClose, onCreated, mode = 'create', initial }: StartHuntModalProps) {
   const [speciesQuery, setSpeciesQuery] = useState('');
   const [species, setSpecies] = useState<SpeciesOption | null>(null);
   const [method, setMethod] = useState<string>('');
@@ -38,8 +46,20 @@ export function StartHuntModal({ isOpen, onClose, onCreated }: StartHuntModalPro
       setStartDate(new Date().toISOString().slice(0, 10));
       setNotes('');
       setInvalidCombo(false);
+      return;
     }
-  }, [isOpen]);
+    // Prefill in edit mode
+    if (mode === 'edit') {
+      if (initial?.species) setSpecies(initial.species);
+      if (initial?.method) setMethod(initial.method);
+      if (initial?.location) {
+        setLocation(initial.location);
+        setLocationQuery(initial.location.label);
+      }
+      setStartDate(initial?.startDate || new Date().toISOString().slice(0, 10));
+      setNotes(initial?.notes || '');
+    }
+  }, [isOpen, mode, initial]);
 
   const allSpecies = useMemo(() => getSpeciesList(), []);
   const filteredSpecies = useMemo(() => {
@@ -67,7 +87,7 @@ export function StartHuntModal({ isOpen, onClose, onCreated }: StartHuntModalPro
     setInvalidCombo(!ok);
   }, [species, method, location]);
 
-  const canSubmit = !!species && !!method && !!location && !invalidCombo && !submitting;
+  const canSubmit = mode === 'edit' ? !submitting && !!species : (!!species && !!method && !!location && !invalidCombo && !submitting);
 
   const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) onClose();
@@ -82,9 +102,15 @@ export function StartHuntModal({ isOpen, onClose, onCreated }: StartHuntModalPro
   }, [isOpen, onClose]);
 
   const handleSubmit = async () => {
-    if (!canSubmit || !species || !location) return;
+    if (!canSubmit || !species) return;
     setSubmitting(true);
     try {
+      if (mode === 'edit') {
+        // For now, just close; future: update row in DB
+        onClose();
+        return;
+      }
+      if (!location) return;
       const parsed = JSON.parse(location.value) as { region: string | null; area: string | null };
       const insert: Record<string, any> = {
         pokemon_id: species.id,
@@ -96,7 +122,7 @@ export function StartHuntModal({ isOpen, onClose, onCreated }: StartHuntModalPro
         is_completed: false,
         notes: notes || null,
       };
-      // Optional fields (only include if your schema has them)
+      // Optional fields (uncomment if present)
       // insert.region = parsed.region;
       // insert.area = parsed.area;
       // insert.location = parsed.area;
@@ -143,7 +169,7 @@ export function StartHuntModal({ isOpen, onClose, onCreated }: StartHuntModalPro
           overflowY: 'auto',
         }}
       >
-        <h2 style={{ color: '#ffcb05', marginTop: 0, marginBottom: '1rem' }}>✨ Start New Hunt</h2>
+        <h2 style={{ color: '#ffcb05', marginTop: 0, marginBottom: '1rem' }}>{mode === 'edit' ? '✏️ Edit Hunt' : '✨ Start New Hunt'}</h2>
 
         {/* Species */}
         <div style={{ marginBottom: '1rem' }}>
@@ -153,6 +179,7 @@ export function StartHuntModal({ isOpen, onClose, onCreated }: StartHuntModalPro
             placeholder={species ? `${species.name} (#${String(species.id).padStart(3, '0')})` : 'Search species by name or ID...'}
             value={speciesQuery}
             onChange={(e) => setSpeciesQuery(e.target.value)}
+            disabled={mode === 'edit'}
             style={{
               width: '100%',
               backgroundColor: 'rgba(255,255,255,0.1)',
@@ -162,7 +189,7 @@ export function StartHuntModal({ isOpen, onClose, onCreated }: StartHuntModalPro
               padding: '10px 12px',
             }}
           />
-          {speciesQuery && (
+          {speciesQuery && mode !== 'edit' && (
             <div style={{
               backgroundColor: 'rgba(0,0,0,0.95)',
               border: '1px solid rgba(255,203,5,0.3)',
@@ -195,7 +222,7 @@ export function StartHuntModal({ isOpen, onClose, onCreated }: StartHuntModalPro
           <select
             value={method}
             onChange={(e) => setMethod(e.target.value)}
-            disabled={!species || methodOptions.length === 0}
+            disabled={mode === 'edit' || !species || methodOptions.length === 0}
             style={{
               width: '100%',
               backgroundColor: 'rgba(255,255,255,0.1)',
@@ -224,7 +251,7 @@ export function StartHuntModal({ isOpen, onClose, onCreated }: StartHuntModalPro
             placeholder={species ? 'Search location...' : 'Pick a species first'}
             value={locationQuery}
             onChange={(e) => setLocationQuery(e.target.value)}
-            disabled={!species}
+            disabled={mode === 'edit' || !species}
             style={{
               width: '100%',
               backgroundColor: 'rgba(255,255,255,0.1)',
@@ -235,7 +262,7 @@ export function StartHuntModal({ isOpen, onClose, onCreated }: StartHuntModalPro
               marginBottom: 6,
             }}
           />
-          {species && locationQuery && (
+          {species && locationQuery && mode !== 'edit' && (
             <div style={{
               backgroundColor: 'rgba(0,0,0,0.95)',
               border: '1px solid rgba(255,203,5,0.3)',
@@ -330,7 +357,7 @@ export function StartHuntModal({ isOpen, onClose, onCreated }: StartHuntModalPro
               cursor: canSubmit ? 'pointer' : 'not-allowed',
             }}
           >
-            {submitting ? 'Starting…' : 'Start Hunt'}
+            {submitting ? (mode === 'edit' ? 'Saving…' : 'Starting…') : (mode === 'edit' ? 'Save' : 'Start Hunt')}
           </button>
         </div>
       </div>

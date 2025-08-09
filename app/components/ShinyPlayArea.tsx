@@ -16,6 +16,7 @@ interface MonthData {
 export default function ShinyCalendar({ portfolio }: ShinyCalendarProps) {
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const [viewMode, setViewMode] = useState<'calendar' | 'showcase'>('calendar');
+  const [sortBy, setSortBy] = useState<'date' | 'type' | 'rarity'>('date');
   const [hoveredShiny, setHoveredShiny] = useState<ShinyPortfolio | null>(null);
   
   if (portfolio.length === 0) {
@@ -89,33 +90,30 @@ export default function ShinyCalendar({ portfolio }: ShinyCalendarProps) {
         <h3>{viewMode === 'calendar' ? '📅 Shiny Calendar' : '✨ Shiny Showcase'}</h3>
         <div className="calendar-controls">
           {/* View Mode Toggle */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <span style={{ fontSize: '0.875rem', color: 'rgba(255, 255, 255, 0.7)' }}>View:</span>
-            <button
-              onClick={() => setViewMode(viewMode === 'calendar' ? 'showcase' : 'calendar')}
-              style={{
-                backgroundColor: 'rgba(255, 215, 0, 0.2)',
-                color: '#ffd700',
-                border: '1px solid #ffd700',
-                padding: '6px 12px',
-                borderRadius: '6px',
-                fontSize: '0.8rem',
-                fontWeight: 'bold',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '4px',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(255, 215, 0, 0.3)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(255, 215, 0, 0.2)';
-              }}
-            >
-              {viewMode === 'calendar' ? '🖼️ Showcase' : '📅 Calendar'}
-            </button>
+            <span style={{ fontSize: '0.8rem', color: '#ccc', minWidth: 90, textAlign: 'right' }}>{viewMode === 'calendar' ? 'Calendar' : 'Showcase'}</span>
+            <label style={{ position: 'relative', display: 'inline-block', width: 46, height: 24 }}>
+              <input
+                type="checkbox"
+                checked={viewMode === 'showcase'}
+                onChange={() => setViewMode(viewMode === 'calendar' ? 'showcase' : 'calendar')}
+                style={{ opacity: 0, width: 0, height: 0 }}
+              />
+              <span
+                style={{
+                  position: 'absolute', cursor: 'pointer', top: 0, left: 0, right: 0, bottom: 0,
+                  backgroundColor: 'rgba(255, 215, 0, 0.25)', border: '1px solid #ffd700', borderRadius: 999,
+                  transition: '0.2s'
+                }}
+              />
+              <span
+                style={{
+                  position: 'absolute', height: 18, width: 18, left: viewMode === 'showcase' ? 26 : 4, bottom: 3,
+                  backgroundColor: '#ffd700', borderRadius: '50%', transition: '0.2s'
+                }}
+              />
+            </label>
           </div>
           
           {viewMode === 'calendar' && (
@@ -161,7 +159,7 @@ export default function ShinyCalendar({ portfolio }: ShinyCalendarProps) {
                 <div className="month-decoration"></div>
               </div>
               
-              <div className="month-shinies">
+              <div className="month-shinies" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: 12 }}>
                 {monthData.shinies.map((shiny, shinyIndex) => {
                   const pokemonColors = getPokemonColors(shiny.pokemonId);
                   const dayOfMonth = new Date(shiny.dateFound).getDate();
@@ -172,42 +170,27 @@ export default function ShinyCalendar({ portfolio }: ShinyCalendarProps) {
                       key={shiny.id} 
                       className={`calendar-shiny ${isRecent ? 'recent' : ''}`}
                       style={{
-                        animationDelay: `${(index * 0.1) + (shinyIndex * 0.05)}s`
+                        animationDelay: `${(index * 0.1) + (shinyIndex * 0.05)}s`,
+                        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
+                        padding: 8, border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8
                       }}
                     >
-                      <div className="shiny-date-marker">
-                        <span className="day-number">{dayOfMonth}</span>
-                      </div>
-                      
-                      <div className="shiny-display">
-                        <div 
-                          className="shiny-glow-ring"
-                          style={{
-                            boxShadow: `0 0 20px ${pokemonColors.glowLight}, inset 0 0 20px ${pokemonColors.glowLight}`
-                          }}
-                        ></div>
-                        
-                        <img 
-                          src={getShinySpritePath(shiny.pokemonId, shiny.pokemonName)}
-                          alt={`Shiny ${shiny.pokemonName}`}
-                          className="calendar-sprite"
-                          style={{
-                            filter: `drop-shadow(0 0 10px ${pokemonColors.glow}) drop-shadow(0 0 20px ${pokemonColors.glowLight})`,
-                          }}
-                          onError={(e) => {
-                            e.currentTarget.src = '/images/shiny-sprites/001_Bulbasaur.gif';
-                          }}
-                        />
-                        
-                        {isRecent && <div className="recent-badge">NEW!</div>}
-                      </div>
-                      
-                      <div className="shiny-info">
-                        <div className="shiny-name">{shiny.pokemonName}</div>
-                        <div className="shiny-method">{shiny.method}</div>
-                        {shiny.encounterCount && (
-                          <div className="shiny-encounters">{shiny.encounterCount.toLocaleString()} enc</div>
-                        )}
+                      <img 
+                        src={getShinySpritePath(shiny.pokemonId, shiny.pokemonName)}
+                        alt={`Shiny ${shiny.pokemonName}`}
+                        className="calendar-sprite"
+                        style={{
+                          width: 56, height: 56,
+                          filter: `drop-shadow(0 0 10px ${pokemonColors.glow}) drop-shadow(0 0 20px ${pokemonColors.glowLight})`,
+                        }}
+                        onError={(e) => { e.currentTarget.src = '/images/shiny-sprites/001_Bulbasaur.gif'; }}
+                      />
+                      <div style={{ color: '#fff', fontSize: '0.8rem', fontWeight: 700, textAlign: 'center' }}>{shiny.pokemonName}</div>
+                      <div style={{ position: 'relative' }}
+                        onMouseEnter={() => setHoveredShiny(shiny)}
+                        onMouseLeave={() => setHoveredShiny(null)}
+                      >
+                        {/* Hover content appears globally below when hoveredShiny is set */}
                       </div>
                     </div>
                   );
@@ -219,6 +202,18 @@ export default function ShinyCalendar({ portfolio }: ShinyCalendarProps) {
       ) : (
         /* Showcase View */
         <div className="shiny-showcase">
+          <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+            <label style={{ color: '#ffd700', fontSize: '0.9rem' }}>Sort:</label>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as any)}
+              style={{ background: 'rgba(0,0,0,0.4)', color: '#fff', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 6, padding: '6px 8px' }}
+            >
+              <option value="date">Date</option>
+              <option value="type">Type</option>
+              <option value="rarity">Rarity</option>
+            </select>
+          </div>
           <div style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))',
@@ -226,7 +221,15 @@ export default function ShinyCalendar({ portfolio }: ShinyCalendarProps) {
             padding: '20px',
             position: 'relative'
           }}>
-            {portfolio.map((shiny, index) => {
+            {portfolio
+              .slice()
+              .sort((a, b) => {
+                if (sortBy === 'date') return new Date(b.dateFound).getTime() - new Date(a.dateFound).getTime();
+                if (sortBy === 'type') return a.pokemonName.localeCompare(b.pokemonName);
+                if (sortBy === 'rarity') return 0; // Placeholder until rarity exists in DB/meta
+                return 0;
+              })
+              .map((shiny, index) => {
               const pokemonColors = getPokemonColors(shiny.pokemonId);
               const isRecent = new Date(shiny.dateFound).getTime() > Date.now() - (7 * 24 * 60 * 60 * 1000);
               
