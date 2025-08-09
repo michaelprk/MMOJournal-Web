@@ -74,7 +74,16 @@ export function StartHuntModal({ isOpen, onClose, onCreated, mode = 'create', in
     return allSpecies.filter((s) => s.name.toLowerCase().includes(q) || String(s.id).includes(q)).slice(0, 20);
   }, [speciesQuery, allSpecies]);
 
-  const methodOptions = useMemo(() => (species ? getMethodsForSpecies(species.id) : []), [species]);
+  const METHOD_OPTIONS = [
+    '5x Horde',
+    '3x Horde',
+    'Single/Lures',
+    'Fishing',
+    'Egg Hunt',
+    'Alpha Egg Hunt',
+    'Fossil'
+  ];
+  const methodOptions = METHOD_OPTIONS;
   const allLocations = useMemo(() => (species ? getValidLocations(species.id) : []), [species]);
   const filteredLocations = useMemo(() => {
     const q = locationQuery.trim().toLowerCase();
@@ -327,12 +336,27 @@ export function StartHuntModal({ isOpen, onClose, onCreated, mode = 'create', in
                   }}
                   style={{ padding: '8px 10px', cursor: 'pointer', color: '#fff' }}
                 >
-                  {opt.label} {opt.rarity ? `· ${opt.rarity}` : ''}
+                  {opt.label}
                 </div>
               ))}
             </div>
           )}
         </div>
+        {location && (
+          <div style={{ marginBottom: '1rem' }}>
+            <span style={{
+              display: 'inline-flex', alignItems: 'center', gap: 8,
+              background: 'rgba(0,0,0,0.7)', border: '1px solid rgba(255,203,5,0.5)', color: '#fff',
+              borderRadius: 999, padding: '4px 10px'
+            }}>
+              {location.label}
+              <button type="button" aria-label="Clear location" onClick={() => { setLocation(null); setLocationQuery(''); }}
+                style={{ background: 'transparent', color: '#fde68a', border: 'none', cursor: 'pointer' }}>
+                ×
+              </button>
+            </span>
+          </div>
+        )}
         {species && method && location && invalidCombo && (
           <div style={{ color: '#ff6b6b', fontSize: '0.9rem', marginBottom: '0.75rem' }}>
             This method/location isn’t valid for this species

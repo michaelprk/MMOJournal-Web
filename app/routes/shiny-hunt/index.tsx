@@ -187,45 +187,71 @@ export default function ShinyShowcase() {
 
 
 
-  // Load hunts from Supabase
+  // Load hunts from Supabase (active & completed separated)
   useEffect(() => {
     if (initializing || !user) return;
     let cleanup: (() => void) | undefined;
     (async () => {
       try {
-        const data = await shinyHuntService.list();
-        const mapped = data.map((r) => ({
+        const active = await shinyHuntService.listActive();
+        const completed = await shinyHuntService.listCompleted();
+        setCurrentHunts(active.map((r) => ({
           id: r.id,
           pokemonId: r.pokemon_id,
           pokemonName: r.pokemon_name,
           method: r.method as any,
-          dateFound: (r.start_date || r.created_at) as string,
-          nature: undefined,
-          encounterCount: r.total_encounters,
-          ivs: undefined,
-          notes: null,
+          startDate: (r.start_date || r.created_at) as string,
+          phaseCount: r.phase_count,
+          totalEncounters: r.total_encounters,
+          isCompleted: r.is_completed,
+          phasePokemon: [],
           createdAt: r.created_at,
           updatedAt: r.created_at,
-        }));
-        setPortfolio(mapped as any);
+        })));
+        setPortfolio(completed.map((r: any) => ({
+          id: r.id,
+          pokemonId: r.pokemon_id,
+          pokemonName: r.pokemon_name,
+          method: r.method as any,
+          dateFound: (r.found_at || r.start_date || r.created_at) as string,
+          nature: r.meta?.nature,
+          encounterCount: r.total_encounters,
+          ivs: r.meta?.ivs,
+          createdAt: r.created_at,
+          updatedAt: r.created_at,
+        })) as any);
       } catch (err: any) {
         console.error('[shiny:list] error', err);
       }
       cleanup = shinyHuntService.subscribe(String(user.id), (row) => {
-        const mapped = {
-          id: row.id,
-          pokemonId: row.pokemon_id,
-          pokemonName: row.pokemon_name,
-          method: row.method as any,
-          dateFound: (row.start_date || row.created_at) as string,
-          nature: undefined,
-          encounterCount: row.total_encounters,
-          ivs: undefined,
-          notes: null,
-          createdAt: row.created_at,
-          updatedAt: row.created_at,
-        };
-        setPortfolio((prev) => [mapped as any, ...prev]);
+        if (row.is_completed) {
+          setPortfolio((prev) => ([{
+            id: row.id,
+            pokemonId: row.pokemon_id,
+            pokemonName: row.pokemon_name,
+            method: row.method as any,
+            dateFound: (row.found_at || row.start_date || row.created_at) as string,
+            nature: (row as any).meta?.nature,
+            encounterCount: row.total_encounters,
+            ivs: (row as any).meta?.ivs,
+            createdAt: row.created_at,
+            updatedAt: row.created_at,
+          }] as any).concat(prev));
+        } else {
+          setCurrentHunts((prev) => ([{
+            id: row.id,
+            pokemonId: row.pokemon_id,
+            pokemonName: row.pokemon_name,
+            method: row.method as any,
+            startDate: (row.start_date || row.created_at) as string,
+            phaseCount: row.phase_count,
+            totalEncounters: row.total_encounters,
+            isCompleted: row.is_completed,
+            phasePokemon: [],
+            createdAt: row.created_at,
+            updatedAt: row.created_at,
+          }] as any).concat(prev));
+        }
       });
     })();
     return () => {

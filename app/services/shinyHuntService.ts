@@ -51,6 +51,72 @@ export const shinyHuntService = {
       supabase.removeChannel(channel);
     };
   },
+
+  async listActive(): Promise<ShinyHuntRow[]> {
+    const { data, error } = await supabase
+      .from('shiny_hunts')
+      .select(
+        'id,pokemon_id,pokemon_name,method,region,area,location,rarity,phase_count,total_encounters,is_completed,start_date,created_at'
+      )
+      .eq('is_completed', false)
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    return (data || []) as ShinyHuntRow[];
+  },
+
+  async listCompleted(): Promise<ShinyHuntRow[]> {
+    const { data, error } = await supabase
+      .from('shiny_hunts')
+      .select(
+        'id,pokemon_id,pokemon_name,method,region,area,location,rarity,phase_count,total_encounters,is_completed,start_date,created_at,found_at,completed_month,completed_year,meta'
+      )
+      .eq('is_completed', true)
+      .order('found_at', { ascending: false });
+    if (error) throw error;
+    return (data || []) as any;
+  },
+
+  async create(payload: Partial<ShinyHuntRow> & { pokemon_id: number; pokemon_name: string; method: string }): Promise<void> {
+    const insert = {
+      ...payload,
+      is_completed: false,
+      // found_at left null; trigger will set cache when completed
+    } as any;
+    const { error } = await supabase.from('shiny_hunts').insert([insert]);
+    if (error) throw error;
+  },
+
+  async markFound(id: number): Promise<void> {
+    const { error } = await supabase
+      .from('shiny_hunts')
+      .update({ is_completed: true, found_at: new Date().toISOString() })
+      .eq('id', id);
+    if (error) throw error;
+  },
+
+  async updateCounters(id: number, data: { phase_count?: number; total_encounters?: number }): Promise<void> {
+    const { error } = await supabase
+      .from('shiny_hunts')
+      .update(data)
+      .eq('id', id);
+    if (error) throw error;
+  },
+
+  async updateMeta(id: number, partialMeta: any): Promise<void> {
+    // Merge into meta JSONB
+    const { data, error } = await supabase
+      .from('shiny_hunts')
+      .select('meta')
+      .eq('id', id)
+      .single();
+    if (error) throw error;
+    const newMeta = { ...(data?.meta || {}), ...partialMeta };
+    const { error: upErr } = await supabase
+      .from('shiny_hunts')
+      .update({ meta: newMeta })
+      .eq('id', id);
+    if (upErr) throw upErr;
+  },
 };
 
 
