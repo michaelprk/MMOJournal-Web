@@ -418,7 +418,7 @@ export default function ShinyShowcase() {
           borderRadius: '8px',
           boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
           margin: '0 auto',
-          marginBottom: '24px', // add breathing room below the bar
+          marginBottom: '28px', // add breathing room below the bar
           maxWidth: '1400px',
         }}
       >
