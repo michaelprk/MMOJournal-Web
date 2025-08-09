@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { supabase } from '../../services/supabase';
 import { getSpeciesList, getMethodsForSpecies, getValidLocations, validateEncounter } from '../../lib/pokedex';
 
@@ -26,6 +27,7 @@ interface StartHuntModalProps {
 }
 
 export function StartHuntModal({ isOpen, onClose, onCreated, mode = 'create', initial }: StartHuntModalProps) {
+  const [mounted, setMounted] = useState(false);
   const [speciesQuery, setSpeciesQuery] = useState('');
   const [species, setSpecies] = useState<SpeciesOption | null>(null);
   const [method, setMethod] = useState<string>('');
@@ -37,6 +39,7 @@ export function StartHuntModal({ isOpen, onClose, onCreated, mode = 'create', in
   const [invalidCombo, setInvalidCombo] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     if (!isOpen) {
       setSpeciesQuery('');
       setSpecies(null);
@@ -141,9 +144,9 @@ export function StartHuntModal({ isOpen, onClose, onCreated, mode = 'create', in
     }
   };
 
-  if (!isOpen) return null;
+  if (!isOpen || !mounted || typeof document === 'undefined') return null;
 
-  return (
+  return createPortal(
     <div
       style={{
         position: 'fixed',
@@ -167,6 +170,8 @@ export function StartHuntModal({ isOpen, onClose, onCreated, mode = 'create', in
           maxWidth: 700,
           maxHeight: '90vh',
           overflowY: 'auto',
+          position: 'relative',
+          zIndex: 10000,
         }}
       >
         <h2 style={{ color: '#ffcb05', marginTop: 0, marginBottom: '1rem' }}>{mode === 'edit' ? '✏️ Edit Hunt' : '✨ Start New Hunt'}</h2>
@@ -361,7 +366,8 @@ export function StartHuntModal({ isOpen, onClose, onCreated, mode = 'create', in
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 
