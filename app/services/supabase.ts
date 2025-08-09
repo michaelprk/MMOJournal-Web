@@ -2,10 +2,20 @@ import { createClient } from '@supabase/supabase-js';
 import type { PokemonBuild, PokemonApiData, CompetitiveTier, ShinyHunt } from '../types/pokemon';
 
 // Singleton Supabase client
-const supabaseUrl = process.env.VITE_SUPABASE_URL;
-const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY;
+const readEnv = (key: string): string | undefined => {
+  // Browser via Vite
+  if (typeof window !== 'undefined' && typeof import.meta !== 'undefined') {
+    return (import.meta as any).env?.[key];
+  }
+  // Node (scripts/tests)
+  return (process.env as any)[key];
+};
 
-if (import.meta.env.DEV) {
+const supabaseUrl = readEnv('VITE_SUPABASE_URL');
+const supabaseKey = readEnv('VITE_SUPABASE_ANON_KEY');
+
+const isDev = (typeof import.meta !== 'undefined' && (import.meta as any).env?.DEV) || process.env.NODE_ENV !== 'production';
+if (isDev) {
   if (!supabaseUrl || !supabaseKey) {
     // eslint-disable-next-line no-console
     console.warn('[Supabase] Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY. Check your .env');

@@ -102,6 +102,24 @@ CREATE POLICY "Users can delete own builds" ON pokemon_builds
   FOR DELETE USING (auth.uid() = user_id);
 ```
 
+### Profiles table for username support
+
+To support username-based sign-in (username or email), add a `profiles` table mapping usernames to emails:
+
+```sql
+create table if not exists profiles (
+  user_id uuid primary key references auth.users(id) on delete cascade,
+  username text unique not null,
+  email text unique not null,
+  created_at timestamptz default now()
+);
+
+alter table profiles enable row level security;
+
+create policy "Users can manage own profile" on profiles
+  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+```
+
 ## Step 3: Configure Environment Variables
 
 1. Create a `.env` file in your project root

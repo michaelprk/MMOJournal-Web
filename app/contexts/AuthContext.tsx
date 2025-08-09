@@ -7,8 +7,8 @@ type AuthUser = { id: string; email: string | null } | null;
 type AuthContextType = {
   user: AuthUser;
   initializing: boolean;
-  signIn: (email: string, password: string) => Promise<boolean>;
-  signUp: (email: string, password: string) => Promise<boolean>;
+  signIn: (identifier: string, password: string) => Promise<boolean>; // username or email
+  signUp: (username: string, email: string, password: string) => Promise<boolean>;
   signOut: () => Promise<void>;
 };
 
@@ -36,14 +36,36 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
   }, []);
 
-  const signIn = async (email: string, password: string) => {
+  const signIn = async (identifier: string, password: string) => {
+    let email = identifier.trim();
+    if (!email.includes('@')) {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('email')
+        .eq('username', email)
+        .single();
+      if (error || !data?.email) return false;
+      email = data.email;
+    }
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     return !error;
   };
 
-  const signUp = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signUp({ email, password });
-    return !error;
+  const signUp = async (username: string, email: string, password: string) => {
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { data: { username } }
+    });
+    if (error) return false;
+    const userId = data.user?.id;
+    if (!userId) return false;
+    // Create profile row
+    const { error: pErr } = await supabase
+      .from('profiles')
+      .insert([{ user_id: userId, username, email }]);
+    if (pErr) return false;
+    return true;
   };
 
   const signOut = async () => {

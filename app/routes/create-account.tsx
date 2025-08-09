@@ -5,6 +5,7 @@ import { useAuth } from "../contexts/AuthContext";
 export default function CreateAccount() {
   const navigate = useNavigate();
   const { signUp } = useAuth();
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -12,8 +13,8 @@ export default function CreateAccount() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email.trim() || !password.trim()) {
-      alert("Please enter an email and password");
+    if (!username.trim() || !email.trim() || !password.trim() || !confirmPassword.trim()) {
+      alert("Please fill in all fields");
       return;
     }
     if (password !== confirmPassword) {
@@ -21,7 +22,7 @@ export default function CreateAccount() {
       return;
     }
     setIsSubmitting(true);
-    const ok = await signUp(email.trim(), password);
+    const ok = await signUp(username.trim(), email.trim(), password);
     setIsSubmitting(false);
     if (ok) navigate("/pvp");
     else alert("Failed to create account");
@@ -48,10 +49,24 @@ export default function CreateAccount() {
       />
 
       <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", width: 300, gap: "1rem" }}>
-        
+        <input
+          type="text"
+          placeholder="Username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          style={{
+            padding: "0.75rem",
+            fontSize: "1rem",
+            borderRadius: 4,
+            border: "1px solid #555",
+            backgroundColor: "#111",
+            color: "#fff",
+          }}
+          autoFocus
+        />
         <input
           type="email"
-          placeholder="Email (optional)"
+          placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           style={{
@@ -62,7 +77,6 @@ export default function CreateAccount() {
             backgroundColor: "#111",
             color: "#fff",
           }}
-          autoFocus
         />
         <input
           type="password"
