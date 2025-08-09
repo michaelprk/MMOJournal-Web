@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import type { PokemonBuild, PokemonApiData, CompetitiveTier } from '../types/pokemon';
+import type { PokemonBuild, PokemonApiData, CompetitiveTier, ShinyHunt, ShinyPortfolio } from '../types/pokemon';
 
 // These will need to be set up in your environment
 const supabaseUrl = process.env.VITE_SUPABASE_URL || 'your-project-url';
@@ -11,11 +11,12 @@ export class PokemonBuildService {
   /**
    * Get all Pokemon builds, optionally filtered by tier
    */
-  static async getBuilds(tier?: CompetitiveTier): Promise<PokemonBuild[]> {
+  static async getBuilds(userId: string, tier?: CompetitiveTier): Promise<PokemonBuild[]> {
     try {
       let query = supabase
         .from('pokemon_builds')
         .select('*')
+        .eq('user_id', userId)
         .order('created_at', { ascending: false });
 
       if (tier) {
@@ -39,12 +40,13 @@ export class PokemonBuildService {
   /**
    * Get a single Pokemon build by ID
    */
-  static async getBuild(id: string): Promise<PokemonBuild | null> {
+  static async getBuild(userId: string, id: string): Promise<PokemonBuild | null> {
     try {
       const { data, error } = await supabase
         .from('pokemon_builds')
         .select('*')
         .eq('id', id)
+        .eq('user_id', userId)
         .single();
 
       if (error) {
@@ -62,11 +64,11 @@ export class PokemonBuildService {
   /**
    * Create a new Pokemon build
    */
-  static async createBuild(build: Omit<PokemonBuild, 'id' | 'created_at' | 'updated_at'>): Promise<PokemonBuild> {
+  static async createBuild(userId: string, build: Omit<PokemonBuild, 'id' | 'created_at' | 'updated_at' | 'user_id'>): Promise<PokemonBuild> {
     try {
       const { data, error } = await supabase
         .from('pokemon_builds')
-        .insert([build])
+        .insert([{ ...build, user_id: userId }])
         .select()
         .single();
 
@@ -85,12 +87,13 @@ export class PokemonBuildService {
   /**
    * Update an existing Pokemon build
    */
-  static async updateBuild(id: string, updates: Partial<PokemonBuild>): Promise<PokemonBuild> {
+  static async updateBuild(userId: string, id: string, updates: Partial<PokemonBuild>): Promise<PokemonBuild> {
     try {
       const { data, error } = await supabase
         .from('pokemon_builds')
         .update(updates)
         .eq('id', id)
+        .eq('user_id', userId)
         .select()
         .single();
 
@@ -109,12 +112,13 @@ export class PokemonBuildService {
   /**
    * Delete a Pokemon build
    */
-  static async deleteBuild(id: string): Promise<void> {
+  static async deleteBuild(userId: string, id: string): Promise<void> {
     try {
       const { error } = await supabase
         .from('pokemon_builds')
         .delete()
-        .eq('id', id);
+        .eq('id', id)
+        .eq('user_id', userId);
 
       if (error) {
         console.error('Error deleting Pokemon build:', error);
@@ -124,6 +128,43 @@ export class PokemonBuildService {
       console.error('Error in deleteBuild:', error);
       throw error;
     }
+  }
+}
+
+// ================================
+// Shiny Hunt Services (Supabase)
+// ================================
+export class ShinyHuntService {
+  static async getHunts(userId: string): Promise<ShinyHunt[]> {
+    const { data, error } = await supabase
+      .from('shiny_hunts')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    return (data as any) || [];
+  }
+
+  static async createHunt(userId: string, hunt: Omit<ShinyHunt, 'id' | 'createdAt' | 'updatedAt'>): Promise<ShinyHunt> {
+    const { data, error } = await supabase
+      .from('shiny_hunts')
+      .insert([{ ...hunt, user_id: userId }])
+      .select()
+      .single();
+    if (error) throw error;
+    return data as any;
+  }
+
+  static async updateHunt(userId: string, id: number, updates: Partial<ShinyHunt>): Promise<ShinyHunt> {
+    const { data, error } = await supabase
+      .from('shiny_hunts')
+      .update(updates)
+      .eq('id', id)
+      .eq('user_id', userId)
+      .select()
+      .single();
+    if (error) throw error;
+    return data as any;
   }
 }
 

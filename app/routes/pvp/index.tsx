@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import type { PokemonBuild, CompetitiveTier } from '../../types/pokemon';
 import { COMPETITIVE_TIERS } from '../../types/pokemon';
-import { PokemonBuildService } from '../../services/pokemon-backend';
+import { PokemonBuildService } from '../../services/supabase';
+import { useAuth } from '../../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import { TierFilter } from '../../components/TierFilter';
 import { PokemonBuildCard } from '../../components/PokemonBuildCard';
 import { PokemonBuildListView } from '../../components/PokemonBuildListView';
@@ -13,6 +15,8 @@ import { AddPokemonModal } from '../../components/AddPokemonModal';
 import { ExportModal } from '../../components/ExportModal';
 
 export default function PVPPage() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [builds, setBuilds] = useState<PokemonBuild[]>([]);
   const [filteredBuilds, setFilteredBuilds] = useState<PokemonBuild[]>([]);
   const [selectedTier, setSelectedTier] = useState<CompetitiveTier | undefined>();
@@ -171,8 +175,13 @@ export default function PVPPage() {
 
   // Load Pokemon builds
   useEffect(() => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
     loadBuilds();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
   // Filter and sort builds when tier or sort changes
   useEffect(() => {
@@ -188,7 +197,8 @@ export default function PVPPage() {
   const loadBuilds = async () => {
     try {
       setIsLoading(true);
-      const data = await PokemonBuildService.getBuilds();
+      if (!user) return;
+      const data = await PokemonBuildService.getBuilds(String(user.id));
       setBuilds(data);
       setError(null);
     } catch (err) {
@@ -201,10 +211,11 @@ export default function PVPPage() {
 
   const handleSaveBuild = async (buildData: Omit<PokemonBuild, 'id' | 'created_at' | 'updated_at'>) => {
     try {
+      if (!user) return;
       if (editingBuild) {
-        await PokemonBuildService.updateBuild(editingBuild.id, buildData);
+        await PokemonBuildService.updateBuild(String(user.id), editingBuild.id, buildData);
       } else {
-        await PokemonBuildService.createBuild(buildData);
+        await PokemonBuildService.createBuild(String(user.id), buildData);
       }
       await loadBuilds();
       setShowAddModal(false);
@@ -225,7 +236,8 @@ export default function PVPPage() {
   const handleDeleteBuild = async (id: string) => {
     if (window.confirm('Are you sure you want to delete this Pokemon build?')) {
       try {
-        await PokemonBuildService.deleteBuild(id);
+        if (!user) return;
+        await PokemonBuildService.deleteBuild(String(user.id), id);
         await loadBuilds();
       } catch (err) {
         console.error('Failed to delete Pokemon build:', err);
@@ -257,7 +269,8 @@ export default function PVPPage() {
 
   const handleUpdateBuildTeam = async (buildId: string, teamId?: string, teamName?: string) => {
     try {
-      const response = await PokemonBuildService.updateBuild(buildId, {
+      if (!user) return;
+      const response = await PokemonBuildService.updateBuild(String(user.id), buildId, {
         team_id: teamId || undefined,
         team_name: teamName || undefined
       });
@@ -282,7 +295,8 @@ export default function PVPPage() {
       const pokemonInTeam = builds.filter(build => build.team_id === teamId);
       
       for (const pokemon of pokemonInTeam) {
-        await PokemonBuildService.updateBuild(pokemon.id, {
+        if (!user) return;
+        await PokemonBuildService.updateBuild(String(user.id), pokemon.id, {
           team_name: newName
         });
       }

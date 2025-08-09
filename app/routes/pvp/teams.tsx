@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import type { PokemonBuild } from '../../types/pokemon';
-import { PokemonBuildService } from '../../services/pokemon-backend';
+import { PokemonBuildService } from '../../services/supabase';
+import { useAuth } from '../../contexts/AuthContext';
 import { TeamView } from '../../components/TeamView';
 
 interface Team {
@@ -10,19 +11,22 @@ interface Team {
 }
 
 export default function TeamsPage() {
+  const { user } = useAuth();
   const [builds, setBuilds] = useState<PokemonBuild[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   // Load Pokemon builds
   useEffect(() => {
+    if (!user) return;
     loadBuilds();
-  }, []);
+  }, [user]);
 
   const loadBuilds = async () => {
     try {
       setIsLoading(true);
-      const data = await PokemonBuildService.getBuilds();
+      if (!user) return;
+      const data = await PokemonBuildService.getBuilds(String(user.id));
       setBuilds(data);
       setError(null);
     } catch (err) {
@@ -41,7 +45,8 @@ export default function TeamsPage() {
   const handleDeleteBuild = async (id: string) => {
     if (window.confirm('Are you sure you want to delete this Pokemon build?')) {
       try {
-        await PokemonBuildService.deleteBuild(id);
+        if (!user) return;
+        await PokemonBuildService.deleteBuild(String(user.id), id);
         await loadBuilds();
       } catch (err) {
         console.error('Failed to delete Pokemon build:', err);

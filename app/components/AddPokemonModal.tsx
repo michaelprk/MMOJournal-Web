@@ -3,6 +3,7 @@ import type { PokemonBuild, CompetitiveTier } from '../types/pokemon';
 import { COMPETITIVE_TIERS, POKEMON_NATURES, TIER_FULL_NAMES, TIER_COLORS } from '../types/pokemon';
 import { parseMultipleShowdownImports, multipleShowdownImportsToBuilds, isValidShowdownImport } from '../utils/showdown-parser';
 import { PokeApiService } from '../services/pokemon-backend';
+import { useAuth } from '../contexts/AuthContext';
 import { AutocompleteInput } from './AutocompleteInput';
 
 interface AddPokemonModalProps {
@@ -15,6 +16,7 @@ interface AddPokemonModalProps {
 }
 
 export function AddPokemonModal({ isOpen, onClose, onSave, editBuild, defaultTab = 'manual', existingBuilds = [] }: AddPokemonModalProps) {
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<'manual' | 'showdown'>(defaultTab);
   const [isLoading, setIsLoading] = useState(false);
   const [showdownText, setShowdownText] = useState('');

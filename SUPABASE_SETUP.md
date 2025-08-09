@@ -108,13 +108,30 @@ To find these values:
 - Click "Settings" → "API"
 - Copy the "Project URL" and "anon public" key
 
-## Step 4: Optional - Authentication Setup
+## Step 4: Authentication & RLS for user-owned data
 
-If you want user authentication (recommended for production):
+For user-specific data, enable RLS and add a `user_id` column to tables, then create policies:
 
-1. In Supabase dashboard, go to "Authentication" → "Settings"
-2. Configure your desired authentication providers
-3. Update the RLS policies as needed
+```sql
+-- Example: pokemon_builds
+alter table pokemon_builds add column if not exists user_id uuid not null default auth.uid();
+
+alter table pokemon_builds enable row level security;
+
+create policy "Users can view their own builds" on pokemon_builds
+  for select using (auth.uid() = user_id);
+
+create policy "Users can insert their own builds" on pokemon_builds
+  for insert with check (auth.uid() = user_id);
+
+create policy "Users can update their own builds" on pokemon_builds
+  for update using (auth.uid() = user_id);
+
+create policy "Users can delete their own builds" on pokemon_builds
+  for delete using (auth.uid() = user_id);
+```
+
+Repeat similarly for shiny hunt tables (e.g., `shiny_hunts`, `shiny_portfolio`) to scope by `user_id`.
 
 ## Step 5: Test Your Setup
 
