@@ -11,6 +11,7 @@ import ShinyHuntCard from '../../components/ShinyHuntCard';
 
 import ShinyCalendar from '../../components/ShinyPlayArea';
 import { supabase } from '../../services/supabase';
+import { shinyHuntService, type ShinyHuntRow } from '../../services/shinyHuntService';
 import { useAuth } from '../../contexts/AuthContext';
 import HuntModal from '../../components/HuntModal';
 import { StartHuntModal } from '../../components/shiny/StartHuntModal';
@@ -189,18 +190,21 @@ export default function ShinyShowcase() {
   // Load hunts from Supabase
   useEffect(() => {
     if (initializing || !user) return;
+    let cleanup: (() => void) | undefined;
     (async () => {
-      const { data, error } = await supabase
-        .from('shiny_hunts')
-        .select('*')
-        .order('created_at', { ascending: false });
-      if (!error && data) {
-        // Map DB rows to ShinyHunt shape if needed
-        setCurrentHunts([]); // Active hunts list could be separate; placeholder
-        // Portfolio represents caught shinies
+      try {
+        const data = await shinyHuntService.list();
         setPortfolio(data as any);
+      } catch (err: any) {
+        console.error('[shiny:list] error', err);
       }
+      cleanup = shinyHuntService.subscribe(String(user.id), (row) => {
+        setPortfolio((prev) => [row as any, ...prev]);
+      });
     })();
+    return () => {
+      cleanup && cleanup();
+    };
   }, [initializing, user]);
 
   // Get filtered data
@@ -501,9 +505,13 @@ export default function ShinyShowcase() {
       <StartHuntModal
         isOpen={showStartHunt}
         onClose={() => setShowStartHunt(false)}
-        onCreated={() => {
-          // For now, refresh list from local state; real app would refetch from Supabase
-          // No-op here; user will see new hunt on next load if persisted
+        onCreated={async () => {
+          try {
+            const data = await shinyHuntService.list();
+            setPortfolio(data as any);
+          } catch (e) {
+            console.error('[shiny:list] error after create', e);
+          }
         }}
       />
 
