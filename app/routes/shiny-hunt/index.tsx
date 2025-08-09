@@ -414,12 +414,12 @@ export default function ShinyShowcase() {
           padding: '16px',
           display: 'flex',
           justifyContent: 'space-between',
-          alignItems: 'center',
+          alignItems: 'center', // vertically center contents inside the bar
           backgroundColor: 'rgba(0, 0, 0, 0.1)',
           borderRadius: '8px',
           boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
           margin: '0 auto',
-          marginBottom: '16px',
+          marginBottom: '24px', // add breathing room below the bar
           maxWidth: '1400px',
         }}
       >
@@ -494,10 +494,10 @@ export default function ShinyShowcase() {
       <div
         style={{
           position: 'fixed',
-          top: '350px', // Start below navbar + utility bar
+          top: '380px', // Start below navbar + utility bar + extra gap for breathing room
           left: 0,
           right: 0,
-          height: 'calc(100vh - 350px)', // Take remaining viewport height
+          height: 'calc(100vh - 380px)', // Adjust to match new top offset
           backgroundColor: 'transparent',
           overflowY: 'auto', // Allow scrolling within this container
           overflowX: 'hidden',
