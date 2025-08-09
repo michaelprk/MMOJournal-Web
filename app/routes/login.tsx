@@ -11,7 +11,7 @@ export default function Login() {
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
-  const { signIn } = useAuth();
+  const { signIn, loading } = useAuth();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -87,6 +87,7 @@ export default function Login() {
         {/* Buttons */}
         <button
           type="submit"
+          disabled={loading}
           style={{
             backgroundColor: "#ffcb05",
             border: "none",
@@ -97,11 +98,12 @@ export default function Login() {
             cursor: "pointer",
             color: "#000",
             transition: "background-color 0.3s ease",
+            opacity: loading ? 0.7 : 1,
           }}
           onMouseOver={e => (e.currentTarget.style.backgroundColor = "#e6b800")}
           onMouseOut={e => (e.currentTarget.style.backgroundColor = "#ffcb05")}
         >
-          Login
+          {loading ? 'Signing in...' : 'Login'}
         </button>
 
         <button

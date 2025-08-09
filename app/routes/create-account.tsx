@@ -10,22 +10,34 @@ export default function CreateAccount() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
+    const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
     if (!username.trim() || !email.trim() || !password.trim() || !confirmPassword.trim()) {
-      alert("Please fill in all fields");
+      setError("Please fill in all fields");
+      return;
+    }
+    if (!usernameRegex.test(username.trim())) {
+      setError("Username must be 3-20 characters, letters/numbers/underscore only");
       return;
     }
     if (password !== confirmPassword) {
-      alert("Passwords do not match");
+      setError("Passwords do not match");
       return;
     }
     setIsSubmitting(true);
-    const ok = await signUp(username.trim(), email.trim(), password);
-    setIsSubmitting(false);
-    if (ok) navigate("/pvp");
-    else alert("Failed to create account");
+    try {
+      await signUp(username.trim(), email.trim(), password);
+      navigate("/pvp");
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Failed to create account';
+      setError(msg);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -49,6 +61,9 @@ export default function CreateAccount() {
       />
 
       <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", width: 300, gap: "1rem" }}>
+        {error && (
+          <div style={{ color: '#ff6b6b', fontWeight: 'bold', fontSize: '0.95rem' }}>{error}</div>
+        )}
         <input
           type="text"
           placeholder="Username"
