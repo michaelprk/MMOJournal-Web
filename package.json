@@ -12,7 +12,8 @@
     "backend:start": "cd backend && npm start",
     "backend:db:generate": "cd backend && npx prisma generate",
     "backend:db:migrate": "cd backend && npx prisma migrate dev",
-    "backend:db:studio": "cd backend && npx prisma studio"
+    "backend:db:studio": "cd backend && npx prisma studio",
+    "sb:ping": "tsx scripts/sb-ping.ts"
   },
   "dependencies": {
     "@react-router/node": "^7.5.3",

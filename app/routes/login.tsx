@@ -8,18 +8,18 @@ export async function loader() {
 }
 
 export default function Login() {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { signIn } = useAuth();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!username.trim() || !password.trim()) {
-      alert("Please enter username and password");
+    if (!email.trim() || !password.trim()) {
+      alert("Please enter email and password");
       return;
     }
-    const ok = await login(username.trim(), password.trim());
+    const ok = await signIn(email.trim(), password.trim());
     if (ok) navigate("/pvp");
     else alert("Invalid credentials");
   };
@@ -55,10 +55,10 @@ export default function Login() {
         style={{ display: "flex", flexDirection: "column", width: 300, gap: "1rem" }}
       >
         <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={e => setUsername(e.target.value)}
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
           style={{
             padding: "0.75rem",
             fontSize: "1rem",

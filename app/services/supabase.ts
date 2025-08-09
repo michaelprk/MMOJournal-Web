@@ -1,132 +1,127 @@
 import { createClient } from '@supabase/supabase-js';
-import type { PokemonBuild, PokemonApiData, CompetitiveTier, ShinyHunt, ShinyPortfolio } from '../types/pokemon';
+import type { PokemonBuild, PokemonApiData, CompetitiveTier, ShinyHunt } from '../types/pokemon';
 
-// These will need to be set up in your environment
-const supabaseUrl = process.env.VITE_SUPABASE_URL || 'your-project-url';
-const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY || 'your-anon-key';
+// Singleton Supabase client
+const supabaseUrl = process.env.VITE_SUPABASE_URL;
+const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY;
 
-export const supabase = createClient(supabaseUrl, supabaseKey);
+if (import.meta.env.DEV) {
+  if (!supabaseUrl || !supabaseKey) {
+    // eslint-disable-next-line no-console
+    console.warn('[Supabase] Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY. Check your .env');
+  }
+}
+
+export const supabase = createClient(supabaseUrl || '', supabaseKey || '');
+
+export async function ping(): Promise<{ ok: boolean }> {
+  try {
+    const { error } = await supabase
+      .from('pokemon_builds')
+      .select('id', { count: 'exact', head: true });
+    if (error) return { ok: false };
+    return { ok: true };
+  } catch {
+    return { ok: false };
+  }
+}
 
 export class PokemonBuildService {
   /**
    * Get all Pokemon builds, optionally filtered by tier
    */
-  static async getBuilds(userId: string, tier?: CompetitiveTier): Promise<PokemonBuild[]> {
+  static async getBuilds(tier?: CompetitiveTier): Promise<PokemonBuild[]> {
     try {
       let query = supabase
         .from('pokemon_builds')
         .select('*')
-        .eq('user_id', userId)
         .order('created_at', { ascending: false });
 
       if (tier) {
         query = query.eq('tier', tier);
       }
 
-      const { data, error } = await query;
+      const { data, error, status } = await query;
 
-      if (error) {
-        console.error('Error fetching Pokemon builds:', error);
-        throw error;
-      }
+      if (error) throw new Error(`SB: ${status || ''} ${error.message}`.trim());
 
       return data || [];
     } catch (error) {
-      console.error('Error in getBuilds:', error);
-      throw error;
+      throw error instanceof Error ? error : new Error('SB: failed to get builds');
     }
   }
 
   /**
    * Get a single Pokemon build by ID
    */
-  static async getBuild(userId: string, id: string): Promise<PokemonBuild | null> {
+  static async getBuild(id: string): Promise<PokemonBuild | null> {
     try {
-      const { data, error } = await supabase
+      const { data, error, status } = await supabase
         .from('pokemon_builds')
         .select('*')
         .eq('id', id)
-        .eq('user_id', userId)
         .single();
 
-      if (error) {
-        console.error('Error fetching Pokemon build:', error);
-        throw error;
-      }
+      if (error) throw new Error(`SB: ${status || ''} ${error.message}`.trim());
 
       return data;
     } catch (error) {
-      console.error('Error in getBuild:', error);
-      throw error;
+      throw error instanceof Error ? error : new Error('SB: failed to get build');
     }
   }
 
   /**
    * Create a new Pokemon build
    */
-  static async createBuild(userId: string, build: Omit<PokemonBuild, 'id' | 'created_at' | 'updated_at' | 'user_id'>): Promise<PokemonBuild> {
+  static async createBuild(build: Omit<PokemonBuild, 'id' | 'created_at' | 'updated_at' | 'user_id'>): Promise<PokemonBuild> {
     try {
-      const { data, error } = await supabase
+      const { data, error, status } = await supabase
         .from('pokemon_builds')
-        .insert([{ ...build, user_id: userId }])
+        .insert([build])
         .select()
         .single();
 
-      if (error) {
-        console.error('Error creating Pokemon build:', error);
-        throw error;
-      }
+      if (error) throw new Error(`SB: ${status || ''} ${error.message}`.trim());
 
       return data;
     } catch (error) {
-      console.error('Error in createBuild:', error);
-      throw error;
+      throw error instanceof Error ? error : new Error('SB: failed to create build');
     }
   }
 
   /**
    * Update an existing Pokemon build
    */
-  static async updateBuild(userId: string, id: string, updates: Partial<PokemonBuild>): Promise<PokemonBuild> {
+  static async updateBuild(id: string, updates: Partial<PokemonBuild>): Promise<PokemonBuild> {
     try {
-      const { data, error } = await supabase
+      const { data, error, status } = await supabase
         .from('pokemon_builds')
         .update(updates)
         .eq('id', id)
-        .eq('user_id', userId)
         .select()
         .single();
 
-      if (error) {
-        console.error('Error updating Pokemon build:', error);
-        throw error;
-      }
+      if (error) throw new Error(`SB: ${status || ''} ${error.message}`.trim());
 
       return data;
     } catch (error) {
-      console.error('Error in updateBuild:', error);
-      throw error;
+      throw error instanceof Error ? error : new Error('SB: failed to update build');
     }
   }
 
   /**
    * Delete a Pokemon build
    */
-  static async deleteBuild(userId: string, id: string): Promise<void> {
+  static async deleteBuild(id: string): Promise<void> {
     try {
-      const { error } = await supabase
+      const { error, status } = await supabase
         .from('pokemon_builds')
         .delete()
-        .eq('id', id)
-        .eq('user_id', userId);
+        .eq('id', id);
 
-      if (error) {
-        console.error('Error deleting Pokemon build:', error);
-        throw error;
-      }
+      if (error) throw new Error(`SB: ${status || ''} ${error.message}`.trim());
     } catch (error) {
-      console.error('Error in deleteBuild:', error);
-      throw error;
+      throw error instanceof Error ? error : new Error('SB: failed to delete build');
     }
   }
 }
@@ -139,6 +134,7 @@ export class ShinyHuntService {
     const { data, error } = await supabase
       .from('shiny_hunts')
       .select('*')
+      // optional scoping, RLS should enforce
       .eq('user_id', userId)
       .order('created_at', { ascending: false });
     if (error) throw error;

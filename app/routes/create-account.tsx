@@ -4,8 +4,7 @@ import { useAuth } from "../contexts/AuthContext";
 
 export default function CreateAccount() {
   const navigate = useNavigate();
-  const { register } = useAuth();
-  const [username, setUsername] = useState("");
+  const { signUp } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -13,8 +12,8 @@ export default function CreateAccount() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!username.trim() || !password.trim()) {
-      alert("Please enter a username and password");
+    if (!email.trim() || !password.trim()) {
+      alert("Please enter an email and password");
       return;
     }
     if (password !== confirmPassword) {
@@ -22,7 +21,7 @@ export default function CreateAccount() {
       return;
     }
     setIsSubmitting(true);
-    const ok = await register({ username: username.trim(), email: email.trim() || undefined, password });
+    const ok = await signUp(email.trim(), password);
     setIsSubmitting(false);
     if (ok) navigate("/pvp");
     else alert("Failed to create account");
@@ -49,21 +48,7 @@ export default function CreateAccount() {
       />
 
       <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", width: 300, gap: "1rem" }}>
-        <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          style={{
-            padding: "0.75rem",
-            fontSize: "1rem",
-            borderRadius: 4,
-            border: "1px solid #555",
-            backgroundColor: "#111",
-            color: "#fff",
-          }}
-          autoFocus
-        />
+        
         <input
           type="email"
           placeholder="Email (optional)"
@@ -77,6 +62,7 @@ export default function CreateAccount() {
             backgroundColor: "#111",
             color: "#fff",
           }}
+          autoFocus
         />
         <input
           type="password"

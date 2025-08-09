@@ -2,33 +2,19 @@ export interface PokemonBuild {
   id: string;
   name: string;
   species: string;
-  gender?: 'M' | 'F' | 'U'; // Male, Female, or Unknown/Genderless
+  gender?: 'M' | 'F' | 'U' | null;
   tier: CompetitiveTier;
   level: number;
   nature: string;
   ability: string;
-  item?: string;
+  item?: string | null;
   moves: string[];
   ivs: PokemonStats;
   evs: PokemonStats;
-  // Flat EV fields from backend
-  hpEV?: number;
-  attackEV?: number;
-  defenseEV?: number;
-  spAttackEV?: number;
-  spDefenseEV?: number;
-  speedEV?: number;
-  // Flat IV fields from backend
-  hpIV?: number;
-  attackIV?: number;
-  defenseIV?: number;
-  spAttackIV?: number;
-  spDefenseIV?: number;
-  speedIV?: number;
-  description?: string;
-  showdown_import?: string;
-  team_id?: string; // New field for grouping Pokemon into teams
-  team_name?: string; // New field for team name
+  description?: string | null;
+  showdown_import?: string | null;
+  team_id?: string | null;
+  team_name?: string | null;
   user_id?: string;
   created_at: string;
   updated_at: string;

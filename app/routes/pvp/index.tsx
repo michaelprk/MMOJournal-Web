@@ -15,7 +15,7 @@ import { AddPokemonModal } from '../../components/AddPokemonModal';
 import { ExportModal } from '../../components/ExportModal';
 
 export default function PVPPage() {
-  const { user } = useAuth();
+  const { user, initializing } = useAuth();
   const navigate = useNavigate();
   const [builds, setBuilds] = useState<PokemonBuild[]>([]);
   const [filteredBuilds, setFilteredBuilds] = useState<PokemonBuild[]>([]);
@@ -175,13 +175,14 @@ export default function PVPPage() {
 
   // Load Pokemon builds
   useEffect(() => {
+    if (initializing) return;
     if (!user) {
       navigate('/login');
       return;
     }
     loadBuilds();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
+  }, [user, initializing]);
 
   // Filter and sort builds when tier or sort changes
   useEffect(() => {
@@ -197,13 +198,17 @@ export default function PVPPage() {
   const loadBuilds = async () => {
     try {
       setIsLoading(true);
-      if (!user) return;
-      const data = await PokemonBuildService.getBuilds(String(user.id));
+      const data = await PokemonBuildService.getBuilds();
       setBuilds(data);
       setError(null);
     } catch (err) {
-      console.error('Failed to load Pokemon builds:', err);
-      setError('Failed to load Pokemon builds. Please try again.');
+      const msg = err instanceof Error ? err.message : String(err);
+      if (/SB:.*(401|403)/.test(msg)) {
+        setError('Unauthorized. Redirecting to login...');
+        setTimeout(() => navigate('/login'), 1000);
+      } else {
+        setError('Failed to load Pokemon builds. Please try again.');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -211,11 +216,10 @@ export default function PVPPage() {
 
   const handleSaveBuild = async (buildData: Omit<PokemonBuild, 'id' | 'created_at' | 'updated_at'>) => {
     try {
-      if (!user) return;
       if (editingBuild) {
-        await PokemonBuildService.updateBuild(String(user.id), editingBuild.id, buildData);
+        await PokemonBuildService.updateBuild(editingBuild.id, buildData);
       } else {
-        await PokemonBuildService.createBuild(String(user.id), buildData);
+        await PokemonBuildService.createBuild(buildData);
       }
       await loadBuilds();
       setShowAddModal(false);
@@ -236,8 +240,7 @@ export default function PVPPage() {
   const handleDeleteBuild = async (id: string) => {
     if (window.confirm('Are you sure you want to delete this Pokemon build?')) {
       try {
-        if (!user) return;
-        await PokemonBuildService.deleteBuild(String(user.id), id);
+        await PokemonBuildService.deleteBuild(id);
         await loadBuilds();
       } catch (err) {
         console.error('Failed to delete Pokemon build:', err);
@@ -269,8 +272,7 @@ export default function PVPPage() {
 
   const handleUpdateBuildTeam = async (buildId: string, teamId?: string, teamName?: string) => {
     try {
-      if (!user) return;
-      const response = await PokemonBuildService.updateBuild(String(user.id), buildId, {
+      const response = await PokemonBuildService.updateBuild(buildId, {
         team_id: teamId || undefined,
         team_name: teamName || undefined
       });
@@ -295,8 +297,7 @@ export default function PVPPage() {
       const pokemonInTeam = builds.filter(build => build.team_id === teamId);
       
       for (const pokemon of pokemonInTeam) {
-        if (!user) return;
-        await PokemonBuildService.updateBuild(String(user.id), pokemon.id, {
+        await PokemonBuildService.updateBuild(pokemon.id, {
           team_name: newName
         });
       }

@@ -11,22 +11,25 @@ interface Team {
 }
 
 export default function TeamsPage() {
-  const { user } = useAuth();
+  const { user, initializing } = useAuth();
   const [builds, setBuilds] = useState<PokemonBuild[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   // Load Pokemon builds
   useEffect(() => {
-    if (!user) return;
+    if (initializing) return;
+    if (!user) {
+      window.location.href = '/login';
+      return;
+    }
     loadBuilds();
-  }, [user]);
+  }, [user, initializing]);
 
   const loadBuilds = async () => {
     try {
       setIsLoading(true);
-      if (!user) return;
-      const data = await PokemonBuildService.getBuilds(String(user.id));
+      const data = await PokemonBuildService.getBuilds();
       setBuilds(data);
       setError(null);
     } catch (err) {
@@ -45,8 +48,7 @@ export default function TeamsPage() {
   const handleDeleteBuild = async (id: string) => {
     if (window.confirm('Are you sure you want to delete this Pokemon build?')) {
       try {
-        if (!user) return;
-        await PokemonBuildService.deleteBuild(String(user.id), id);
+        await PokemonBuildService.deleteBuild(id);
         await loadBuilds();
       } catch (err) {
         console.error('Failed to delete Pokemon build:', err);
