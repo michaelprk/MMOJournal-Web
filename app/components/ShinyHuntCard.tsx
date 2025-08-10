@@ -229,6 +229,20 @@ export default function ShinyHuntCard({
         </div>
 
         <h3 className="pokemon-name">{hunt.pokemonName}</h3>
+        {/* Method and Location under name */}
+        <div style={{ marginTop: 6, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+          <div style={{ 
+            display: 'inline-block', background: methodColor.background, color: methodColor.text,
+            padding: '2px 8px', borderRadius: 6, fontSize: '0.8rem', fontWeight: 800
+          }}>
+            {hunt.method}
+          </div>
+          {(hunt.region || hunt.area) && (
+            <div style={{ color: '#ccc', fontSize: '0.8rem' }}>
+              {(hunt.region || 'Unknown Region')} — {hunt.area ? String(hunt.area).toUpperCase() : 'UNKNOWN AREA'}
+            </div>
+          )}
+        </div>
         
         <div className="hunt-stats">
           <div className="stat">

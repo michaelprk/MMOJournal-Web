@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { supabase } from '../../services/supabase';
+import { shinyHuntService } from '../../services/shinyHuntService';
 import { getSpeciesList, getMethodsForSpecies, getValidLocations, validateEncounter, getDedupedLocationsForSpecies, isMethodValidForLocation } from '../../lib/pokedex';
 
 type SpeciesOption = { id: number; name: string };
@@ -18,15 +19,17 @@ interface StartHuntModalProps {
   }) => void;
   mode?: 'create' | 'edit';
   initial?: {
+    id?: number;
     species?: SpeciesOption;
     method?: string;
     location?: LocationOption | null;
     startDate?: string;
     notes?: string;
   };
+  onUpdated?: () => void;
 }
 
-export function StartHuntModal({ isOpen, onClose, onCreated, mode = 'create', initial }: StartHuntModalProps) {
+export function StartHuntModal({ isOpen, onClose, onCreated, mode = 'create', initial, onUpdated }: StartHuntModalProps) {
   const [mounted, setMounted] = useState(false);
   const [speciesQuery, setSpeciesQuery] = useState('');
   const [species, setSpecies] = useState<SpeciesOption | null>(null);
@@ -132,7 +135,17 @@ export function StartHuntModal({ isOpen, onClose, onCreated, mode = 'create', in
     setSubmitting(true);
     try {
       if (mode === 'edit') {
-        // For now, just close; future: update row in DB
+        const parsed = location ? (JSON.parse(location.value) as { region: string | null; area: string | null }) : { region: null, area: null };
+        await shinyHuntService.updateHunt(initial?.id as number, {
+          method,
+          region: parsed.region,
+          area: parsed.area,
+          location: parsed.area,
+          rarity: location?.rarity ?? null,
+          start_date: startDate,
+          notes: notes || null as any,
+        } as any);
+        onUpdated?.();
         onClose();
         return;
       }

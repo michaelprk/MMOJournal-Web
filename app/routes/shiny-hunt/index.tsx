@@ -71,9 +71,9 @@ export default function ShinyShowcase() {
     setCurrentHunts(prev => [...prev, newHunt]);
   };
 
+  const [editHunt, setEditHunt] = useState<ShinyHunt | null>(null);
   const handleEditHunt = (hunt: ShinyHunt) => {
-    // TODO: Implement edit functionality
-    console.log('Edit hunt:', hunt);
+    setEditHunt(hunt);
   };
 
   const handleAddPhase = (hunt: ShinyHunt) => {
@@ -581,6 +581,48 @@ export default function ShinyShowcase() {
           } catch (e) {
             console.error('[shiny:list] error after create', e);
           }
+        }}
+      />
+
+      {/* Edit Hunt Modal (reuse StartHuntModal in edit mode) */}
+      <StartHuntModal
+        isOpen={!!editHunt}
+        onClose={() => setEditHunt(null)}
+        mode="edit"
+        initial={editHunt ? {
+          id: editHunt.id,
+          species: { id: editHunt.pokemonId, name: editHunt.pokemonName },
+          method: editHunt.method as any,
+          location: editHunt.region || editHunt.area ? {
+            label: `${(editHunt.region || 'Unknown Region')} — ${editHunt.area ? String(editHunt.area).toUpperCase() : 'UNKNOWN AREA'}`,
+            value: JSON.stringify({ region: editHunt.region ?? null, area: editHunt.area ?? null }),
+            region: editHunt.region ?? null,
+            area: editHunt.area ?? null,
+            method: editHunt.method as any,
+            rarity: editHunt.rarity ?? null,
+          } : null,
+          startDate: editHunt.startDate,
+          notes: editHunt.notes,
+        } : undefined}
+        onUpdated={async () => {
+          const active = await shinyHuntService.listActive();
+          setCurrentHunts(active.map((r) => ({
+            id: r.id,
+            pokemonId: r.pokemon_id,
+            pokemonName: r.pokemon_name,
+            method: r.method as any,
+            startDate: (r.start_date || r.created_at) as string,
+            phaseCount: r.phase_count,
+            totalEncounters: r.total_encounters,
+            isCompleted: r.is_completed,
+            region: (r as any).region,
+            area: (r as any).area,
+            location: (r as any).location,
+            rarity: (r as any).rarity,
+            phasePokemon: [],
+            createdAt: r.created_at,
+            updatedAt: r.created_at,
+          })));
         }}
       />
 
