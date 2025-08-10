@@ -211,12 +211,14 @@ export default function ShinyHuntCard({
       </div>
 
       <div className="hunt-card-content">
-        <div className="shiny-sprite-container">
+          <div className="shiny-sprite-container">
           <img 
             src={spritePath} 
             alt={`Shiny ${hunt.pokemonName}`}
             className="shiny-sprite"
             style={{
+              width: '80px',
+              height: '80px',
               filter: `drop-shadow(0 0 10px ${pokemonColors.glow}) drop-shadow(0 0 20px ${pokemonColors.glowLight})`,
             }}
             onError={(e) => {
@@ -328,8 +330,8 @@ export default function ShinyHuntCard({
                     src={getShinySpritePath(phasePokemon.pokemonId, phasePokemon.pokemonName)}
                     alt={phasePokemon.pokemonName}
                     style={{ 
-                      width: '32px', 
-                      height: '32px',
+                      width: '36px', 
+                      height: '36px',
                       filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))'
                     }}
                     onError={(e) => {
