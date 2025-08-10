@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { supabase } from '../../services/supabase';
-import { getSpeciesList, getMethodsForSpecies, getValidLocations, validateEncounter } from '../../lib/pokedex';
+import { getSpeciesList, getMethodsForSpecies, getValidLocations, validateEncounter, getDedupedLocationsForSpecies, isMethodValidForLocation } from '../../lib/pokedex';
 
 type SpeciesOption = { id: number; name: string };
 type LocationOption = { label: string; value: string; region: string | null; area: string | null; method: string; rarity: string | null };
@@ -84,7 +84,18 @@ export function StartHuntModal({ isOpen, onClose, onCreated, mode = 'create', in
     'Fossil'
   ];
   const methodOptions = METHOD_OPTIONS;
-  const allLocations = useMemo(() => (species ? getValidLocations(species.id) : []), [species]);
+  const allLocations = useMemo(() => {
+    if (!species) return [] as LocationOption[];
+    // De-dup by (region, area)
+    return getDedupedLocationsForSpecies(species.id).map((l) => ({
+      label: l.label,
+      value: l.value,
+      region: l.region,
+      area: l.area,
+      method: '',
+      rarity: null,
+    }));
+  }, [species]);
   const filteredLocations = useMemo(() => {
     const q = locationQuery.trim().toLowerCase();
     if (!q) return allLocations.slice(0, 30);
@@ -98,7 +109,7 @@ export function StartHuntModal({ isOpen, onClose, onCreated, mode = 'create', in
     }
     const valueObj = safeParse<LocationOption['value']>(location.value);
     const parsed = valueObj ? (JSON.parse(location.value) as { region: string | null; area: string | null }) : { region: location.region, area: location.area };
-    const ok = validateEncounter(species.id, { method, region: parsed.region, area: parsed.area });
+    const ok = isMethodValidForLocation(species.id, parsed.region ?? null, parsed.area ?? null, method);
     setInvalidCombo(!ok);
   }, [species, method, location]);
 
@@ -137,11 +148,11 @@ export function StartHuntModal({ isOpen, onClose, onCreated, mode = 'create', in
         is_completed: false,
         notes: notes || null,
       };
-      // Optional fields (uncomment if present)
-      // insert.region = parsed.region;
-      // insert.area = parsed.area;
-      // insert.location = parsed.area;
-      // insert.rarity = location.rarity;
+      // Optional fields now stored
+      insert.region = parsed.region;
+      insert.area = parsed.area;
+      insert.location = parsed.area;
+      insert.rarity = location.rarity;
       // insert.status = 'active';
 
       const { error } = await supabase.from('shiny_hunts').insert([insert]);
