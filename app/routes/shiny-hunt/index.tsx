@@ -633,7 +633,7 @@ export default function ShinyShowcase() {
       <AddPhaseModal
         isOpen={!!huntForPhase}
         onClose={() => setHuntForPhase(null)}
-        parentHunt={huntForPhase as any}
+        parentHunt={huntForPhase as any || { id: 0, pokemonId: 0, pokemonName: '', method: '', region: null, area: null }}
         onAdded={async () => {
           // Refresh completed list and optionally child phases under current hunt
           const completed = await shinyHuntService.listCompleted();

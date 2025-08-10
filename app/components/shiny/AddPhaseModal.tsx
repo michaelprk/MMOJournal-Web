@@ -42,10 +42,10 @@ export function AddPhaseModal({ isOpen, onClose, parentHunt, onAdded }: AddPhase
 
   const lockedLocation: LocationOption | null = useMemo(() => {
     // Build locked location (Region — Location) from parent hunt info if present
-    const region = (parentHunt as any).region ?? null;
-    const area = (parentHunt as any).area ?? null;
+    const region = (parentHunt as any)?.region ?? null;
+    const area = (parentHunt as any)?.area ?? null;
     const label = `${region || 'Unknown Region'} — ${area ? String(area).toUpperCase() : 'UNKNOWN AREA'}`;
-    return { label, value: JSON.stringify({ region, area }), region, area, method: parentHunt.method, rarity: null };
+    return { label, value: JSON.stringify({ region, area }), region, area, method: (parentHunt as any)?.method, rarity: null };
   }, [parentHunt]);
 
   const speciesAtLockedLocation = useMemo(() => {
