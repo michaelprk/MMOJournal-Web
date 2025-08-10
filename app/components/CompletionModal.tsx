@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import type { ShinyHunt, PokemonStats } from '../types/pokemon';
 import { POKEMON_NATURES } from '../types/pokemon';
 
@@ -79,7 +80,7 @@ export default function CompletionModal({
 
   if (!isOpen || !hunt) return null;
 
-  return (
+  const modal = (
     <div style={{
       position: 'fixed',
       top: 0,
@@ -244,4 +245,7 @@ export default function CompletionModal({
       </div>
     </div>
   );
+
+  if (typeof document === 'undefined') return modal;
+  return createPortal(modal, document.body);
 } 
