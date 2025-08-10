@@ -12,7 +12,10 @@ export type ShinyHuntRow = {
   phase_count: number;
   total_encounters: number;
   is_completed: boolean;
+  is_phase?: boolean;
+  parent_hunt_id?: string | null;
   start_date: string | null;
+  found_at?: string | null;
   created_at: string;
 };
 
@@ -21,7 +24,7 @@ export const shinyHuntService = {
     const query = supabase
       .from('shiny_hunts')
       .select(
-        'id,pokemon_id,pokemon_name,method,region,area,location,rarity,phase_count,total_encounters,is_completed,start_date,created_at'
+        'id,pokemon_id,pokemon_name,method,region,area,location,rarity,phase_count,total_encounters,is_completed,is_phase,parent_hunt_id,start_date,found_at,created_at'
       )
       .order('created_at', { ascending: false });
 
@@ -56,9 +59,10 @@ export const shinyHuntService = {
     const { data, error } = await supabase
       .from('shiny_hunts')
       .select(
-        'id,pokemon_id,pokemon_name,method,region,area,location,rarity,phase_count,total_encounters,is_completed,start_date,created_at'
+        'id,pokemon_id,pokemon_name,method,region,area,location,rarity,phase_count,total_encounters,is_completed,is_phase,start_date,created_at'
       )
       .eq('is_completed', false)
+      .eq('is_phase', false)
       .order('created_at', { ascending: false });
     if (error) throw error;
     return (data || []) as ShinyHuntRow[];
@@ -68,7 +72,7 @@ export const shinyHuntService = {
     const { data, error } = await supabase
       .from('shiny_hunts')
       .select(
-        'id,pokemon_id,pokemon_name,method,region,area,location,rarity,phase_count,total_encounters,is_completed,start_date,created_at,found_at,completed_month,completed_year,meta'
+        'id,pokemon_id,pokemon_name,method,region,area,location,rarity,phase_count,total_encounters,is_completed,is_phase,parent_hunt_id,start_date,created_at,found_at,completed_month,completed_year,meta'
       )
       .eq('is_completed', true)
       .order('found_at', { ascending: false });
@@ -86,10 +90,41 @@ export const shinyHuntService = {
     if (error) throw error;
   },
 
+  async addPhase(parentId: number | string, payload: Partial<ShinyHuntRow> & { pokemon_id: number; pokemon_name: string; method: string; found_at?: string | null }): Promise<void> {
+    const insert = {
+      ...payload,
+      is_completed: true,
+      is_phase: true,
+      parent_hunt_id: String(parentId),
+      found_at: payload.found_at || new Date().toISOString(),
+    } as any;
+    const { error } = await supabase.from('shiny_hunts').insert([insert]);
+    if (error) throw error;
+  },
+
   async markFound(id: number): Promise<void> {
     const { error } = await supabase
       .from('shiny_hunts')
       .update({ is_completed: true, found_at: new Date().toISOString() })
+      .eq('id', id);
+    if (error) throw error;
+  },
+
+  async listPhases(parentId: number | string): Promise<ShinyHuntRow[]> {
+    const { data, error } = await supabase
+      .from('shiny_hunts')
+      .select('id,pokemon_id,pokemon_name,found_at,total_encounters')
+      .eq('parent_hunt_id', String(parentId))
+      .eq('is_phase', true)
+      .order('found_at', { ascending: true });
+    if (error) throw error;
+    return (data || []) as any;
+  },
+
+  async updateHunt(id: number, patch: Partial<Pick<ShinyHuntRow, 'method' | 'region' | 'area' | 'location' | 'rarity' | 'start_date' | 'notes'>>): Promise<void> {
+    const { error } = await supabase
+      .from('shiny_hunts')
+      .update(patch)
       .eq('id', id);
     if (error) throw error;
   },

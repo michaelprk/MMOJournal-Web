@@ -15,6 +15,7 @@ import { shinyHuntService, type ShinyHuntRow } from '../../services/shinyHuntSer
 import { useAuth } from '../../contexts/AuthContext';
 import HuntModal from '../../components/HuntModal';
 import { StartHuntModal } from '../../components/shiny/StartHuntModal';
+import { AddPhaseModal } from '../../components/shiny/AddPhaseModal';
 import { EditShinyModal } from '../../components/shiny/EditShinyModal';
 import CompletionModal from '../../components/CompletionModal';
 
@@ -77,8 +78,7 @@ export default function ShinyShowcase() {
 
   const handleAddPhase = (hunt: ShinyHunt) => {
     setHuntForPhase(hunt);
-    setHuntModalMode('phase');
-    setShowHuntModal(true);
+    // new modal replaces legacy HuntModal for phase
   };
 
   const handleAddPhaseData = (data: {
@@ -582,17 +582,27 @@ export default function ShinyShowcase() {
         }}
       />
 
-      {/* Legacy Hunt Modal (phase/add) */}
-      <HuntModal
-        isOpen={showHuntModal}
-        onClose={() => {
-          setShowHuntModal(false);
-          setHuntForPhase(null);
+      {/* Add Phase Modal (Supabase-backed) */}
+      <AddPhaseModal
+        isOpen={!!huntForPhase}
+        onClose={() => setHuntForPhase(null)}
+        parentHunt={huntForPhase as any}
+        onAdded={async () => {
+          // Refresh completed list and optionally child phases under current hunt
+          const completed = await shinyHuntService.listCompleted();
+          setPortfolio(completed.map((r: any) => ({
+            id: r.id,
+            pokemonId: r.pokemon_id,
+            pokemonName: r.pokemon_name,
+            method: r.method as any,
+            dateFound: (r.found_at || r.start_date || r.created_at) as string,
+            nature: r.meta?.nature,
+            encounterCount: r.total_encounters,
+            ivs: r.meta?.ivs,
+            createdAt: r.created_at,
+            updatedAt: r.created_at,
+          })) as any);
         }}
-        onCreateHunt={handleCreateHunt}
-        onAddPhase={handleAddPhaseData}
-        mode={huntModalMode}
-        huntForPhase={huntForPhase || undefined}
       />
 
       {/* Completion Modal */}
