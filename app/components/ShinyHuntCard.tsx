@@ -37,7 +37,7 @@ export default function ShinyHuntCard({
   };
 
   const spritePath = getShinySpritePath(hunt.pokemonId, hunt.pokemonName);
-  const methodColor = HUNTING_METHOD_COLORS[hunt.method];
+  const methodColor = HUNTING_METHOD_COLORS[hunt.method] || { background: 'rgba(255, 215, 0, 0.2)', text: '#000', gradient: '' } as any;
   const startDate = new Date(hunt.startDate).toLocaleDateString();
   const pokemonColors = getPokemonColors(hunt.pokemonId);
 
