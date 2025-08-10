@@ -1,6 +1,6 @@
 -- Link phases to their parent hunt and flag them for UI grouping
 alter table if exists public.shiny_hunts
-  add column if not exists parent_hunt_id uuid references public.shiny_hunts(id) on delete set null,
+  add column if not exists parent_hunt_id bigint references public.shiny_hunts(id) on delete set null,
   add column if not exists is_phase boolean not null default false;
 
 -- Indexes

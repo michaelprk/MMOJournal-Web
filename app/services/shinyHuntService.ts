@@ -13,7 +13,7 @@ export type ShinyHuntRow = {
   total_encounters: number;
   is_completed: boolean;
   is_phase?: boolean;
-  parent_hunt_id?: string | null;
+  parent_hunt_id?: number | null;
   start_date: string | null;
   found_at?: string | null;
   created_at: string;
@@ -90,12 +90,12 @@ export const shinyHuntService = {
     if (error) throw error;
   },
 
-  async addPhase(parentId: number | string, payload: Partial<ShinyHuntRow> & { pokemon_id: number; pokemon_name: string; method: string; found_at?: string | null }): Promise<void> {
+  async addPhase(parentId: number, payload: Partial<ShinyHuntRow> & { pokemon_id: number; pokemon_name: string; method: string; found_at?: string | null }): Promise<void> {
     const insert = {
       ...payload,
       is_completed: true,
       is_phase: true,
-      parent_hunt_id: String(parentId),
+      parent_hunt_id: Number(parentId),
       found_at: payload.found_at || new Date().toISOString(),
     } as any;
     const { error } = await supabase.from('shiny_hunts').insert([insert]);
@@ -110,11 +110,11 @@ export const shinyHuntService = {
     if (error) throw error;
   },
 
-  async listPhases(parentId: number | string): Promise<ShinyHuntRow[]> {
+  async listPhases(parentId: number): Promise<ShinyHuntRow[]> {
     const { data, error } = await supabase
       .from('shiny_hunts')
       .select('id,pokemon_id,pokemon_name,found_at,total_encounters')
-      .eq('parent_hunt_id', String(parentId))
+      .eq('parent_hunt_id', Number(parentId))
       .eq('is_phase', true)
       .order('found_at', { ascending: true });
     if (error) throw error;
