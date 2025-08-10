@@ -112,7 +112,7 @@ export default function ShinyShowcase() {
     setShowCompletionModal(true);
   };
 
-  const handleCompleteHunt = (huntId: number, data: {
+  const handleCompleteHunt = async (huntId: number, data: {
     nature?: string;
     ivs?: Partial<PokemonStats>;
     encounterCount?: number;
@@ -120,30 +120,33 @@ export default function ShinyShowcase() {
   }) => {
     const hunt = currentHunts.find(h => h.id === huntId);
     if (!hunt) return;
-
-    // Add to portfolio
-    const newPortfolioEntry: ShinyPortfolio = {
-      id: Date.now(),
-      pokemonId: hunt.pokemonId,
-      pokemonName: hunt.pokemonName,
-      method: hunt.method,
-      dateFound: new Date().toISOString(),
-      nature: data.nature,
-      encounterCount: data.encounterCount || hunt.totalEncounters,
-      ivs: data.ivs,
-      notes: data.notes,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
-
-    setPortfolio(prev => [...prev, newPortfolioEntry]);
-    
-    // Remove from current hunts
-    setCurrentHunts(prev => prev.filter(h => h.id !== huntId));
-    
-    // Close modal
-    setShowCompletionModal(false);
-    setCompletingHunt(null);
+    try {
+      await shinyHuntService.markFound(huntId as any);
+      if (data.ivs || data.nature) {
+        await shinyHuntService.updateMeta(huntId as any, { ivs: data.ivs, nature: data.nature });
+      }
+      if (typeof data.encounterCount === 'number') {
+        await shinyHuntService.updateCounters(huntId as any, { total_encounters: data.encounterCount });
+      }
+      setPortfolio(prev => ([{
+        id: hunt.id as any,
+        pokemonId: hunt.pokemonId,
+        pokemonName: hunt.pokemonName,
+        method: hunt.method as any,
+        dateFound: new Date().toISOString(),
+        nature: data.nature,
+        encounterCount: data.encounterCount || hunt.totalEncounters,
+        ivs: data.ivs,
+        notes: data.notes,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      }] as any).concat(prev));
+      setCurrentHunts(prev => prev.filter(h => h.id !== huntId));
+      setShowCompletionModal(false);
+      setCompletingHunt(null);
+    } catch (e) {
+      console.error('[shiny:markFound] failed', e);
+    }
   };
 
   const handleUpdateNotes = (huntId: number, notes: string) => {
