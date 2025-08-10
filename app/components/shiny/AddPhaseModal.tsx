@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { getSpeciesList, getValidLocations } from '../../lib/pokedex';
+import { getSpeciesList, getValidLocations, getSpeciesAtLocation } from '../../lib/pokedex';
 import { shinyHuntService } from '../../services/shinyHuntService';
 
 type SpeciesOption = { id: number; name: string };
@@ -40,13 +40,6 @@ export function AddPhaseModal({ isOpen, onClose, parentHunt, onAdded }: AddPhase
     }
   }, [isOpen]);
 
-  const allSpecies = useMemo(() => getSpeciesList(), []);
-  const filteredSpecies = useMemo(() => {
-    const q = speciesQuery.trim().toLowerCase();
-    if (!q) return allSpecies.slice(0, 50);
-    return allSpecies.filter((s) => s.name.toLowerCase().includes(q)).slice(0, 50);
-  }, [speciesQuery, allSpecies]);
-
   const lockedLocation: LocationOption | null = useMemo(() => {
     // Build locked location (Region — Location) from parent hunt info if present
     const region = (parentHunt as any).region ?? null;
@@ -54,6 +47,17 @@ export function AddPhaseModal({ isOpen, onClose, parentHunt, onAdded }: AddPhase
     const label = `${region || 'Unknown Region'} — ${area ? String(area).toUpperCase() : 'UNKNOWN AREA'}`;
     return { label, value: JSON.stringify({ region, area }), region, area, method: parentHunt.method, rarity: null };
   }, [parentHunt]);
+
+  const speciesAtLockedLocation = useMemo(() => {
+    return getSpeciesAtLocation(lockedLocation?.region || null, lockedLocation?.area || null);
+  }, [lockedLocation?.region, lockedLocation?.area]);
+
+  const filteredSpecies = useMemo(() => {
+    const q = speciesQuery.trim().toLowerCase();
+    const base = speciesAtLockedLocation;
+    if (!q) return base.slice(0, 50);
+    return base.filter((s) => s.name.toLowerCase().includes(q)).slice(0, 50);
+  }, [speciesQuery, speciesAtLockedLocation]);
 
   const canSubmit = !!species;
 
