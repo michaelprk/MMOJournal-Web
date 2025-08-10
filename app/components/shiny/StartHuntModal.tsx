@@ -168,8 +168,14 @@ export function StartHuntModal({ isOpen, onClose, onCreated, mode = 'create', in
       insert.rarity = location.rarity;
       // insert.status = 'active';
 
-      const { error } = await supabase.from('shiny_hunts').insert([insert]);
+      const { data, error } = await supabase
+        .from('shiny_hunts')
+        .insert([insert])
+        .select('id,pokemon_id,pokemon_name,method,region,area,location,rarity,phase_count,total_encounters,is_completed,is_phase,parent_hunt_id,start_date,found_at,created_at')
+        .single();
       if (error) throw error;
+      // eslint-disable-next-line no-console
+      if (import.meta?.env?.DEV) console.debug('[create] returned', data);
       onCreated?.({ pokemonId: species.id, pokemonName: species.name, method, startDate, notes });
       onClose();
     } catch (err) {

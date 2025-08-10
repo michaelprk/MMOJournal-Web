@@ -209,6 +209,10 @@ export default function ShinyShowcase() {
           phaseCount: r.phase_count,
           totalEncounters: r.total_encounters,
           isCompleted: r.is_completed,
+          region: (r as any).region,
+          area: (r as any).area,
+          location: (r as any).location,
+          rarity: (r as any).rarity,
           phasePokemon: [],
           createdAt: r.created_at,
           updatedAt: r.created_at,
@@ -566,21 +570,34 @@ export default function ShinyShowcase() {
         onClose={() => setShowStartHunt(false)}
         onCreated={async () => {
           try {
-            const data = await shinyHuntService.list();
-            const mapped = data.map((r) => ({
-              id: r.id,
-              pokemonId: r.pokemon_id,
-              pokemonName: r.pokemon_name,
-              method: r.method as any,
-              dateFound: (r.start_date || r.created_at) as string,
-              nature: undefined,
-              encounterCount: r.total_encounters,
-              ivs: undefined,
-              notes: null,
-              createdAt: r.created_at,
-              updatedAt: r.created_at,
-            }));
-            setPortfolio(mapped as any);
+            const fetched = await shinyHuntService.listActive();
+            setCurrentHunts((prev) => {
+              const map = new Map(prev.map((r) => [r.id, r]));
+              for (const r of fetched) {
+                const existing = map.get(r.id);
+                const merged = {
+                  id: r.id,
+                  pokemonId: r.pokemon_id,
+                  pokemonName: r.pokemon_name,
+                  method: r.method as any,
+                  startDate: (r.start_date || r.created_at) as string,
+                  phaseCount: r.phase_count,
+                  totalEncounters: r.total_encounters,
+                  isCompleted: r.is_completed,
+                  region: (r as any).region,
+                  area: (r as any).area,
+                  location: (r as any).location,
+                  rarity: (r as any).rarity,
+                  phasePokemon: existing?.phasePokemon || [],
+                  createdAt: r.created_at,
+                  updatedAt: r.created_at,
+                } as ShinyHunt;
+                map.set(r.id, merged);
+              }
+              const mergedArr = Array.from(map.values()).sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt));
+              if (import.meta?.env?.DEV) console.debug('[merge] active count', mergedArr.length, 'first ids', mergedArr.slice(0, 5).map(x => x.id));
+              return mergedArr;
+            });
           } catch (e) {
             console.error('[shiny:list] error after create', e);
           }

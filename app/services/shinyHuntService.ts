@@ -59,7 +59,7 @@ export const shinyHuntService = {
     const { data, error } = await supabase
       .from('shiny_hunts')
       .select(
-        'id,pokemon_id,pokemon_name,method,region,area,location,rarity,phase_count,total_encounters,is_completed,is_phase,start_date,created_at'
+        'id,pokemon_id,pokemon_name,method,region,area,location,rarity,phase_count,total_encounters,is_completed,is_phase,parent_hunt_id,start_date,found_at,created_at'
       )
       .eq('is_completed', false)
       .eq('is_phase', false)
@@ -80,14 +80,20 @@ export const shinyHuntService = {
     return (data || []) as any;
   },
 
-  async create(payload: Partial<ShinyHuntRow> & { pokemon_id: number; pokemon_name: string; method: string }): Promise<void> {
+  async create(payload: Partial<ShinyHuntRow> & { pokemon_id: number; pokemon_name: string; method: string }): Promise<ShinyHuntRow> {
     const insert = {
       ...payload,
       is_completed: false,
+      found_at: null,
       // found_at left null; trigger will set cache when completed
     } as any;
-    const { error } = await supabase.from('shiny_hunts').insert([insert]);
+    const { data, error } = await supabase
+      .from('shiny_hunts')
+      .insert([insert])
+      .select('id,pokemon_id,pokemon_name,method,region,area,location,rarity,phase_count,total_encounters,is_completed,is_phase,parent_hunt_id,start_date,found_at,created_at')
+      .single();
     if (error) throw error;
+    return data as ShinyHuntRow;
   },
 
   async addPhase(parentId: number, payload: Partial<ShinyHuntRow> & { pokemon_id: number; pokemon_name: string; method: string; found_at?: string | null }): Promise<void> {
