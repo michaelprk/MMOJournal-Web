@@ -49,8 +49,10 @@ export function AddPhaseModal({ isOpen, onClose, parentHunt, onAdded }: AddPhase
   }, [parentHunt]);
 
   const speciesAtLockedLocation = useMemo(() => {
-    return getSpeciesAtLocation(lockedLocation?.region || null, lockedLocation?.area || null);
-  }, [lockedLocation?.region, lockedLocation?.area]);
+    const region = (parentHunt as any)?.region ?? null;
+    const area = (parentHunt as any)?.area ?? null;
+    return getSpeciesAtLocation(region, area);
+  }, [parentHunt]);
 
   const filteredSpecies = useMemo(() => {
     const q = speciesQuery.trim().toLowerCase();
@@ -137,6 +139,9 @@ export function AddPhaseModal({ isOpen, onClose, parentHunt, onAdded }: AddPhase
             style={{ width: '100%', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,203,5,0.5)', borderRadius: 8, color: '#fff', padding: '8px 10px', marginBottom: 8 }}
           />
           <div style={{ maxHeight: 180, overflowY: 'auto', border: '1px solid rgba(255,203,5,0.3)', borderRadius: 8 }}>
+            {filteredSpecies.length === 0 && (
+              <div style={{ padding: '8px 10px', color: '#bbb' }}>No species available at this location</div>
+            )}
             {filteredSpecies.map((s) => (
               <div key={s.id}
                 onClick={() => setSpecies(s)}
