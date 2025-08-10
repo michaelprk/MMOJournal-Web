@@ -221,6 +221,7 @@ export default function ShinyShowcase() {
           ivs: r.meta?.ivs,
           createdAt: r.created_at,
           updatedAt: r.created_at,
+          is_phase: r.is_phase,
         })) as any);
       } catch (err: any) {
         console.error('[shiny:list] error', err);
@@ -238,6 +239,7 @@ export default function ShinyShowcase() {
             ivs: (row as any).meta?.ivs,
             createdAt: row.created_at,
             updatedAt: row.created_at,
+            is_phase: (row as any).is_phase,
           }] as any).concat(prev));
         } else {
           setCurrentHunts((prev) => ([{

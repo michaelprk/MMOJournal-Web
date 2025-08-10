@@ -186,6 +186,15 @@ export default function ShinyCalendar({ portfolio, onEdit }: ShinyCalendarProps)
                         }}
                         onError={(e) => { e.currentTarget.src = '/images/shiny-sprites/001_Bulbasaur.gif'; }}
                       />
+                      {(shiny as any).is_phase && (
+                        <div style={{
+                          position: 'absolute', top: 6, left: 6,
+                          background: 'rgba(255,215,0,0.85)', color: '#000',
+                          fontSize: 10, fontWeight: 800, padding: '2px 4px', borderRadius: 4
+                        }}>
+                          PHASE
+                        </div>
+                      )}
                       <div style={{ color: '#fff', fontSize: '0.8rem', fontWeight: 700, textAlign: 'center' }}>{shiny.pokemonName}</div>
                       <div style={{ position: 'relative' }}
                         onMouseEnter={() => setHoveredShiny(shiny)}
