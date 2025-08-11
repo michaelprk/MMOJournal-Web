@@ -65,10 +65,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
             pointerEvents: "none",
           }}
         >
-          {/* MP4 default source */}
-          <source src="/images/Recording%202025-08-10%20004639.mp4" type="video/mp4" />
-          {/* Optional WebM source for broader compatibility */}
-          <source src="/images/Recording%202025-08-10%20004639.webm" type="video/webm" />
+          {/* MP4 default source - Snowpoint background */}
+          <source src="/images/Snowpoint.mp4" type="video/mp4" />
         </video>
 
         {showNavbar && <Navbar />}

@@ -39,7 +39,7 @@ export const shinyHuntService = {
 
   subscribe(userId: string, onInsert: (row: ShinyHuntRow) => void) {
     const channel = supabase
-      .channel('shiny_hunts_insert')
+      .channel('shiny_hunts_changes')
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'shiny_hunts', filter: `user_id=eq.${userId}` },
@@ -157,6 +157,15 @@ export const shinyHuntService = {
       .update({ meta: newMeta })
       .eq('id', id);
     if (upErr) throw upErr;
+  },
+
+  async deleteHunt(id: number): Promise<void> {
+    const { error } = await supabase
+      .from('shiny_hunts')
+      .delete()
+      .eq('id', id)
+      .single();
+    if (error) throw new Error(`SB: ${error.message}`);
   },
 };
 

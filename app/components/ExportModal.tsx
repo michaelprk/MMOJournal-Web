@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import type { PokemonBuild } from '../types/pokemon';
 import { buildToShowdownFormat } from '../utils/showdown-parser';
 
@@ -13,7 +14,17 @@ interface ExportModalProps {
 export function ExportModal({ isOpen, onClose, pokemon, team, title }: ExportModalProps) {
   const [copied, setCopied] = useState(false);
 
-  if (!isOpen) return null;
+  // Prevent background interaction/scroll while modal is open
+  useEffect(() => {
+    if (!isOpen) return;
+    document.body.classList.add('modal-open');
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.classList.remove('modal-open');
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [isOpen]);
 
   const exportText = team 
     ? team.map(p => buildToShowdownFormat(p)).join('\n\n')
@@ -42,8 +53,12 @@ export function ExportModal({ isOpen, onClose, pokemon, team, title }: ExportMod
     }
   };
 
-  return (
+  if (!isOpen) return null;
+
+  return createPortal(
     <div
+      role="dialog"
+      aria-modal="true"
       style={{
         position: 'fixed',
         top: 0,
@@ -54,7 +69,7 @@ export function ExportModal({ isOpen, onClose, pokemon, team, title }: ExportMod
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        zIndex: 10000,
+        zIndex: 100000, // ensure above utility bars and headers
         padding: '20px',
       }}
       onClick={(e) => {
@@ -75,6 +90,8 @@ export function ExportModal({ isOpen, onClose, pokemon, team, title }: ExportMod
           display: 'flex',
           flexDirection: 'column',
           boxShadow: '0 10px 30px rgba(255, 203, 5, 0.3)',
+          zIndex: 100001,
+          position: 'relative',
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -221,6 +238,7 @@ export function ExportModal({ isOpen, onClose, pokemon, team, title }: ExportMod
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 } 

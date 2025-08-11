@@ -158,6 +158,10 @@ export interface ShinyHunt {
   totalEncounters: number;
   isCompleted: boolean;
   notes?: string;
+  region?: string | null;
+  area?: string | null;
+  location?: string | null;
+  rarity?: string | null;
   phasePokemon?: PhasePokemon[]; // Array of Pokemon encountered in each phase
   createdAt: string;
   updatedAt: string;

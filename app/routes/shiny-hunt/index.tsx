@@ -10,6 +10,7 @@ import ShinyUtilityBar from '../../components/ShinyUtilityBar';
 import ShinyHuntCard from '../../components/ShinyHuntCard';
 
 import ShinyCalendar from '../../components/ShinyPlayArea';
+import ShinyTile, { type ShinyHoverDetails } from '../../components/shiny/ShinyTile';
 import { supabase } from '../../services/supabase';
 import { shinyHuntService, type ShinyHuntRow } from '../../services/shinyHuntService';
 import { useAuth } from '../../contexts/AuthContext';
@@ -79,6 +80,18 @@ export default function ShinyShowcase() {
   const handleAddPhase = (hunt: ShinyHunt) => {
     setHuntForPhase(hunt);
     // new modal replaces legacy HuntModal for phase
+  };
+
+  const handleDeleteHunt = async (hunt: ShinyHunt) => {
+    if (!window.confirm('Delete this hunt? If it has phases, they’ll be deleted too.')) return;
+    try {
+      await shinyHuntService.deleteHunt(hunt.id);
+      setCurrentHunts(prev => prev.filter(h => h.id !== hunt.id));
+      setPortfolio(prev => prev.filter(p => p.id !== hunt.id));
+    } catch (e) {
+      console.error('[shiny:delete] failed', e);
+      alert('Failed to delete hunt');
+    }
   };
 
   const handleAddPhaseData = (data: {
@@ -495,6 +508,7 @@ export default function ShinyShowcase() {
                     onMarkFound={handleMarkFound}
                     onUpdateNotes={handleUpdateNotes}
                     viewMode={huntsViewMode}
+                    onDelete={handleDeleteHunt}
                   />
                 ))}
               </div>

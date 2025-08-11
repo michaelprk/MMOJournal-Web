@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { supabase } from '../../services/supabase';
 import { shinyHuntService } from '../../services/shinyHuntService';
-import { getSpeciesList, getMethodsForSpecies, getValidLocations, validateEncounter, getDedupedLocationsForSpecies, isMethodValidForLocation } from '../../lib/pokedex';
+import { getSpeciesList, getMethodsForSpecies, getValidLocations, validateEncounter, getDedupedLocationsForSpecies, isMethodValidForLocation, canonicalizeMethod } from '../../lib/pokedex';
 
 type SpeciesOption = { id: number; name: string };
 type LocationOption = { label: string; value: string; region: string | null; area: string | null; method: string; rarity: string | null };
@@ -77,15 +77,17 @@ export function StartHuntModal({ isOpen, onClose, onCreated, mode = 'create', in
     return allSpecies.filter((s) => s.name.toLowerCase().includes(q) || String(s.id).includes(q)).slice(0, 20);
   }, [speciesQuery, allSpecies]);
 
-  const METHOD_OPTIONS = [
-    '5x Horde',
-    '3x Horde',
-    'Single/Lures',
-    'Fishing',
-    'Egg Hunt',
-    'Alpha Egg Hunt',
-    'Fossil'
+  // Display labels → canonical method mapping
+  const METHOD_LABELS: Array<{ label: string; key: ReturnType<typeof canonicalizeMethod> }> = [
+    { label: '5x Horde', key: 'horde' },
+    { label: '3x Horde', key: 'horde' },
+    { label: 'Single/Lures', key: 'single_lures' },
+    { label: 'Fishing', key: 'fishing' },
+    { label: 'Egg Hunt', key: 'egg' },
+    { label: 'Alpha Egg Hunt', key: 'egg' },
+    { label: 'Fossil', key: 'fossil' },
   ];
+  const METHOD_OPTIONS = METHOD_LABELS.map((m) => m.label);
   const methodOptions = METHOD_OPTIONS;
   const allLocations = useMemo(() => {
     if (!species) return [] as LocationOption[];
@@ -112,6 +114,7 @@ export function StartHuntModal({ isOpen, onClose, onCreated, mode = 'create', in
     }
     const valueObj = safeParse<LocationOption['value']>(location.value);
     const parsed = valueObj ? (JSON.parse(location.value) as { region: string | null; area: string | null }) : { region: location.region, area: location.area };
+    // Canonicalize for validation (the validator will translate again internally)
     const ok = isMethodValidForLocation(species.id, parsed.region ?? null, parsed.area ?? null, method);
     setInvalidCombo(!ok);
   }, [species, method, location]);

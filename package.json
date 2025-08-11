@@ -13,7 +13,9 @@
     "backend:db:generate": "cd backend && npx prisma generate",
     "backend:db:migrate": "cd backend && npx prisma migrate dev",
     "backend:db:studio": "cd backend && npx prisma studio",
-    "sb:ping": "tsx scripts/sb-ping.ts"
+    "sb:ping": "tsx scripts/sb-ping.ts",
+    "audit:hunts": "tsx scripts/audit-hunts.ts",
+    "audit:cases": "tsx scripts/check-cases.ts"
   },
   "dependencies": {
     "@react-router/node": "^7.5.3",

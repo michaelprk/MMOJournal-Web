@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import type { ShinyPortfolio } from '../types/pokemon';
-import { getShinySpritePath, getPokemonColors } from '../types/pokemon';
+import { getPokemonColors } from '../types/pokemon';
+import ShinyTile, { type ShinyHoverDetails } from './shiny/ShinyTile';
 
 interface ShinyCalendarProps {
   portfolio: ShinyPortfolio[];
@@ -18,7 +19,6 @@ export default function ShinyCalendar({ portfolio, onEdit }: ShinyCalendarProps)
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const [viewMode, setViewMode] = useState<'calendar' | 'showcase'>('calendar');
   const [sortBy, setSortBy] = useState<'date' | 'type' | 'rarity'>('date');
-  const [hoveredShiny, setHoveredShiny] = useState<ShinyPortfolio | null>(null);
   
   if (portfolio.length === 0) {
     return (
@@ -159,49 +159,39 @@ export default function ShinyCalendar({ portfolio, onEdit }: ShinyCalendarProps)
                 </div>
                 <div className="month-decoration"></div>
               </div>
-              
               <div className="month-shinies" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: 12 }}>
                 {monthData.shinies.map((shiny, shinyIndex) => {
-                  const pokemonColors = getPokemonColors(shiny.pokemonId);
-                  const dayOfMonth = new Date(shiny.dateFound).getDate();
-                  const isRecent = new Date(shiny.dateFound).getTime() > Date.now() - (7 * 24 * 60 * 60 * 1000);
-                  
+                  const details: ShinyHoverDetails = {
+                    id: shiny.id,
+                    pokemonId: shiny.pokemonId,
+                    pokemonName: shiny.pokemonName,
+                    method: shiny.method as any,
+                    date: shiny.dateFound,
+                    nature: shiny.nature || null,
+                    encounters: shiny.encounterCount ?? null,
+                    notes: shiny.notes || null,
+                    isPhase: (shiny as any).is_phase || false,
+                  };
                   return (
-                    <div 
-                      key={shiny.id} 
-                      className={`calendar-shiny ${isRecent ? 'recent' : ''}`}
-                      style={{
-                        animationDelay: `${(index * 0.1) + (shinyIndex * 0.05)}s`,
-                        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
-                        padding: 8, border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8
-                      }}
-                    >
-                      <img 
-                        src={getShinySpritePath(shiny.pokemonId, shiny.pokemonName)}
-                        alt={`Shiny ${shiny.pokemonName}`}
-                        className="calendar-sprite"
-                        style={{
-                          width: 56, height: 56,
-                          filter: `drop-shadow(0 0 10px ${pokemonColors.glow}) drop-shadow(0 0 20px ${pokemonColors.glowLight})`,
-                        }}
-                        onError={(e) => { e.currentTarget.src = '/images/shiny-sprites/001_Bulbasaur.gif'; }}
+                    <div key={shiny.id} style={{ animationDelay: `${(index * 0.1) + (shinyIndex * 0.05)}s` }}>
+                      <ShinyTile
+                        details={details}
+                        size={56}
+                        showName
+                        onEdit={(d) => onEdit?.({
+                          id: d.id,
+                          pokemonId: d.pokemonId,
+                          pokemonName: d.pokemonName,
+                          method: (d.method || shiny.method) as any,
+                          dateFound: shiny.dateFound,
+                          nature: shiny.nature,
+                          encounterCount: shiny.encounterCount,
+                          ivs: shiny.ivs,
+                          notes: shiny.notes,
+                          createdAt: shiny.createdAt,
+                          updatedAt: shiny.updatedAt,
+                        })}
                       />
-                      {(shiny as any).is_phase && (
-                        <div style={{
-                          position: 'absolute', top: 6, left: 6,
-                          background: 'rgba(255,215,0,0.85)', color: '#000',
-                          fontSize: 10, fontWeight: 800, padding: '2px 4px', borderRadius: 4
-                        }}>
-                          PHASE
-                        </div>
-                      )}
-                      <div style={{ color: '#fff', fontSize: '0.8rem', fontWeight: 700, textAlign: 'center' }}>{shiny.pokemonName}</div>
-                      <div style={{ position: 'relative' }}
-                        onMouseEnter={() => setHoveredShiny(shiny)}
-                        onMouseLeave={() => setHoveredShiny(null)}
-                      >
-                        {/* Hover content appears globally below when hoveredShiny is set */}
-                      </div>
                     </div>
                   );
                 })}
@@ -236,187 +226,31 @@ export default function ShinyCalendar({ portfolio, onEdit }: ShinyCalendarProps)
               .sort((a, b) => {
                 if (sortBy === 'date') return new Date(b.dateFound).getTime() - new Date(a.dateFound).getTime();
                 if (sortBy === 'type') return a.pokemonName.localeCompare(b.pokemonName);
-                if (sortBy === 'rarity') return 0; // Placeholder until rarity exists in DB/meta
+                if (sortBy === 'rarity') return 0;
                 return 0;
               })
               .map((shiny, index) => {
-              const pokemonColors = getPokemonColors(shiny.pokemonId);
-              const isRecent = new Date(shiny.dateFound).getTime() > Date.now() - (7 * 24 * 60 * 60 * 1000);
-              
-              return (
-                <div 
-                  key={shiny.id}
-                  style={{
-                    background: 'rgba(0, 0, 0, 0.3)',
-                    border: `2px solid ${pokemonColors.glowLight}`,
-                    borderRadius: '12px',
-                    padding: '12px',
-                    textAlign: 'center',
-                    transition: 'all 0.3s ease',
-                    cursor: 'pointer',
-                    position: 'relative',
-                    animationDelay: `${index * 0.05}s`,
-                    animation: 'fadeInScale 0.6s ease forwards',
-                    opacity: 0,
-                    transform: 'scale(0.8)',
-                  }}
-                  onMouseEnter={() => setHoveredShiny(shiny)}
-                  onMouseLeave={() => setHoveredShiny(null)}
-                  onMouseMove={(e) => {
-                    if (hoveredShiny?.id === shiny.id) {
-                      const rect = e.currentTarget.getBoundingClientRect();
-                      const x = e.clientX - rect.left;
-                      const y = e.clientY - rect.top;
-                      
-                      e.currentTarget.style.transform = `scale(1.1) perspective(1000px) rotateX(${(y - rect.height/2) * 0.1}deg) rotateY(${(x - rect.width/2) * -0.1}deg)`;
-                      e.currentTarget.style.boxShadow = `0 8px 25px ${pokemonColors.glow}, 0 0 30px ${pokemonColors.glowLight}`;
-                    }
-                  }}
-                  onMouseOut={(e) => {
-                    e.currentTarget.style.transform = 'scale(1)';
-                    e.currentTarget.style.boxShadow = `0 4px 12px rgba(0,0,0,0.3)`;
-                  }}
-                >
-                  {isRecent && (
-                    <div style={{
-                      position: 'absolute',
-                      top: '-8px',
-                      right: '-8px',
-                      background: 'linear-gradient(45deg, #ff6b35, #f7931e)',
-                      color: '#fff',
-                      fontSize: '0.6rem',
-                      fontWeight: 'bold',
-                      padding: '2px 6px',
-                      borderRadius: '8px',
-                      animation: 'bounce 2s infinite'
-                    }}>
-                      NEW!
-                    </div>
-                  )}
-                  
-                  <img 
-                    src={getShinySpritePath(shiny.pokemonId, shiny.pokemonName)}
-                    alt={`Shiny ${shiny.pokemonName}`}
-                    style={{
-                      width: '64px',
-                      height: '64px',
-                      filter: `drop-shadow(0 0 15px ${pokemonColors.glow}) drop-shadow(0 0 25px ${pokemonColors.glowLight})`,
-                      marginBottom: '8px'
-                    }}
-                    onError={(e) => {
-                      e.currentTarget.src = '/images/shiny-sprites/001_Bulbasaur.gif';
-                    }}
-                  />
-                  
-                  <div style={{
-                    color: '#fff',
-                    fontSize: '0.9rem',
-                    fontWeight: 'bold',
-                    marginBottom: '4px'
-                  }}>
-                    {shiny.pokemonName}
+                const details: ShinyHoverDetails = {
+                  id: shiny.id,
+                  pokemonId: shiny.pokemonId,
+                  pokemonName: shiny.pokemonName,
+                  method: shiny.method as any,
+                  date: shiny.dateFound,
+                  region: (shiny as any).region ?? null,
+                  area: (shiny as any).area ?? null,
+                  rarity: (shiny as any).rarity ?? null,
+                  nature: (shiny as any).nature ?? null,
+                  encounters: shiny.encounterCount ?? null,
+                  notes: shiny.notes ?? null,
+                  isPhase: (shiny as any).is_phase || false,
+                };
+                return (
+                  <div key={shiny.id} style={{ animationDelay: `${index * 0.05}s`, animation: 'fadeInScale 0.6s ease forwards', opacity: 0 }}>
+                    <ShinyTile details={details} size={64} showName onEdit={() => onEdit && onEdit(shiny)} />
                   </div>
-                  
-                  <div style={{
-                    color: pokemonColors.glowLight,
-                    fontSize: '0.7rem',
-                    opacity: 0.8
-                  }}>
-                    {new Date(shiny.dateFound).toLocaleDateString()}
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })}
           </div>
-          
-           {/* Hover Information Tooltip */}
-          {hoveredShiny && (
-              <div style={{
-              position: 'fixed',
-              top: '50%',
-              right: '20px',
-              transform: 'translateY(-50%)',
-              background: 'rgba(0, 0, 0, 0.95)',
-              border: `2px solid ${getPokemonColors(hoveredShiny.pokemonId).glowLight}`,
-              borderRadius: '12px',
-              padding: '16px',
-              minWidth: '250px',
-              zIndex: 1000,
-              animation: 'slideInRight 0.3s ease',
-              boxShadow: `0 8px 25px ${getPokemonColors(hoveredShiny.pokemonId).glow}`
-            }}>
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px',
-                marginBottom: '12px'
-              }}>
-                <img 
-                  src={getShinySpritePath(hoveredShiny.pokemonId, hoveredShiny.pokemonName)}
-                  alt={`Shiny ${hoveredShiny.pokemonName}`}
-                  style={{
-                    width: '48px',
-                    height: '48px',
-                    filter: `drop-shadow(0 0 10px ${getPokemonColors(hoveredShiny.pokemonId).glow})`
-                  }}
-                />
-                <div>
-                  <h4 style={{ color: '#fff', margin: '0 0 4px 0', fontSize: '1.1rem' }}>
-                    {hoveredShiny.pokemonName}
-                  </h4>
-                  <div style={{ color: getPokemonColors(hoveredShiny.pokemonId).glowLight, fontSize: '0.8rem' }}>
-                    #{hoveredShiny.pokemonId.toString().padStart(3, '0')}
-                  </div>
-                </div>
-              </div>
-              
-              <div style={{ fontSize: '0.85rem', color: '#ccc', lineHeight: '1.4' }}>
-                <div style={{ marginBottom: '6px' }}>
-                  <strong style={{ color: '#ffd700' }}>Method:</strong> {hoveredShiny.method}
-                </div>
-                  {(hoveredShiny as any).region && (hoveredShiny as any).area && (
-                    <div style={{ marginBottom: '6px' }}>
-                      <strong style={{ color: '#ffd700' }}>Location:</strong> {(hoveredShiny as any).region} — {((hoveredShiny as any).area as string).toUpperCase?.() || (hoveredShiny as any).area}
-                    </div>
-                  )}
-                  {(hoveredShiny as any).rarity && (
-                    <div style={{ marginBottom: '6px' }}>
-                      <strong style={{ color: '#ffd700' }}>Rarity:</strong> {(hoveredShiny as any).rarity}
-                    </div>
-                  )}
-                <div style={{ marginBottom: '6px' }}>
-                  <strong style={{ color: '#ffd700' }}>Date Found:</strong> {new Date(hoveredShiny.dateFound).toLocaleDateString()}
-                </div>
-                {hoveredShiny.nature && (
-                  <div style={{ marginBottom: '6px' }}>
-                    <strong style={{ color: '#ffd700' }}>Nature:</strong> {hoveredShiny.nature}
-                  </div>
-                )}
-                {hoveredShiny.encounterCount && (
-                  <div style={{ marginBottom: '6px' }}>
-                    <strong style={{ color: '#ffd700' }}>Encounters:</strong> {hoveredShiny.encounterCount.toLocaleString()}
-                  </div>
-                )}
-                {hoveredShiny.notes && (
-                  <div style={{ marginTop: '8px', paddingTop: '8px', borderTop: '1px solid rgba(255,255,255,0.2)' }}>
-                    <strong style={{ color: '#ffd700' }}>Notes:</strong><br />
-                    <em style={{ color: '#aaa' }}>{hoveredShiny.notes}</em>
-                  </div>
-                )}
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 8 }}>
-                <button
-                  onClick={() => onEdit && onEdit(hoveredShiny)}
-                  style={{
-                    background: 'transparent', color: '#fff', border: '1px solid rgba(255,255,255,0.3)',
-                    borderRadius: 6, padding: '6px 10px', fontSize: '0.85rem', cursor: 'pointer'
-                  }}
-                >
-                  ✏️ Edit
-                </button>
-              </div>
-            </div>
-          )}
         </div>
       )}
     </div>

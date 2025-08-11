@@ -43,6 +43,30 @@ export function getMethodsForSpecies(speciesId: number): string[] {
   return Array.from(new Set(methods));
 }
 
+// Canonicalization helpers
+// We compare encounter methods by intent, not exact labels. This function maps any
+// display label or variant to a canonical key used for validation logic.
+export function canonicalizeMethod(methodRaw: string):
+  | 'single_lures'
+  | 'horde'
+  | 'fishing'
+  | 'safari'
+  | 'egg'
+  | 'fossil'
+  | 'honey'
+  | 'unknown' {
+  const m = (methodRaw || '').toLowerCase();
+  if (!m) return 'unknown';
+  if (m.includes('horde')) return 'horde';
+  if (m.includes('lure') || m.includes('single')) return 'single_lures';
+  if (m.includes('fish') || m.includes('rod')) return 'fishing';
+  if (m.includes('safari')) return 'safari';
+  if (m.includes('egg')) return 'egg';
+  if (m.includes('fossil')) return 'fossil';
+  if (m.includes('honey') || m.includes('headbutt')) return 'honey';
+  return 'unknown';
+}
+
 export function getValidLocations(
   speciesId: number
 ): Array<{ label: string; value: string; region: string | null; area: string | null; method: string; rarity: string | null }> {
@@ -73,6 +97,25 @@ export function getValidLocations(
   }
 
   return results;
+}
+
+// Raw locations accessor for audits/tools. Returns un-deduped typed entries.
+export function getRawLocationsForSpecies(
+  speciesId: number
+): Array<{ type: string; region: string | null; area: string | null; rarity: string | null }> {
+  const monster = findMonsterById(speciesId);
+  if (!monster || !Array.isArray(monster.locations)) return [];
+  const result: Array<{ type: string; region: string | null; area: string | null; rarity: string | null }> = [];
+  for (const loc of monster.locations) {
+    if (!loc) continue;
+    const type = (loc.type || '').trim();
+    const region = loc.region_name ?? null;
+    const area = loc.location ?? null;
+    const rarity = loc.rarity ?? null;
+    if (!type && !region && !area) continue;
+    result.push({ type, region, area, rarity });
+  }
+  return result;
 }
 
 // De-dup location options by (region, area) only
@@ -112,24 +155,41 @@ export function isMethodValidForLocation(
 ): boolean {
   const monster = findMonsterById(speciesId);
   if (!monster || !Array.isArray(monster.locations)) return false;
-  const m = (method || '').toLowerCase();
+  const canon = canonicalizeMethod(method);
 
   const methodMatchesType = (locTypeRaw?: string) => {
     const t = (locTypeRaw || '').toLowerCase();
     if (!t) return false;
-    if (m.includes('horde')) return t.includes('horde');
-    if (m.includes('lure') || m.includes('single')) return t.includes('grass') || t.includes('lure') || t.includes('single');
-    if (m.includes('safari')) return t.includes('safari');
-    if (m.includes('fishing') || m.includes('rod')) return t.includes('rod') || t.includes('fishing');
-    if (m.includes('egg')) return true; // allow anywhere
-    if (m.includes('fossil')) return t.includes('fossil');
-    if (m.includes('honey')) return t.includes('honey') || t.includes('headbutt');
-    return true; // fallback permissive
+    switch (canon) {
+      case 'horde':
+        // Dataset often uses rarity "Horde" but type may be grass/cave/water.
+        // Accept common encounter surfaces for hordes.
+        return t.includes('horde') || t.includes('grass') || t.includes('cave') || t.includes('water');
+      case 'single_lures':
+        // Singles/Lures are typically grass encounters, but in caves the dataset
+        // often labels the area as "Cave" even when the encounter is grass in-cave.
+        // Accept cave as valid for singles/lures to cover places like Meteor Falls, Relic Castle.
+        return t.includes('grass') || t.includes('cave') || t.includes('lure') || t.includes('single');
+      case 'safari':
+        return t.includes('safari');
+      case 'fishing':
+        return t.includes('rod') || t.includes('fishing') || t.includes('water') || t.includes('surf');
+      case 'egg':
+        return true; // eggs don't depend on location type
+      case 'fossil':
+        return t.includes('fossil');
+      case 'honey':
+        return t.includes('honey') || t.includes('headbutt');
+      default:
+        // Unknown method: be conservative and require some overlap
+        return t.includes('grass') || t.includes('cave') || t.includes('safari') || t.includes('fishing') || t.includes('rod');
+    }
   };
 
   return monster.locations.some((loc) => {
     const r = loc.region_name ?? null;
     const a = loc.location ?? null;
+    // Compare by exact values from dataset, as selectors are built from the same source.
     if (r !== region || a !== area) return false;
     return methodMatchesType(loc.type);
   });

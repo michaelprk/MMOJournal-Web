@@ -9,6 +9,7 @@ interface ShinyHuntCardProps {
   onMarkFound: (hunt: ShinyHunt) => void;
   onUpdateNotes: (huntId: number, notes: string) => void;
   viewMode?: 'grid' | 'compact';
+  onDelete?: (hunt: ShinyHunt) => void;
 }
 
 export default function ShinyHuntCard({
@@ -17,7 +18,8 @@ export default function ShinyHuntCard({
   onAddPhase,
   onMarkFound,
   onUpdateNotes,
-  viewMode = 'grid'
+  viewMode = 'grid',
+  onDelete,
 }: ShinyHuntCardProps) {
   const [notes, setNotes] = useState(hunt.notes || '');
 
@@ -205,6 +207,23 @@ export default function ShinyHuntCard({
         >
           ✏️
         </button>
+        {onDelete && (
+          <button
+            onClick={() => onDelete(hunt)}
+            title="Delete hunt"
+            style={{
+              marginLeft: 8,
+              background: 'transparent',
+              color: '#ff6b6b',
+              border: '1px solid rgba(255, 107, 107, 0.5)',
+              borderRadius: 6,
+              padding: '2px 6px',
+              cursor: 'pointer',
+            }}
+          >
+            🗑️
+          </button>
+        )}
         <div className="method-badge" style={{ background: methodColor.background }}>
           {hunt.method}
         </div>

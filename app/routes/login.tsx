@@ -1,7 +1,8 @@
 // login.tsx
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import Modal from "../components/ui/Modal";
 
 export async function loader() {
   return null; // no data needed here for now
@@ -10,23 +11,78 @@ export async function loader() {
 export default function Login() {
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalTitle, setModalTitle] = useState("");
+  const [modalBody, setModalBody] = useState<React.ReactNode>(null);
+  const [modalVariant, setModalVariant] = useState<"success" | "error" | "info">("info");
+  const redirectTimerRef = useRef<number | null>(null);
+
   const navigate = useNavigate();
-  const { signIn, loading } = useAuth();
+  const { signIn, loading, user, initializing } = useAuth();
+
+  // Auth guard: if already signed in, redirect immediately without flicker
+  useEffect(() => {
+    if (!initializing && user) {
+      navigate("/pvp", { replace: true });
+    }
+  }, [user, initializing, navigate]);
+
+  useEffect(() => () => {
+    if (redirectTimerRef.current) window.clearTimeout(redirectTimerRef.current);
+  }, []);
+
+  const openModal = (title: string, body: React.ReactNode, variant: "success" | "error" | "info") => {
+    setModalTitle(title);
+    setModalBody(body);
+    setModalVariant(variant);
+    setModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setModalOpen(false);
+    // If success modal closes, navigate immediately
+    if (modalVariant === "success") {
+      navigate("/pvp", { replace: true });
+    }
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!identifier.trim() || !password.trim()) {
-      alert("Please enter username or email, and password");
+    // Clear any previous modal state
+    setModalOpen(false);
+    setModalBody(null);
+
+    const trimmedId = identifier.trim();
+    const trimmedPw = password.trim();
+    if (!trimmedId || !trimmedPw) {
+      openModal("Incorrect details", "Please check your email and password.", "error");
       return;
     }
-    const ok = await signIn(identifier.trim(), password.trim());
-    if (ok) navigate("/pvp");
-    else alert("Invalid credentials");
+
+    try {
+      await signIn(trimmedId, trimmedPw);
+      // Show success modal then redirect after ~700ms
+      openModal("Successfully logged in", null, "success");
+      redirectTimerRef.current = window.setTimeout(() => {
+        navigate("/pvp", { replace: true });
+      }, 700);
+    } catch (err: any) {
+      const isNetwork = typeof err?.message === "string" && err.message.toLowerCase().includes("network");
+      openModal(
+        isNetwork ? "Network error" : "Incorrect details",
+        isNetwork ? "Network error. Please try again." : "Please check your email and password.",
+        "error"
+      );
+      setPassword("");
+    }
   };
 
   const handleCreateAccount = () => {
     navigate("/create-account"); // create this route/page later
   };
+
+  // Avoid flicker by not rendering the form when initializing or already authed
+  if (initializing || user) return null;
 
   return (
     <div
@@ -130,6 +186,10 @@ export default function Login() {
           Create Account
         </button>
       </form>
+
+      <Modal isOpen={modalOpen} title={modalTitle} onClose={closeModal} variant={modalVariant}>
+        {modalBody}
+      </Modal>
     </div>
   );
 }

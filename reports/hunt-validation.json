@@ -1,0 +1,140 @@
+{
+  "summary": {
+    "durationMs": 288,
+    "combosChecked": 51563,
+    "catalogueFailures": 27416,
+    "dbRowsChecked": 0,
+    "dbFailures": 0
+  },
+  "top10CatalogueFailures": [
+    {
+      "speciesId": 1,
+      "speciesName": "Bulbasaur",
+      "methodDisplay": "Fishing",
+      "methodCanonical": "fishing",
+      "region": "Kanto",
+      "area": "VIRIDIAN FOREST",
+      "norm": {
+        "region": "kanto",
+        "area": "viridian forest"
+      }
+    },
+    {
+      "speciesId": 1,
+      "speciesName": "Bulbasaur",
+      "methodDisplay": "Fossil",
+      "methodCanonical": "fossil",
+      "region": "Kanto",
+      "area": "VIRIDIAN FOREST",
+      "norm": {
+        "region": "kanto",
+        "area": "viridian forest"
+      }
+    },
+    {
+      "speciesId": 1,
+      "speciesName": "Bulbasaur",
+      "methodDisplay": "Safari",
+      "methodCanonical": "safari",
+      "region": "Kanto",
+      "area": "VIRIDIAN FOREST",
+      "norm": {
+        "region": "kanto",
+        "area": "viridian forest"
+      }
+    },
+    {
+      "speciesId": 1,
+      "speciesName": "Bulbasaur",
+      "methodDisplay": "Honey",
+      "methodCanonical": "honey",
+      "region": "Kanto",
+      "area": "VIRIDIAN FOREST",
+      "norm": {
+        "region": "kanto",
+        "area": "viridian forest"
+      }
+    },
+    {
+      "speciesId": 2,
+      "speciesName": "Ivysaur",
+      "methodDisplay": "Fishing",
+      "methodCanonical": "fishing",
+      "region": "Kanto",
+      "area": "ROUTE 5",
+      "norm": {
+        "region": "kanto",
+        "area": "route 5"
+      }
+    },
+    {
+      "speciesId": 2,
+      "speciesName": "Ivysaur",
+      "methodDisplay": "Fossil",
+      "methodCanonical": "fossil",
+      "region": "Kanto",
+      "area": "ROUTE 5",
+      "norm": {
+        "region": "kanto",
+        "area": "route 5"
+      }
+    },
+    {
+      "speciesId": 2,
+      "speciesName": "Ivysaur",
+      "methodDisplay": "Safari",
+      "methodCanonical": "safari",
+      "region": "Kanto",
+      "area": "ROUTE 5",
+      "norm": {
+        "region": "kanto",
+        "area": "route 5"
+      }
+    },
+    {
+      "speciesId": 2,
+      "speciesName": "Ivysaur",
+      "methodDisplay": "Honey",
+      "methodCanonical": "honey",
+      "region": "Kanto",
+      "area": "ROUTE 5",
+      "norm": {
+        "region": "kanto",
+        "area": "route 5"
+      }
+    },
+    {
+      "speciesId": 4,
+      "speciesName": "Charmander",
+      "methodDisplay": "Fishing",
+      "methodCanonical": "fishing",
+      "region": "Kanto",
+      "area": "ROUTE 3",
+      "norm": {
+        "region": "kanto",
+        "area": "route 3"
+      }
+    },
+    {
+      "speciesId": 4,
+      "speciesName": "Charmander",
+      "methodDisplay": "Fossil",
+      "methodCanonical": "fossil",
+      "region": "Kanto",
+      "area": "ROUTE 3",
+      "norm": {
+        "region": "kanto",
+        "area": "route 3"
+      }
+    }
+  ],
+  "perMethodCatalogueFailureCounts": {
+    "fishing": 3794,
+    "fossil": 5881,
+    "safari": 5881,
+    "honey": 6051,
+    "horde": 3142,
+    "single_lures": 2667
+  },
+  "databaseFailures": []
+}

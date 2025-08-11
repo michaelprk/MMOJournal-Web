@@ -71,6 +71,27 @@ MMOJournal-Web is the web-based evolution of the MMOJournal CLI app — a person
 
 ## 🆕 Recent Development Progress
 
+> Note for Shiny Hunts FK: After merging changes that include `app/db/sql/shiny_hunts_fk_cascade.sql`, run that SQL file in the Supabase SQL Editor to switch `parent_hunt_id` foreign key to `ON DELETE CASCADE` so deleting a parent hunt removes its phases.
+
+### **Shiny Hunt Calendar & Showcase** (New)
+- Calendar month grid now shows actual shiny sprites + species names, with a PHASE badge for phase entries.
+- Hover details use a shared anchored popover that stays interactive and positions within the viewport.
+- Clicking a tile opens the edit modal.
+
+### **Showcase Hover Stability** (New)
+- Hover popup is anchored to each tile and no longer jumps off-screen; remains interactive without losing hover.
+
+### **Validation & Data Canonicalization** (New)
+- Added canonicalization for encounter methods (e.g., Single/Lures, Fishing, Horde) and improved validator logic for cave/grass/surf/water labeling mismatches.
+- Scripted audit to verify all method/location combos and DB rows with `npm run audit:hunts`.
+- Specific fixes verified: Beldum/Hoenn/Meteor Falls, Larvesta/Unova/Relic Castle, Bagon Single/Lures.
+
+### **Export Modal (Teams)** (New)
+- Export modal portals to `document.body`, locks background scroll, and renders above utility bars and headers for clean presentation.
+
+### **Background Visuals** (New)
+- App-wide animated background video (`public/images/Snowpoint.mp4`) with muted audio and darkened/blurred styling to preserve the dark+yellow aesthetic.
+
 ### **Team Management & Organization** (Latest)
 - **Team Creation**: Create and manage teams with unique identifiers and names
 - **Team View Page**: Dedicated showcase page for displaying organized teams
