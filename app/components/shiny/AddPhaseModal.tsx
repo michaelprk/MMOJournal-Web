@@ -73,7 +73,13 @@ export function AddPhaseModal({ isOpen, onClose, parentHunt, onAdded }: AddPhase
   const validateSpeciesAtLocation = (): boolean => {
     if (!species) return false;
     // Filter valid locations for species to those matching the locked region/area
-    const valid = getValidLocations(species.id).some((l) => l.region === lockedLocation?.region && l.area === lockedLocation?.area);
+    const normalizeArea = (s: string | null | undefined) => {
+      if (s == null) return null;
+      return String(s).replace(/\s*\((?:NIGHT|DAY|MORNING|EVENING|AFTERNOON|DUSK|DAWN)\)\s*$/i, '').trim();
+    };
+    const valid = getValidLocations(species.id).some((l) => (
+      l.region === lockedLocation?.region && normalizeArea(l.area) === normalizeArea(lockedLocation?.area)
+    ));
     return valid;
   };
 
