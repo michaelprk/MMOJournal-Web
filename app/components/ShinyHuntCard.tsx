@@ -49,8 +49,8 @@ export default function ShinyHuntCard({
     if (label.includes('egg')) return 'linear-gradient(135deg, rgba(255, 193, 7, 0.05), rgba(255, 193, 7, 0.02))'; // amber tint for eggs
     if (label.includes('fossil')) return 'linear-gradient(135deg, rgba(158, 158, 158, 0.06), rgba(120, 120, 120, 0.025))'; // gray tint for fossil
     if (label.includes('honey') || label.includes('headbutt')) return 'linear-gradient(135deg, rgba(255, 215, 0, 0.06), rgba(255, 215, 0, 0.025))'; // gold tint for honey
-    // Singles / Lures and default: subtle violet to match existing feel
-    return 'linear-gradient(135deg, rgba(186, 104, 200, 0.05), rgba(186, 104, 200, 0.02))';
+    // Singles / Lures and default: move to magenta/purple family
+    return 'linear-gradient(135deg, rgba(236, 72, 153, 0.05), rgba(168, 85, 247, 0.02))';
   })();
   const startDate = new Date(hunt.startDate).toLocaleDateString();
   const pokemonColors = getPokemonColors(hunt.pokemonId);
@@ -179,6 +179,8 @@ export default function ShinyHuntCard({
               if (m.includes('egg')) return 'linear-gradient(45deg, #ffca28, #ffc107)';
               if (m.includes('fossil')) return 'linear-gradient(45deg, #9e9e9e, #757575)';
               if (m.includes('honey') || m.includes('headbutt')) return 'linear-gradient(45deg, #ffd54f, #ffca28)';
+              // Singles / Lures and default: magenta/purple
+              if (m.includes('lure') || m.includes('single')) return 'linear-gradient(45deg, #ec4899, #a855f7)';
               return methodColor.background;
             })(),
             color: '#fff',
