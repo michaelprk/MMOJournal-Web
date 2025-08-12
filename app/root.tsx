@@ -93,7 +93,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
           }}
         >
           {/* MP4 default source - Snowpoint background */}
-          <source src="/images/Snowpoint.mp4" type="video/mp4" />
+              {/* Background assets live under /public/images/backgrounds/ for future rotations. */}
+              {/* Example alternate: /images/backgrounds/recording-2025-08-10-004639.mp4 */}
+              <source src="/images/Snowpoint.mp4" type="video/mp4" />
         </video>
 
         {showNavbar && <Navbar />}
