@@ -30,7 +30,7 @@ export function ShinyTile({ details, size = 56, showName = true, onEdit, onDelet
   const [closing, setClosing] = useState<ReturnType<typeof setTimeout> | null>(null);
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const popRef = useRef<HTMLDivElement | null>(null);
-  const [placement, setPlacement] = useState<'right' | 'left'>('right');
+  const [placement, setPlacement] = useState<'above' | 'below'>('below');
 
   const clearCloseTimer = () => {
     if (closing) {
@@ -56,9 +56,8 @@ export function ShinyTile({ details, size = 56, showName = true, onEdit, onDelet
     if (!wrapper || !pop) return;
     const wrapperRect = wrapper.getBoundingClientRect();
     const popRect = pop.getBoundingClientRect();
-    const spaceRight = window.innerWidth - wrapperRect.right;
-    const willOverflowRight = spaceRight < popRect.width + 16;
-    setPlacement(willOverflowRight ? 'left' : 'right');
+    const spaceBelow = window.innerHeight - wrapperRect.bottom;
+    setPlacement(spaceBelow < popRect.height + 16 ? 'above' : 'below');
   }, [open]);
 
   return (
@@ -133,8 +132,9 @@ export function ShinyTile({ details, size = 56, showName = true, onEdit, onDelet
           onMouseLeave={requestClose}
           style={{
             position: 'absolute',
-            top: 0,
-            [placement === 'right' ? 'left' : 'right']: 'calc(100% + 8px)'
+            left: '50%',
+            transform: 'translateX(-50%)',
+            [placement === 'below' ? 'top' : 'bottom']: 'calc(100% + 8px)'
           } as React.CSSProperties}
         >
           <ShinyHoverCard details={details} onEdit={onEdit} onDelete={onDelete} />

@@ -17,6 +17,7 @@ interface MonthData {
 
 export default function ShinyCalendar({ portfolio, onEdit }: ShinyCalendarProps) {
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
+  const [selectedMonth, setSelectedMonth] = useState<number | null>(null); // 0-11
   const [viewMode, setViewMode] = useState<'calendar' | 'showcase'>('calendar');
   const [sortBy, setSortBy] = useState<'date' | 'type' | 'rarity'>('date');
   
@@ -81,15 +82,27 @@ export default function ShinyCalendar({ portfolio, onEdit }: ShinyCalendarProps)
 
   // Get available years
   const availableYears = [...new Set(sortedMonths.map(m => m.year))].sort((a, b) => b - a);
+  // Default to latest year
+  if (selectedYear === null && availableYears.length > 0) {
+    setSelectedYear(availableYears[0]);
+  }
 
   // Filter by selected year if any
   const filteredMonths = selectedYear ? sortedMonths.filter(m => m.year === selectedYear) : sortedMonths;
+  const monthsByYear = selectedYear
+    ? Array.from({ length: 12 }, (_, i) => ({
+        month: i,
+        year: selectedYear,
+        monthName: new Date(selectedYear, i, 1).toLocaleString('default', { month: 'long' }),
+        shinies: filteredMonths.find(m => m.month === i)?.shinies || []
+      }))
+    : [];
 
   return (
     <div className="shiny-calendar">
-      <div className="calendar-header">
-        <h3>{viewMode === 'calendar' ? '📅 Shiny Calendar' : '✨ Shiny Showcase'}</h3>
-        <div className="calendar-controls">
+      <div className="calendar-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+        <h3 style={{ margin: 0, color: '#ffd700' }}>{viewMode === 'calendar' ? '📅 Shiny Calendar' : '✨ Shiny Showcase'}</h3>
+        <div className="calendar-controls" style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
           {/* View Mode Toggle */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <span style={{ fontSize: '0.875rem', color: 'rgba(255, 255, 255, 0.7)' }}>View:</span>
@@ -117,18 +130,29 @@ export default function ShinyCalendar({ portfolio, onEdit }: ShinyCalendarProps)
             </label>
           </div>
           
-          {viewMode === 'calendar' && (
-            <div className="year-selector">
-              <label>Year:</label>
-              <select 
-                value={selectedYear || 'all'} 
-                onChange={(e) => setSelectedYear(e.target.value === 'all' ? null : parseInt(e.target.value))}
+          {viewMode === 'calendar' && selectedYear !== null && (
+            <div className="year-selector" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <button
+                aria-label="Previous Year"
+                onClick={() => {
+                  const idx = availableYears.indexOf(selectedYear);
+                  if (idx >= 0 && idx < availableYears.length - 1) setSelectedYear(availableYears[idx + 1]);
+                }}
+                style={{ background: 'transparent', color: '#ffd700', border: '1px solid rgba(255,215,0,0.4)', borderRadius: 6, padding: '6px 10px', cursor: 'pointer' }}
               >
-                <option value="all">All Years</option>
-                {availableYears.map(year => (
-                  <option key={year} value={year}>{year}</option>
-                ))}
-              </select>
+                ◀
+              </button>
+              <div style={{ color: '#fff', fontWeight: 800 }}>{selectedYear}</div>
+              <button
+                aria-label="Next Year"
+                onClick={() => {
+                  const idx = availableYears.indexOf(selectedYear);
+                  if (idx > 0) setSelectedYear(availableYears[idx - 1]);
+                }}
+                style={{ background: 'transparent', color: '#ffd700', border: '1px solid rgba(255,215,0,0.4)', borderRadius: 6, padding: '6px 10px', cursor: 'pointer' }}
+              >
+                ▶
+              </button>
             </div>
           )}
           
@@ -148,19 +172,47 @@ export default function ShinyCalendar({ portfolio, onEdit }: ShinyCalendarProps)
       </div>
       
       {viewMode === 'calendar' ? (
-        /* Calendar View */
-        <div className="calendar-timeline">
-          {filteredMonths.map((monthData, index) => (
-            <div key={`${monthData.year}-${monthData.month}`} className="calendar-month">
-              <div className="month-header">
-                <div className="month-info">
-                  <h4>{monthData.monthName} {monthData.year}</h4>
-                  <span className="month-count">{monthData.shinies.length} shinies</span>
+        // Calendar View redesigned: Year header + 3x4 months grid + month detail area
+        <div>
+          {/* Months grid (3x4) */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
+            gap: 12,
+            marginBottom: 16,
+          }}>
+            {monthsByYear.map((m) => (
+              <button
+                key={`m-${m.year}-${m.month}`}
+                onClick={() => setSelectedMonth(m.month)}
+                style={{
+                  textAlign: 'left',
+                  background: selectedMonth === m.month ? 'rgba(255,215,0,0.12)' : 'rgba(0,0,0,0.35)',
+                  border: selectedMonth === m.month ? '1px solid #ffd700' : '1px solid rgba(255,255,255,0.12)',
+                  borderRadius: 10,
+                  padding: 12,
+                  cursor: 'pointer',
+                  color: '#fff'
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ fontWeight: 800 }}>{m.monthName}</div>
+                  <div style={{ fontSize: '0.8rem', color: '#ffd700' }}>{m.shinies.length}</div>
                 </div>
-                <div className="month-decoration"></div>
-              </div>
-              <div className="month-shinies" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: 12 }}>
-                {monthData.shinies.map((shiny, shinyIndex) => {
+              </button>
+            ))}
+          </div>
+
+          {/* Selected month shinies */}
+          {selectedMonth !== null && (
+            <div style={{
+              background: 'rgba(0,0,0,0.3)',
+              border: '1px solid rgba(255,255,255,0.12)',
+              borderRadius: 12,
+              padding: 12,
+            }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: 12 }}>
+                {monthsByYear[selectedMonth]?.shinies.map((shiny, idx) => {
                   const details: ShinyHoverDetails = {
                     id: shiny.id,
                     pokemonId: shiny.pokemonId,
@@ -173,31 +225,14 @@ export default function ShinyCalendar({ portfolio, onEdit }: ShinyCalendarProps)
                     isPhase: (shiny as any).is_phase || false,
                   };
                   return (
-                    <div key={shiny.id} style={{ animationDelay: `${(index * 0.1) + (shinyIndex * 0.05)}s` }}>
-                      <ShinyTile
-                        details={details}
-                        size={56}
-                        showName
-                        onEdit={(d) => onEdit?.({
-                          id: d.id,
-                          pokemonId: d.pokemonId,
-                          pokemonName: d.pokemonName,
-                          method: (d.method || shiny.method) as any,
-                          dateFound: shiny.dateFound,
-                          nature: shiny.nature,
-                          encounterCount: shiny.encounterCount,
-                          ivs: shiny.ivs,
-                          notes: shiny.notes,
-                          createdAt: shiny.createdAt,
-                          updatedAt: shiny.updatedAt,
-                        })}
-                      />
+                    <div key={shiny.id} style={{ animationDelay: `${idx * 0.05}s` }}>
+                      <ShinyTile details={details} size={56} showName onEdit={() => onEdit?.(shiny)} />
                     </div>
                   );
                 })}
               </div>
             </div>
-          ))}
+          )}
         </div>
       ) : (
         /* Showcase View */
