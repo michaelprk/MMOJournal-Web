@@ -229,19 +229,12 @@ export default function ShinyHuntCard({
           </div>
         </div>
 
-        {/* Additional Details - Always Visible */}
-        <div style={{ 
-          marginTop: '12px', 
-          fontSize: '0.8rem', 
-          color: '#ccc',
-          display: 'flex',
-          gap: '16px',
-          justifyContent: 'center'
-        }}>
+        {/* Additional Details - Always Visible; keep consistent height so footer buttons align across cards */}
+        <div style={{ minHeight: 24, marginTop: '12px', fontSize: '0.8rem', color: '#ccc', display: 'flex', gap: '16px', justifyContent: 'center' }}>
           <div><strong>Started:</strong> {startDate}</div>
         </div>
 
-        <div className="hunt-card-footer">
+        <div className="hunt-card-footer" style={{ marginTop: 12 }}>
           <button 
             className="phase-btn"
             onClick={handleAddPhase}

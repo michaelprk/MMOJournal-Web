@@ -174,14 +174,14 @@ export function AddPhaseModal({ isOpen, onClose, parentHunt, onAdded }: AddPhase
             style={{ width: '100%', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,203,5,0.5)', borderRadius: 8, color: '#fff', padding: '8px 10px', marginBottom: 8 }}
           />
           {speciesOpen && (
-            <div style={{ maxHeight: 180, overflowY: 'auto', border: '1px solid rgba(255,203,5,0.3)', borderRadius: 8 }} onMouseLeave={() => setSpeciesOpen(false)}>
+            <div style={{ maxHeight: 180, overflowY: 'auto', border: '1px solid rgba(255,203,5,0.3)', borderRadius: 8, backgroundColor: 'rgba(0,0,0,0.95)' }} onMouseLeave={() => setSpeciesOpen(false)}>
               {filteredSpecies.length === 0 && (
                 <div style={{ padding: '8px 10px', color: '#bbb' }}>No species available at this location</div>
               )}
               {filteredSpecies.map((s) => (
                 <div key={s.id}
                   onClick={() => { setSpecies(s); setSpeciesOpen(false); setSpeciesQuery(''); }}
-                  style={{ padding: '8px 10px', cursor: 'pointer', background: species?.id === s.id ? 'rgba(255,203,5,0.2)' : 'transparent' }}
+                  style={{ padding: '8px 10px', cursor: 'pointer', background: species?.id === s.id ? 'rgba(255,203,5,0.2)' : 'transparent', color: '#fff' }}
                 >
                   {s.name}
                 </div>
