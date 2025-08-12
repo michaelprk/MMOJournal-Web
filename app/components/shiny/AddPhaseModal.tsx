@@ -26,6 +26,7 @@ export function AddPhaseModal({ isOpen, onClose, parentHunt, onAdded }: AddPhase
   const [mounted, setMounted] = useState(false);
   const [speciesQuery, setSpeciesQuery] = useState('');
   const [species, setSpecies] = useState<SpeciesOption | null>(null);
+  const [speciesOpen, setSpeciesOpen] = useState(false);
   const [foundAt, setFoundAt] = useState<string>(() => new Date().toISOString().slice(0, 10));
   const [notes, setNotes] = useState('');
   const [encounters, setEncounters] = useState<number | ''>('');
@@ -61,10 +62,11 @@ export function AddPhaseModal({ isOpen, onClose, parentHunt, onAdded }: AddPhase
 
   const filteredSpecies = useMemo(() => {
     const q = speciesQuery.trim().toLowerCase();
-    const base = speciesAtLockedLocation;
+    const targetId = (parentHunt as any)?.pokemonId as number | undefined;
+    const base = speciesAtLockedLocation.filter((s) => (typeof targetId === 'number' ? s.id !== targetId : true));
     if (!q) return base.slice(0, 50);
     return base.filter((s) => s.name.toLowerCase().includes(q)).slice(0, 50);
-  }, [speciesQuery, speciesAtLockedLocation]);
+  }, [speciesQuery, speciesAtLockedLocation, parentHunt]);
 
   const canSubmit = !!species && typeof encounters === 'number' && encounters > 0;
 
@@ -156,24 +158,27 @@ export function AddPhaseModal({ isOpen, onClose, parentHunt, onAdded }: AddPhase
         <div style={{ marginBottom: 12 }}>
           <label>Species</label>
           <input
-            placeholder="Search species..."
+            placeholder={species ? species.name : 'Search species...'}
             value={speciesQuery}
             onChange={(e) => setSpeciesQuery(e.target.value)}
+            onFocus={() => setSpeciesOpen(true)}
             style={{ width: '100%', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,203,5,0.5)', borderRadius: 8, color: '#fff', padding: '8px 10px', marginBottom: 8 }}
           />
-          <div style={{ maxHeight: 180, overflowY: 'auto', border: '1px solid rgba(255,203,5,0.3)', borderRadius: 8 }}>
-            {filteredSpecies.length === 0 && (
-              <div style={{ padding: '8px 10px', color: '#bbb' }}>No species available at this location</div>
-            )}
-            {filteredSpecies.map((s) => (
-              <div key={s.id}
-                onClick={() => setSpecies(s)}
-                style={{ padding: '8px 10px', cursor: 'pointer', background: species?.id === s.id ? 'rgba(255,203,5,0.2)' : 'transparent' }}
-              >
-                {s.name}
-              </div>
-            ))}
-          </div>
+          {speciesOpen && (
+            <div style={{ maxHeight: 180, overflowY: 'auto', border: '1px solid rgba(255,203,5,0.3)', borderRadius: 8 }} onMouseLeave={() => setSpeciesOpen(false)}>
+              {filteredSpecies.length === 0 && (
+                <div style={{ padding: '8px 10px', color: '#bbb' }}>No species available at this location</div>
+              )}
+              {filteredSpecies.map((s) => (
+                <div key={s.id}
+                  onClick={() => { setSpecies(s); setSpeciesOpen(false); setSpeciesQuery(''); }}
+                  style={{ padding: '8px 10px', cursor: 'pointer', background: species?.id === s.id ? 'rgba(255,203,5,0.2)' : 'transparent' }}
+                >
+                  {s.name}
+                </div>
+              ))}
+            </div>
+          )}
           {species && !validateSpeciesAtLocation() && (
             <div style={{ color: '#ff7675', marginTop: 6, fontSize: '0.85rem' }}>
               Selected species is not available at {lockedLocation?.label}
