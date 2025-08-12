@@ -190,6 +190,45 @@ export default function ShinyHuntCard({
         </div>
       </div>
 
+      {/* Top action row for grid cards */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+        <button 
+          className="phase-btn"
+          onClick={handleAddPhase}
+          style={{
+            backgroundColor: 'rgba(255, 215, 0, 0.2)',
+            color: '#ffd700',
+            border: '1px solid #ffd700',
+            padding: '6px 12px',
+            borderRadius: '6px',
+            fontSize: '0.8rem',
+            cursor: 'pointer',
+            fontWeight: 'bold',
+            transition: 'all 0.2s ease'
+          }}
+        >
+          + Phase
+        </button>
+
+        <button 
+          className="found-btn"
+          onClick={() => onMarkFound(hunt)}
+          style={{
+            backgroundColor: 'rgba(40, 167, 69, 0.2)',
+            color: '#28a745',
+            border: '1px solid #28a745',
+            padding: '6px 12px',
+            borderRadius: '6px',
+            fontSize: '0.8rem',
+            cursor: 'pointer',
+            fontWeight: 'bold',
+            transition: 'all 0.2s ease'
+          }}
+        >
+          ✨ Mark as Found
+        </button>
+      </div>
+
       <div className="hunt-card-content">
           <div className="shiny-sprite-container">
           <img 
@@ -234,43 +273,7 @@ export default function ShinyHuntCard({
           <div><strong>Started:</strong> {startDate}</div>
         </div>
 
-        <div className="hunt-card-footer" style={{ marginTop: 12 }}>
-          <button 
-            className="phase-btn"
-            onClick={handleAddPhase}
-            style={{
-              backgroundColor: 'rgba(255, 215, 0, 0.2)',
-              color: '#ffd700',
-              border: '1px solid #ffd700',
-              padding: '8px 16px',
-              borderRadius: '6px',
-              fontSize: '0.8rem',
-              cursor: 'pointer',
-              fontWeight: 'bold',
-              transition: 'all 0.2s ease'
-            }}
-          >
-            + Phase
-          </button>
-          
-          <button 
-            className="found-btn"
-            onClick={() => onMarkFound(hunt)}
-            style={{
-              backgroundColor: 'rgba(40, 167, 69, 0.2)',
-              color: '#28a745',
-              border: '1px solid #28a745',
-              padding: '8px 16px',
-              borderRadius: '6px',
-              fontSize: '0.8rem',
-              cursor: 'pointer',
-              fontWeight: 'bold',
-              transition: 'all 0.2s ease'
-            }}
-          >
-            ✨ Mark as Found
-          </button>
-        </div>
+        {/* Footer actions moved to top action row */}
 
         {/* Phase Timeline - Always Visible */}
         {hunt.phasePokemon && hunt.phasePokemon.length > 0 && (
