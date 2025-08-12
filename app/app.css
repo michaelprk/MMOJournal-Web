@@ -410,6 +410,7 @@ html, body {
   );
   z-index: 1;
   animation: portfolioShimmer 4s ease-in-out infinite;
+  pointer-events: none;
 }
 
 .hunt-card-header {
