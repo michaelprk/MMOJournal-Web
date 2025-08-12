@@ -77,16 +77,19 @@ export default function ShinyHuntCard({
             </div>
           </div>
 
-          {/* Middle: encounters and optional location */}
-          <div style={{ flex: '1 1 auto', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
-            <div style={{ fontSize: '0.95rem', color: '#ddd' }}>
-              <strong>Encounters:</strong> {hunt.totalEncounters.toLocaleString()}
+          {/* Middle: encounters and optional location on one bolded row */}
+          <div style={{ flex: '1 1 auto', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <div style={{ fontSize: '0.95rem', color: '#ddd', textAlign: 'center' }}>
+              <strong>
+                Encounters: {hunt.totalEncounters.toLocaleString()}
+                {(hunt.region || hunt.area) && (
+                  <>
+                    {"  |  "}
+                    Location: {(hunt.region || 'Unknown Region')} — {hunt.area ? String(hunt.area).toUpperCase() : 'UNKNOWN AREA'}
+                  </>
+                )}
+              </strong>
             </div>
-            {(hunt.region || hunt.area) && (
-              <div style={{ color: '#bbb', fontSize: '0.8rem', textAlign: 'center' }}>
-                {(hunt.region || 'Unknown Region')} — {hunt.area ? String(hunt.area).toUpperCase() : 'UNKNOWN AREA'}
-              </div>
-            )}
           </div>
 
           {/* Right: stacked actions */}
