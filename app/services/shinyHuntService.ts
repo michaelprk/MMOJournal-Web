@@ -79,7 +79,7 @@ export const shinyHuntService = {
     let query = supabase
       .from('shiny_hunts')
       .select(
-        'id,pokemon_id,pokemon_name,method,region,area,location,rarity,phase_count,total_encounters,is_completed,is_phase,parent_hunt_id,start_date,found_at,created_at,is_paused'
+        'id,pokemon_id,pokemon_name,method,region,area,location,rarity,phase_count,total_encounters,is_completed,is_phase,parent_hunt_id,start_date,found_at,created_at'
       )
       .eq('is_completed', false)
       .eq('is_phase', false)
@@ -184,7 +184,7 @@ export const shinyHuntService = {
     // If is_paused column isn't available, treat as no paused hunts
     const base = supabase
       .from('shiny_hunts')
-      .select('id,pokemon_id,pokemon_name,method,region,area,location,rarity,phase_count,total_encounters,is_completed,is_phase,parent_hunt_id,start_date,found_at,created_at,is_paused')
+      .select('id,pokemon_id,pokemon_name,method,region,area,location,rarity,phase_count,total_encounters,is_completed,is_phase,parent_hunt_id,start_date,found_at,created_at')
       .eq('is_completed', false)
       .eq('is_phase', false)
       .order('created_at', { ascending: false });

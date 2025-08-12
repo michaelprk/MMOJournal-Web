@@ -220,7 +220,7 @@ export default function ShinyShowcase() {
           shinyHuntService.listCompleted(),
           shinyHuntService.listPaused().catch(() => []),
         ]);
-        setCurrentHunts(active.map((r) => ({
+        setCurrentHunts(active.filter((r: any) => (r as any).is_paused !== true).map((r) => ({
           id: r.id,
           pokemonId: r.pokemon_id,
           pokemonName: r.pokemon_name,
@@ -287,19 +287,36 @@ export default function ShinyShowcase() {
             is_phase: (row as any).is_phase,
           }] as any).concat(prev));
         } else {
-          setCurrentHunts((prev) => ([{
-            id: row.id,
-            pokemonId: row.pokemon_id,
-            pokemonName: row.pokemon_name,
-            method: row.method as any,
-            startDate: (row.start_date || row.created_at) as string,
-            phaseCount: row.phase_count,
-            totalEncounters: row.total_encounters,
-            isCompleted: row.is_completed,
-            phasePokemon: [],
-            createdAt: row.created_at,
-            updatedAt: row.created_at,
-          }] as any).concat(prev));
+          if ((row as any).is_paused) {
+            setPausedHunts((prev) => ([{
+              id: row.id,
+              pokemonId: row.pokemon_id,
+              pokemonName: row.pokemon_name,
+              method: row.method as any,
+              startDate: (row.start_date || row.created_at) as string,
+              phaseCount: row.phase_count,
+              totalEncounters: row.total_encounters,
+              isCompleted: row.is_completed,
+              phasePokemon: [],
+              createdAt: row.created_at,
+              updatedAt: row.created_at,
+              paused: true,
+            }] as any).concat(prev));
+          } else {
+            setCurrentHunts((prev) => ([{
+              id: row.id,
+              pokemonId: row.pokemon_id,
+              pokemonName: row.pokemon_name,
+              method: row.method as any,
+              startDate: (row.start_date || row.created_at) as string,
+              phaseCount: row.phase_count,
+              totalEncounters: row.total_encounters,
+              isCompleted: row.is_completed,
+              phasePokemon: [],
+              createdAt: row.created_at,
+              updatedAt: row.created_at,
+            }] as any).concat(prev));
+          }
         }
       });
       // Listen for updates to counters and phases to update UI live
