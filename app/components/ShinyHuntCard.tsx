@@ -54,9 +54,11 @@ export default function ShinyHuntCard({
           display: 'flex',
           flexDirection: 'column',
           padding: '8px',
+          paddingBottom: '4px',
           borderRadius: '8px',
           margin: '8px auto',
           maxWidth: '880px',
+          minHeight: 0,
         }}
       >
         {/* Compact layout: center column with sprite row flanked by buttons, then text rows below */}
@@ -111,48 +113,7 @@ export default function ShinyHuntCard({
           Phase {hunt.phaseCount}
         </div>
         
-        {/* Phase Timeline */}
-        {hunt.phasePokemon && hunt.phasePokemon.length > 0 && (
-          <div style={{ 
-            borderTop: '1px solid rgba(255, 215, 0, 0.3)',
-            paddingTop: '8px',
-            marginTop: '8px'
-          }}>
-            {/* Phase items to be updated next per request */}
-            <div style={{ 
-              display: 'flex', 
-              justifyContent: 'center',
-              alignItems: 'center',
-              gap: '8px',
-              flexWrap: 'wrap'
-            }}>
-              {hunt.phasePokemon.map((phasePokemon, index) => (
-                <div key={index} style={{ 
-                  display: 'flex', 
-                  flexDirection: 'column', 
-                  alignItems: 'center',
-                  gap: '4px'
-                }}>
-                  <img 
-                    src={getShinySpritePath(phasePokemon.pokemonId, phasePokemon.pokemonName)}
-                    alt={phasePokemon.pokemonName}
-                    style={{ width: '24px', height: '24px' }}
-                    onError={(e) => {
-                      e.currentTarget.src = '/images/shiny-sprites/001_Bulbasaur.gif';
-                    }}
-                  />
-                  <span style={{ 
-                    fontSize: '0.7rem', 
-                    color: '#aaa',
-                    fontWeight: 'bold'
-                  }}>
-                    {phasePokemon.encounters}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+        {/* Phase timeline will be added later per request; removed to tighten box height */}
       </div>
     );
   }
