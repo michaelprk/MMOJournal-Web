@@ -43,14 +43,14 @@ export default function ShinyHuntCard({
   const methodBg = (() => {
     // Subtle method-tinted panel background
     const label = String(hunt.method || '').toLowerCase();
-    if (label.includes('fish') || label.includes('rod')) return 'linear-gradient(135deg, rgba(33, 150, 243, 0.12), rgba(33, 150, 243, 0.04))'; // blue for fishing
-    if (label.includes('horde')) return 'linear-gradient(135deg, rgba(244, 67, 54, 0.10), rgba(244, 67, 54, 0.04))'; // red tint for horde
-    if (label.includes('safari')) return 'linear-gradient(135deg, rgba(76, 175, 80, 0.10), rgba(76, 175, 80, 0.04))'; // green tint for safari
-    if (label.includes('egg')) return 'linear-gradient(135deg, rgba(255, 193, 7, 0.10), rgba(255, 193, 7, 0.04))'; // amber tint for eggs
-    if (label.includes('fossil')) return 'linear-gradient(135deg, rgba(158, 158, 158, 0.12), rgba(120, 120, 120, 0.05))'; // gray tint for fossil
-    if (label.includes('honey') || label.includes('headbutt')) return 'linear-gradient(135deg, rgba(255, 215, 0, 0.12), rgba(255, 215, 0, 0.05))'; // gold tint for honey
+    if (label.includes('fish') || label.includes('rod')) return 'linear-gradient(135deg, rgba(33, 150, 243, 0.06), rgba(33, 150, 243, 0.02))'; // blue for fishing
+    if (label.includes('horde')) return 'linear-gradient(135deg, rgba(244, 67, 54, 0.05), rgba(244, 67, 54, 0.02))'; // red tint for horde
+    if (label.includes('safari')) return 'linear-gradient(135deg, rgba(76, 175, 80, 0.05), rgba(76, 175, 80, 0.02))'; // green tint for safari
+    if (label.includes('egg')) return 'linear-gradient(135deg, rgba(255, 193, 7, 0.05), rgba(255, 193, 7, 0.02))'; // amber tint for eggs
+    if (label.includes('fossil')) return 'linear-gradient(135deg, rgba(158, 158, 158, 0.06), rgba(120, 120, 120, 0.025))'; // gray tint for fossil
+    if (label.includes('honey') || label.includes('headbutt')) return 'linear-gradient(135deg, rgba(255, 215, 0, 0.06), rgba(255, 215, 0, 0.025))'; // gold tint for honey
     // Singles / Lures and default: subtle violet to match existing feel
-    return 'linear-gradient(135deg, rgba(186, 104, 200, 0.10), rgba(186, 104, 200, 0.04))';
+    return 'linear-gradient(135deg, rgba(186, 104, 200, 0.05), rgba(186, 104, 200, 0.02))';
   })();
   const startDate = new Date(hunt.startDate).toLocaleDateString();
   const pokemonColors = getPokemonColors(hunt.pokemonId);
@@ -168,7 +168,22 @@ export default function ShinyHuntCard({
             ⏸️
           </button>
         )}
-        <div className="method-badge" style={{ background: methodColor.background }}>
+        <div
+          className="method-badge"
+          style={{
+            background: (() => {
+              const m = String(hunt.method || '').toLowerCase();
+              if (m.includes('fish') || m.includes('rod')) return 'linear-gradient(45deg, #2196f3, #42a5f5)';
+              if (m.includes('horde')) return 'linear-gradient(45deg, #ef5350, #e53935)';
+              if (m.includes('safari')) return 'linear-gradient(45deg, #66bb6a, #43a047)';
+              if (m.includes('egg')) return 'linear-gradient(45deg, #ffca28, #ffc107)';
+              if (m.includes('fossil')) return 'linear-gradient(45deg, #9e9e9e, #757575)';
+              if (m.includes('honey') || m.includes('headbutt')) return 'linear-gradient(45deg, #ffd54f, #ffca28)';
+              return methodColor.background;
+            })(),
+            color: '#fff',
+          }}
+        >
           {hunt.method}
         </div>
       </div>
