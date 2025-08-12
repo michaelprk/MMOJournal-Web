@@ -22,9 +22,9 @@ export default function CompletionModal({
   onCompleteHunt
 }: CompletionModalProps) {
   const [completionData, setCompletionData] = useState({
+    gender: 'Genderless' as 'Male' | 'Female' | 'Genderless',
     nature: '',
     encounterCount: hunt?.totalEncounters || 0,
-    notes: '',
     ivs: {
       hp: 0,
       attack: 0,
@@ -59,14 +59,14 @@ export default function CompletionModal({
       nature: completionData.nature || undefined,
       ivs: completionData.ivs,
       encounterCount: completionData.encounterCount,
-      notes: completionData.notes || undefined
+      notes: undefined,
     });
     
     // Reset form
     setCompletionData({
+      gender: 'Genderless',
       nature: '',
       encounterCount: 0,
-      notes: '',
       ivs: {
         hp: 0,
         attack: 0,
@@ -114,6 +114,27 @@ export default function CompletionModal({
         </h3>
         
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div>
+            <label style={{ color: '#ffd700', display: 'block', marginBottom: '8px' }}>Gender:</label>
+            <select 
+              value={completionData.gender}
+              onChange={(e) => handleInputChange('gender', e.target.value)}
+              style={{
+                width: '100%',
+                padding: '8px',
+                border: '1px solid rgba(255, 215, 0, 0.3)',
+                borderRadius: '6px',
+                background: 'rgba(0, 0, 0, 0.4)',
+                color: '#fff',
+                fontSize: '0.9rem',
+              }}
+            >
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Genderless">Genderless</option>
+            </select>
+          </div>
+          
           <div>
             <label style={{ color: '#ffd700', display: 'block', marginBottom: '8px' }}>Nature:</label>
             <select 
@@ -189,26 +210,6 @@ export default function CompletionModal({
             </div>
           </div>
           
-          <div>
-            <label style={{ color: '#ffd700', display: 'block', marginBottom: '8px' }}>Notes:</label>
-            <textarea
-              value={completionData.notes}
-              onChange={(e) => handleInputChange('notes', e.target.value)}
-              placeholder="Add any notes about this shiny..."
-              rows={3}
-              style={{
-                width: '100%',
-                padding: '8px',
-                border: '1px solid rgba(255, 215, 0, 0.3)',
-                borderRadius: '6px',
-                background: 'rgba(0, 0, 0, 0.4)',
-                color: '#fff',
-                fontSize: '0.9rem',
-                resize: 'vertical',
-                fontFamily: 'inherit',
-              }}
-            />
-          </div>
         </div>
         
         <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '20px' }}>

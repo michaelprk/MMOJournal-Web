@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { getSpeciesList, getValidLocations, getSpeciesAtLocation, getSpeciesAtLocationByMethod } from '../../lib/pokedex';
+import { POKEMON_NATURES, type PokemonStats } from '../../types/pokemon';
 import { shinyHuntService } from '../../services/shinyHuntService';
 
 type SpeciesOption = { id: number; name: string };
@@ -28,7 +29,9 @@ export function AddPhaseModal({ isOpen, onClose, parentHunt, onAdded }: AddPhase
   const [species, setSpecies] = useState<SpeciesOption | null>(null);
   const [speciesOpen, setSpeciesOpen] = useState(false);
   const [foundAt, setFoundAt] = useState<string>(() => new Date().toISOString().slice(0, 10));
-  const [notes, setNotes] = useState('');
+  const [gender, setGender] = useState<'Male' | 'Female' | 'Genderless'>('Genderless');
+  const [nature, setNature] = useState<string>('');
+  const [ivs, setIvs] = useState<Partial<PokemonStats>>({ hp: 0, attack: 0, defense: 0, sp_attack: 0, sp_defense: 0, speed: 0 });
   const [encounters, setEncounters] = useState<number | ''>('');
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -39,7 +42,9 @@ export function AddPhaseModal({ isOpen, onClose, parentHunt, onAdded }: AddPhase
       setSpeciesQuery('');
       setSpecies(null);
       setFoundAt(new Date().toISOString().slice(0, 10));
-      setNotes('');
+      setGender('Genderless');
+      setNature('');
+      setIvs({ hp: 0, attack: 0, defense: 0, sp_attack: 0, sp_defense: 0, speed: 0 });
       setEncounters('');
       setErrorMsg(null);
     }
@@ -68,7 +73,7 @@ export function AddPhaseModal({ isOpen, onClose, parentHunt, onAdded }: AddPhase
     return base.filter((s) => s.name.toLowerCase().includes(q)).slice(0, 50);
   }, [speciesQuery, speciesAtLockedLocation, parentHunt]);
 
-  const canSubmit = !!species && typeof encounters === 'number' && encounters > 0;
+  const canSubmit = !!species && typeof encounters === 'number' && encounters > 0 && !!nature;
 
   const validateSpeciesAtLocation = (): boolean => {
     if (!species) return false;
@@ -88,6 +93,12 @@ export function AddPhaseModal({ isOpen, onClose, parentHunt, onAdded }: AddPhase
     if (!species) { setErrorMsg('Select a species'); return; }
     if (typeof encounters !== 'number' || encounters <= 0) { setErrorMsg('Enter a valid encounter count (> 0)'); return; }
     if (!validateSpeciesAtLocation()) { setErrorMsg('Species is not available at the selected location'); return; }
+    // IV sanity check 0-31
+    const stats: (keyof PokemonStats)[] = ['hp','attack','defense','sp_attack','sp_defense','speed'];
+    for (const k of stats) {
+      const v = Number(ivs[k] ?? 0);
+      if (Number.isNaN(v) || v < 0 || v > 31) { setErrorMsg('IVs must be between 0 and 31'); return; }
+    }
     setSubmitting(true);
     try {
       await shinyHuntService.addPhase(parentHunt.id, {
@@ -98,9 +109,9 @@ export function AddPhaseModal({ isOpen, onClose, parentHunt, onAdded }: AddPhase
         area: lockedLocation?.area || null,
         location: lockedLocation?.area || null,
         rarity: null,
-        notes: notes || null as any,
         found_at: new Date(foundAt).toISOString(),
         total_encounters: encounters,
+        meta: { gender, nature, ivs }
       } as any);
 
       // Update parent hunt counters: increment phase and total encounters
@@ -184,6 +195,45 @@ export function AddPhaseModal({ isOpen, onClose, parentHunt, onAdded }: AddPhase
           )}
         </div>
 
+        {/* Gender and Nature */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
+          <div>
+            <label>Gender</label>
+            <select value={gender} onChange={(e) => setGender(e.target.value as any)}
+              style={{ width: '100%', background: 'rgba(255,255,255,0.1)', border: '1px solid #ffcb05', borderRadius: 8, color: '#fff', padding: '8px 10px' }}>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Genderless">Genderless</option>
+            </select>
+          </div>
+          <div>
+            <label>Nature</label>
+            <select value={nature} onChange={(e) => setNature(e.target.value)}
+              style={{ width: '100%', background: 'rgba(255,255,255,0.1)', border: '1px solid #ffcb05', borderRadius: 8, color: '#fff', padding: '8px 10px' }}>
+              <option value="">Select Nature</option>
+              {POKEMON_NATURES.map(n => <option key={n} value={n}>{n}</option>)}
+            </select>
+          </div>
+        </div>
+
+        {/* IVs */}
+        <div style={{ marginBottom: 12 }}>
+          <label>IVs</label>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 8, marginTop: 6 }}>
+            {[
+              ['hp','HP'], ['attack','Atk'], ['defense','Def'], ['sp_attack','SpA'], ['sp_defense','SpD'], ['speed','Spe']
+            ].map(([key,label]) => (
+              <div key={key}>
+                <label style={{ fontSize: '0.8rem', color: '#ccc' }}>{label}</label>
+                <input type="number" min={0} max={31}
+                  value={(ivs as any)[key] ?? 0}
+                  onChange={(e) => setIvs(prev => ({ ...prev, [key]: Math.max(0, Math.min(31, Number(e.target.value) || 0)) }))}
+                  style={{ width: '100%', background: 'rgba(255,255,255,0.1)', border: '1px solid #ffcb05', borderRadius: 8, color: '#fff', padding: '8px 10px' }} />
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* Found date and encounters */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
           <div>
@@ -202,12 +252,6 @@ export function AddPhaseModal({ isOpen, onClose, parentHunt, onAdded }: AddPhase
               style={{ width: '100%', background: 'rgba(255,255,255,0.1)', border: '1px solid #ffcb05', borderRadius: 8, color: '#fff', padding: '8px 10px' }}
             />
           </div>
-        </div>
-
-        <div style={{ marginBottom: 12 }}>
-          <label>Notes (optional)</label>
-          <input value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Notes"
-            style={{ width: '100%', background: 'rgba(255,255,255,0.1)', border: '1px solid #ffcb05', borderRadius: 8, color: '#fff', padding: '8px 10px' }} />
         </div>
 
         {errorMsg && (
