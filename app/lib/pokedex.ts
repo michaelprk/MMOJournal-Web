@@ -223,6 +223,59 @@ export function getSpeciesAtLocation(region: string | null, area: string | null)
   return species;
 }
 
+// Filter species by location and encounter method grouping (horde, fishing, singles/lures, etc.)
+export function getSpeciesAtLocationByMethod(
+  region: string | null,
+  area: string | null,
+  method: string
+): Array<{ id: number; name: string }> {
+  const species: Array<{ id: number; name: string }> = [];
+  const seen = new Set<number>();
+  const canon = canonicalizeMethod(method);
+
+  const methodMatches = (locTypeRaw?: string, locRarityRaw?: string | null) => {
+    const t = (locTypeRaw || '').toLowerCase();
+    const rarity = (locRarityRaw || '').toLowerCase();
+    switch (canon) {
+      case 'horde':
+        return t.includes('horde') || rarity === 'horde';
+      case 'single_lures':
+        return (
+          rarity === 'very common' || rarity === 'common' || rarity === 'uncommon' ||
+          rarity === 'rare' || rarity === 'very rare' || rarity === 'lure'
+        );
+      case 'safari':
+        return t.includes('safari');
+      case 'fishing':
+        return (t.includes('rod') || t.includes('fishing')) || ((t.includes('water') || t.includes('surf')) && rarity === 'lure');
+      case 'egg':
+      case 'alpha_egg':
+        return false;
+      case 'fossil':
+        return t.includes('fossil');
+      case 'honey':
+        return t.includes('honey') || t.includes('headbutt');
+      default:
+        return true;
+    }
+  };
+
+  for (const monster of monsters) {
+    if (!monster?.id || !monster?.name || !Array.isArray(monster.locations)) continue;
+    const ok = monster.locations.some((l) => {
+      const r = l?.region_name ?? null;
+      const a = l?.location ?? null;
+      if (r !== region || a !== area) return false;
+      return methodMatches(l?.type, l?.rarity ?? null);
+    });
+    if (ok && !seen.has(monster.id)) {
+      seen.add(monster.id);
+      species.push({ id: monster.id, name: monster.name });
+    }
+  }
+  return species;
+}
+
 export function validateEncounter(
   speciesId: number,
   params: { region?: string | null; area?: string | null; method: string }

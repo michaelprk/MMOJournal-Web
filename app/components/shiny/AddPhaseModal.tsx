@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { getSpeciesList, getValidLocations, getSpeciesAtLocation } from '../../lib/pokedex';
+import { getSpeciesList, getValidLocations, getSpeciesAtLocation, getSpeciesAtLocationByMethod } from '../../lib/pokedex';
 import { shinyHuntService } from '../../services/shinyHuntService';
 
 type SpeciesOption = { id: number; name: string };
@@ -55,7 +55,8 @@ export function AddPhaseModal({ isOpen, onClose, parentHunt, onAdded }: AddPhase
   const speciesAtLockedLocation = useMemo(() => {
     const region = (parentHunt as any)?.region ?? null;
     const area = (parentHunt as any)?.area ?? null;
-    return getSpeciesAtLocation(region, area);
+    const method = (parentHunt as any)?.method ?? '';
+    return getSpeciesAtLocationByMethod(region, area, method);
   }, [parentHunt]);
 
   const filteredSpecies = useMemo(() => {
