@@ -49,83 +49,66 @@ export default function ShinyHuntCard({
         className="shiny-hunt-card compact"
         style={{
           background: `rgba(0, 0, 0, 0.15)`,
-          border: `1px solid rgba(255, 215, 0, 0.4)`,
-          boxShadow: `0 4px 12px rgba(0, 0, 0, 0.3), inset 0 0 20px rgba(255, 215, 0, 0.1)`,
+          border: `1px solid rgba(255, 215, 0, 0.35)`,
+          boxShadow: `0 2px 8px rgba(0, 0, 0, 0.3), inset 0 0 14px rgba(255, 215, 0, 0.08)`,
           display: 'flex',
           flexDirection: 'column',
-          padding: '12px',
+          padding: '8px',
           borderRadius: '8px',
-          marginBottom: '12px',
+          marginBottom: '8px',
         }}
       >
-        {/* Top Row - Main Info */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-          <div style={{ flex: '0 0 auto' }}>
+        {/* Compact 3-column layout */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          {/* Left: name, sprite, method, start date */}
+          <div style={{ flex: '0 0 160px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+            <h3 style={{ color: '#fff', margin: 0, fontSize: '0.95rem', fontWeight: 800, textAlign: 'center' }}>{hunt.pokemonName}</h3>
             <img 
               src={spritePath} 
               alt={`Shiny ${hunt.pokemonName}`}
-              style={{
-                width: '56px',
-                height: '56px',
-                filter: `drop-shadow(0 0 8px ${pokemonColors.glow}) drop-shadow(0 0 16px ${pokemonColors.glowLight})`,
-              }}
-              onError={(e) => {
-                e.currentTarget.src = '/images/shiny-sprites/001_Bulbasaur.gif';
-              }}
+              style={{ width: '52px', height: '52px', filter: `drop-shadow(0 0 8px ${pokemonColors.glow}) drop-shadow(0 0 16px ${pokemonColors.glowLight})` }}
+              onError={(e) => { e.currentTarget.src = '/images/shiny-sprites/001_Bulbasaur.gif'; }}
             />
+            <div style={{ display: 'inline-block', background: methodColor.background, color: methodColor.text, padding: '2px 6px', borderRadius: 6, fontSize: '0.7rem', fontWeight: 800 }}>
+              {hunt.method}
+            </div>
+            <div style={{ color: '#bbb', fontSize: '0.75rem' }}>
+              <strong>Started:</strong> {startDate}
+            </div>
           </div>
-          
-          <div style={{ flex: '1 1 auto' }}>
-            <h3 style={{ 
-              color: '#fff', 
-              margin: '0 0 4px 0', 
-              fontSize: '1rem', 
-              fontWeight: 'bold' 
-            }}>
-              {hunt.pokemonName}
-            </h3>
-            {/* Method badge removed in compact header; retained elsewhere */}
+
+          {/* Middle: encounters and optional location */}
+          <div style={{ flex: '1 1 auto', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+            <div style={{ fontSize: '0.95rem', color: '#ddd' }}>
+              <strong>Encounters:</strong> {hunt.totalEncounters.toLocaleString()}
+            </div>
+            {(hunt.region || hunt.area) && (
+              <div style={{ color: '#bbb', fontSize: '0.8rem', textAlign: 'center' }}>
+                {(hunt.region || 'Unknown Region')} — {hunt.area ? String(hunt.area).toUpperCase() : 'UNKNOWN AREA'}
+              </div>
+            )}
           </div>
-          
-          <div style={{ flex: '0 0 auto', display: 'flex', gap: '8px' }}>
+
+          {/* Right: stacked actions */}
+          <div style={{ flex: '0 0 120px', display: 'flex', flexDirection: 'column', gap: 6 }}>
             <button 
               onClick={handleAddPhase}
-              style={{
-                backgroundColor: 'rgba(255, 215, 0, 0.2)',
-                color: '#ffd700',
-                border: '1px solid #ffd700',
-                padding: '4px 8px',
-                borderRadius: '4px',
-                fontSize: '0.7rem',
-                cursor: 'pointer',
-                fontWeight: 'bold'
-              }}
+              style={{ backgroundColor: 'rgba(255, 215, 0, 0.2)', color: '#ffd700', border: '1px solid #ffd700', padding: '6px 10px', borderRadius: 6, fontSize: '0.75rem', cursor: 'pointer', fontWeight: 'bold' }}
             >
               + Phase
             </button>
             <button 
               onClick={() => onMarkFound(hunt)}
-              style={{
-                backgroundColor: 'rgba(40, 167, 69, 0.2)',
-                color: '#28a745',
-                border: '1px solid #28a745',
-                padding: '4px 8px',
-                borderRadius: '4px',
-                fontSize: '0.7rem',
-                cursor: 'pointer',
-                fontWeight: 'bold'
-              }}
+              style={{ backgroundColor: 'rgba(40, 167, 69, 0.2)', color: '#28a745', border: '1px solid #28a745', padding: '6px 10px', borderRadius: 6, fontSize: '0.75rem', cursor: 'pointer', fontWeight: 'bold' }}
             >
               ✨ Found
             </button>
           </div>
         </div>
-        
-        {/* Stats Row with centered start date and without duplicate method */}
-        <div style={{ display: 'flex', gap: '16px', marginBottom: '8px', fontSize: '0.8rem', color: '#ccc', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div><strong>Encounters:</strong> {hunt.totalEncounters.toLocaleString()}</div>
-          <div style={{ textAlign: 'center', flex: 1 }}><strong>Started:</strong> {startDate}</div>
-          <div><strong>Phase:</strong> {hunt.phaseCount}</div>
+
+        {/* Phase header row */}
+        <div style={{ marginTop: 6, textAlign: 'center', color: '#ffd700', fontWeight: 800, fontSize: '0.9rem' }}>
+          Phase {hunt.phaseCount}
         </div>
         
         {/* Phase Timeline */}
@@ -135,14 +118,7 @@ export default function ShinyHuntCard({
             paddingTop: '8px',
             marginTop: '8px'
           }}>
-            <h4 style={{ 
-              color: '#ffd700', 
-              margin: '0 0 8px 0', 
-              fontSize: '0.8rem',
-              textAlign: 'center'
-            }}>
-              Phase Timeline
-            </h4>
+            {/* Phase items to be updated next per request */}
             <div style={{ 
               display: 'flex', 
               justifyContent: 'center',
@@ -268,7 +244,6 @@ export default function ShinyHuntCard({
           justifyContent: 'center'
         }}>
           <div><strong>Started:</strong> {startDate}</div>
-          <div><strong>Phase:</strong> {hunt.phaseCount}</div>
         </div>
 
         <div className="hunt-card-footer">
