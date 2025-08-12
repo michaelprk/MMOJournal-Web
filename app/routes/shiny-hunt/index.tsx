@@ -85,8 +85,6 @@ export default function ShinyShowcase() {
   };
 
   const handleDeleteHunt = async (hunt: ShinyHunt) => {
-    const proceed = window.confirm('Hunt deletion is disabled. Do you want to pause this hunt instead?');
-    if (!proceed) return;
     try {
       await shinyHuntService.pauseHunt(hunt.id);
       setCurrentHunts(prev => prev.filter(h => h.id !== hunt.id));
