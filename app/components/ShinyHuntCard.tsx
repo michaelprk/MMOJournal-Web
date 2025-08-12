@@ -39,7 +39,19 @@ export default function ShinyHuntCard({
   };
 
   const spritePath = getShinySpritePath(hunt.pokemonId, hunt.pokemonName);
-  const methodColor = HUNTING_METHOD_COLORS[hunt.method] || { background: 'rgba(255, 215, 0, 0.2)', text: '#000', gradient: '' } as any;
+  const methodColor = HUNTING_METHOD_COLORS[hunt.method] || { background: 'linear-gradient(45deg, #555, #333)', text: '#fff', gradient: '' } as any;
+  const methodBg = (() => {
+    // Subtle method-tinted panel background
+    const label = String(hunt.method || '').toLowerCase();
+    if (label.includes('fish') || label.includes('rod')) return 'linear-gradient(135deg, rgba(33, 150, 243, 0.12), rgba(33, 150, 243, 0.04))'; // blue for fishing
+    if (label.includes('horde')) return 'linear-gradient(135deg, rgba(244, 67, 54, 0.10), rgba(244, 67, 54, 0.04))'; // red tint for horde
+    if (label.includes('safari')) return 'linear-gradient(135deg, rgba(76, 175, 80, 0.10), rgba(76, 175, 80, 0.04))'; // green tint for safari
+    if (label.includes('egg')) return 'linear-gradient(135deg, rgba(255, 193, 7, 0.10), rgba(255, 193, 7, 0.04))'; // amber tint for eggs
+    if (label.includes('fossil')) return 'linear-gradient(135deg, rgba(158, 158, 158, 0.12), rgba(120, 120, 120, 0.05))'; // gray tint for fossil
+    if (label.includes('honey') || label.includes('headbutt')) return 'linear-gradient(135deg, rgba(255, 215, 0, 0.12), rgba(255, 215, 0, 0.05))'; // gold tint for honey
+    // Singles / Lures and default: subtle violet to match existing feel
+    return 'linear-gradient(135deg, rgba(186, 104, 200, 0.10), rgba(186, 104, 200, 0.04))';
+  })();
   const startDate = new Date(hunt.startDate).toLocaleDateString();
   const pokemonColors = getPokemonColors(hunt.pokemonId);
 
@@ -48,7 +60,7 @@ export default function ShinyHuntCard({
       <div 
         className="shiny-hunt-card compact"
         style={{
-          background: `rgba(0, 0, 0, 0.15)`,
+          background: methodBg,
           border: `1px solid rgba(255, 215, 0, 0.35)`,
           boxShadow: `0 2px 8px rgba(0, 0, 0, 0.3), inset 0 0 14px rgba(255, 215, 0, 0.08)`,
           display: 'flex',
@@ -121,7 +133,7 @@ export default function ShinyHuntCard({
     <div 
       className="shiny-hunt-card"
       style={{
-        background: `rgba(0, 0, 0, 0.15)`,
+        background: methodBg,
         border: `1px solid rgba(255, 215, 0, 0.4)`,
         boxShadow: `0 4px 12px rgba(0, 0, 0, 0.3), inset 0 0 20px rgba(255, 215, 0, 0.1)`,
       }}
