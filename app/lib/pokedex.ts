@@ -261,6 +261,20 @@ export function getSpeciesAtLocationByMethod(
     }
   };
 
+  // Normalize encounter surface/type into broad groups for resilient matching
+  const normalizeSurface = (input?: string): string => {
+    const t = (input || '').toLowerCase();
+    if (!t) return '';
+    if (t.includes('grass')) return 'grass';
+    if (t.includes('cave')) return 'cave';
+    if (t.includes('rod') || t.includes('fish')) return 'rod';
+    if (t.includes('water') || t.includes('surf')) return 'water';
+    if (t.includes('desert') || t.includes('sand')) return 'desert';
+    if (t.includes('safari')) return 'safari';
+    if (t.includes('honey') || t.includes('headbutt')) return 'honey';
+    return t;
+  };
+
   // Determine allowed encounter surfaces/types for the parent species at this location
   let allowedSurfaces: Set<string> | null = null;
   if (typeof parentSpeciesId === 'number') {
@@ -271,7 +285,7 @@ export function getSpeciesAtLocationByMethod(
         const r = loc?.region_name ?? null;
         const a = loc?.location ?? null;
         if (r === region && a === area) {
-          const t = (loc?.type || '').toLowerCase();
+          const t = normalizeSurface(loc?.type);
           if (t) allowedSurfaces.add(t);
         }
       }
@@ -286,7 +300,10 @@ export function getSpeciesAtLocationByMethod(
       const a = l?.location ?? null;
       if (r !== region || a !== area) return false;
       if (!methodMatches(l?.type, l?.rarity ?? null)) return false;
-      if (allowedSurfaces && !allowedSurfaces.has((l?.type || '').toLowerCase())) return false;
+      if (allowedSurfaces) {
+        const candidateSurface = normalizeSurface(l?.type);
+        if (!allowedSurfaces.has(candidateSurface)) return false;
+      }
       return true;
     });
     if (ok && !seen.has(monster.id)) {
