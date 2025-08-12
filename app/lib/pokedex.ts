@@ -52,6 +52,7 @@ export function canonicalizeMethod(methodRaw: string):
   | 'fishing'
   | 'safari'
   | 'egg'
+  | 'alpha_egg'
   | 'fossil'
   | 'honey'
   | 'unknown' {
@@ -61,6 +62,7 @@ export function canonicalizeMethod(methodRaw: string):
   if (m.includes('lure') || m.includes('single')) return 'single_lures';
   if (m.includes('fish') || m.includes('rod')) return 'fishing';
   if (m.includes('safari')) return 'safari';
+  if (m.includes('alpha') && m.includes('egg')) return 'alpha_egg';
   if (m.includes('egg')) return 'egg';
   if (m.includes('fossil')) return 'fossil';
   if (m.includes('honey') || m.includes('headbutt')) return 'honey';
@@ -157,25 +159,30 @@ export function isMethodValidForLocation(
   if (!monster || !Array.isArray(monster.locations)) return false;
   const canon = canonicalizeMethod(method);
 
-  const methodMatchesType = (locTypeRaw?: string) => {
+  const methodMatchesType = (locTypeRaw?: string, locRarityRaw?: string | null) => {
     const t = (locTypeRaw || '').toLowerCase();
+    const rarity = (locRarityRaw || '').toLowerCase();
     if (!t) return false;
     switch (canon) {
       case 'horde':
-        // Dataset often uses rarity "Horde" but type may be grass/cave/water.
-        // Accept common encounter surfaces for hordes.
-        return t.includes('horde') || t.includes('grass') || t.includes('cave') || t.includes('water');
+        // Only allow locations explicitly marked as Horde by type or rarity
+        return t.includes('horde') || rarity === 'horde';
       case 'single_lures':
-        // Singles/Lures are typically grass encounters, but in caves the dataset
-        // often labels the area as "Cave" even when the encounter is grass in-cave.
-        // Accept cave as valid for singles/lures to cover places like Meteor Falls, Relic Castle.
-        return t.includes('grass') || t.includes('cave') || t.includes('lure') || t.includes('single');
+        // Limit to general overworld + lure-able entries
+        return (
+          rarity === 'very common' || rarity === 'common' || rarity === 'uncommon' ||
+          rarity === 'rare' || rarity === 'very rare' || rarity === 'lure'
+        );
       case 'safari':
         return t.includes('safari');
       case 'fishing':
-        return t.includes('rod') || t.includes('fishing') || t.includes('water') || t.includes('surf');
+        // Fishing if type is any rod, or (type water and rarity lure)
+        const isRod = t.includes('rod') || t.includes('fishing');
+        const isWaterLure = (t.includes('water') || t.includes('surf')) && rarity === 'lure';
+        return isRod || isWaterLure;
       case 'egg':
-        return true; // eggs don't depend on location type
+      case 'alpha_egg':
+        return true; // eggs don't depend on location
       case 'fossil':
         return t.includes('fossil');
       case 'honey':
@@ -191,7 +198,7 @@ export function isMethodValidForLocation(
     const a = loc.location ?? null;
     // Compare by exact values from dataset, as selectors are built from the same source.
     if (r !== region || a !== area) return false;
-    return methodMatchesType(loc.type);
+    return methodMatchesType(loc.type, loc.rarity ?? null);
   });
 }
 

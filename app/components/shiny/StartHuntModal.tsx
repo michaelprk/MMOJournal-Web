@@ -81,25 +81,60 @@ export function StartHuntModal({ isOpen, onClose, onCreated, mode = 'create', in
   const METHOD_LABELS: Array<{ label: string; key: ReturnType<typeof canonicalizeMethod> }> = [
     { label: '5x Horde', key: 'horde' },
     { label: '3x Horde', key: 'horde' },
-    { label: 'Single/Lures', key: 'single_lures' },
+    { label: 'Singles / Lures', key: 'single_lures' },
     { label: 'Fishing', key: 'fishing' },
     { label: 'Egg Hunt', key: 'egg' },
-    { label: 'Alpha Egg Hunt', key: 'egg' },
+    { label: 'Alpha Egg Hunt', key: 'alpha_egg' },
     { label: 'Fossil', key: 'fossil' },
   ];
   const METHOD_OPTIONS = METHOD_LABELS.map((m) => m.label);
   const methodOptions = METHOD_OPTIONS;
   const allLocations = useMemo(() => {
     if (!species) return [] as LocationOption[];
+    // Show location options that match the selected method constraints
+    const raw = getValidLocations(species.id);
+    const canon = canonicalizeMethod(method);
+    const filtered = raw.filter((l) => {
+      switch (canon) {
+        case 'horde':
+          return (l.method || '').toLowerCase().includes('horde') || (l.rarity || '').toLowerCase() === 'horde';
+        case 'single_lures':
+          return ['very common','common','uncommon','rare','very rare','lure'].includes((l.rarity || '').toLowerCase());
+        case 'fishing':
+          // rod types, or water+rarity=lure
+          const typeLower = (l.method || '').toLowerCase();
+          const rarityLower = (l.rarity || '').toLowerCase();
+          const isRod = typeLower.includes('rod') || typeLower.includes('fishing');
+          const isWaterLure = (typeLower.includes('water') || typeLower.includes('surf')) && rarityLower === 'lure';
+          return isRod || isWaterLure;
+        case 'safari':
+          return (l.method || '').toLowerCase().includes('safari');
+        case 'egg':
+        case 'alpha_egg':
+          return false; // no locations for eggs
+        case 'fossil':
+          return (l.method || '').toLowerCase().includes('fossil');
+        default:
+          return true;
+      }
+    });
     // De-dup by (region, area)
-    return getDedupedLocationsForSpecies(species.id).map((l) => ({
-      label: l.label,
-      value: l.value,
-      region: l.region,
-      area: l.area,
-      method: '',
-      rarity: null,
-    }));
+    const dedupe = new Set<string>();
+    const deduped: LocationOption[] = [];
+    for (const l of filtered) {
+      const key = `${l.region ?? ''}|${l.area ?? ''}`;
+      if (dedupe.has(key)) continue;
+      dedupe.add(key);
+      deduped.push({
+        label: l.label,
+        value: l.value,
+        region: l.region,
+        area: l.area,
+        method: l.method,
+        rarity: l.rarity,
+      });
+    }
+    return deduped;
   }, [species]);
   const filteredLocations = useMemo(() => {
     const q = locationQuery.trim().toLowerCase();
@@ -119,7 +154,12 @@ export function StartHuntModal({ isOpen, onClose, onCreated, mode = 'create', in
     setInvalidCombo(!ok);
   }, [species, method, location]);
 
-  const canSubmit = mode === 'edit' ? !submitting && !!species : (!!species && !!method && !!location && !invalidCombo && !submitting);
+  // Eggs skip location entirely
+  const canonMethod = canonicalizeMethod(method);
+  const requiresLocation = !(canonMethod === 'egg' || canonMethod === 'alpha_egg');
+  const canSubmit = mode === 'edit'
+    ? !submitting && !!species
+    : (!!species && !!method && (!requiresLocation || !!location) && !invalidCombo && !submitting);
 
   const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) onClose();
@@ -152,23 +192,22 @@ export function StartHuntModal({ isOpen, onClose, onCreated, mode = 'create', in
         onClose();
         return;
       }
-      if (!location) return;
-      const parsed = JSON.parse(location.value) as { region: string | null; area: string | null };
+       const parsed = location ? (JSON.parse(location.value) as { region: string | null; area: string | null }) : { region: null, area: null };
       const insert: Record<string, any> = {
         pokemon_id: species.id,
         pokemon_name: species.name,
-        method,
+         method,
         start_date: startDate,
         phase_count: 1,
         total_encounters: 0,
         is_completed: false,
         notes: notes || null,
       };
-      // Optional fields now stored
-      insert.region = parsed.region;
-      insert.area = parsed.area;
-      insert.location = parsed.area;
-      insert.rarity = location.rarity;
+       // Optional fields now stored (skip for egg hunts)
+       insert.region = requiresLocation ? parsed.region : null;
+       insert.area = requiresLocation ? parsed.area : null;
+       insert.location = requiresLocation ? parsed.area : null;
+       insert.rarity = requiresLocation ? (location?.rarity ?? null) : null;
       // insert.status = 'active';
 
       const { data, error } = await supabase
@@ -333,8 +372,8 @@ export function StartHuntModal({ isOpen, onClose, onCreated, mode = 'create', in
           )}
         </div>
 
-        {/* Location */}
-        <div style={{ marginBottom: '0.5rem' }}>
+        {/* Location (hidden/disabled for egg hunts) */}
+        <div style={{ marginBottom: '0.5rem', display: (canonMethod === 'egg' || canonMethod === 'alpha_egg') ? 'none' : 'block' }}>
           <label style={{ display: 'block', color: '#ffcb05', marginBottom: 6 }}>Location</label>
           <input
             type="text"
