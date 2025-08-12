@@ -113,7 +113,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
               location.pathname === "/" ||
               location.pathname === "/pvp" ||
               location.pathname === "/shiny-hunt" ||
-              location.pathname === "/journey" ||
+              location.pathname === "/journal" ||
               location.pathname === "/damage-calc"
             ? "transparent"
             : "rgba(0,0,0,0.7)",

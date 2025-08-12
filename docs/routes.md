@@ -6,7 +6,9 @@
 - /journal: coming soon (personal journal)
 
 Notes:
-- Existing routes like `/journey`, `/login`, `/create-account` remain for now; TBD consolidation/removal.
+- Existing routes like `/login`, `/create-account` remain for now; TBD consolidation/removal.
 - Standalone calc is vendored under `public/pokemmo-damage-calc/`; do not modify upstream logic files.
+
+
 
 
