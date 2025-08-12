@@ -55,58 +55,52 @@ export default function ShinyHuntCard({
           flexDirection: 'column',
           padding: '8px',
           borderRadius: '8px',
-          marginBottom: '8px',
+          margin: '8px auto',
+          maxWidth: '880px',
         }}
       >
-        {/* Compact 4-section layout: Name/Date | Sprite/Method | Encounters/Location | Actions */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          {/* Left-most: species name and start date stacked */}
-          <div style={{ flex: '0 0 180px', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 4 }}>
-            <h3 style={{ color: '#fff', margin: 0, fontSize: '0.95rem', fontWeight: 800 }}>{hunt.pokemonName}</h3>
-            <div style={{ color: '#bbb', fontSize: '0.8rem' }}>
-              <strong>Started:</strong> {startDate}
-            </div>
-          </div>
-
-          {/* Next: larger sprite and method stacked */}
-          <div style={{ flex: '0 0 140px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
-            <img 
-              src={spritePath} 
-              alt={`Shiny ${hunt.pokemonName}`}
-              style={{ width: '68px', height: '68px', filter: `drop-shadow(0 0 8px ${pokemonColors.glow}) drop-shadow(0 0 16px ${pokemonColors.glowLight})` }}
-              onError={(e) => { e.currentTarget.src = '/images/shiny-sprites/001_Bulbasaur.gif'; }}
-            />
-            <div style={{ display: 'inline-block', background: methodColor.background, color: methodColor.text, padding: '2px 6px', borderRadius: 6, fontSize: '0.7rem', fontWeight: 800 }}>
-              {hunt.method}
-            </div>
-          </div>
-
-          {/* Middle: encounters and optional location on one bolded row */}
-          <div style={{ flex: '1 1 auto', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-            <div style={{ fontSize: '0.95rem', color: '#ddd', textAlign: 'center' }}>
-              <strong>
-                Encounters: {hunt.totalEncounters.toLocaleString()}
-                {(hunt.region || hunt.area) && (
-                  <>
-                    {"  |  "}
-                    Location: {(hunt.region || 'Unknown Region')} — {hunt.area ? String(hunt.area).toUpperCase() : 'UNKNOWN AREA'}
-                  </>
-                )}
-              </strong>
-            </div>
-          </div>
-
-          {/* Right: stacked actions */}
-          <div style={{ flex: '0 0 120px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+        {/* Compact layout: buttons flank central column (sprite/method at top, then species/date, then encounters/location) */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px' }}>
+          {/* Left action: +Phase */}
+          <div style={{ flex: '0 0 120px', display: 'flex', justifyContent: 'flex-end' }}>
             <button 
               onClick={handleAddPhase}
-              style={{ backgroundColor: 'rgba(255, 215, 0, 0.2)', color: '#ffd700', border: '1px solid #ffd700', padding: '6px 10px', borderRadius: 6, fontSize: '0.75rem', cursor: 'pointer', fontWeight: 'bold' }}
+              style={{ backgroundColor: 'rgba(255, 215, 0, 0.2)', color: '#ffd700', border: '1px solid #ffd700', padding: '8px 12px', borderRadius: 6, fontSize: '0.8rem', cursor: 'pointer', fontWeight: 700 }}
             >
               + Phase
             </button>
+          </div>
+
+          {/* Center column: sprite + method (top), species/date (bold), encounters/location (unbold) */}
+          <div style={{ flex: '1 1 auto', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+            <img 
+              src={spritePath} 
+              alt={`Shiny ${hunt.pokemonName}`}
+              style={{ width: '88px', height: '88px', filter: `drop-shadow(0 0 8px ${pokemonColors.glow}) drop-shadow(0 0 16px ${pokemonColors.glowLight})` }}
+              onError={(e) => { e.currentTarget.src = '/images/shiny-sprites/001_Bulbasaur.gif'; }}
+            />
+            <div style={{ display: 'inline-block', background: methodColor.background, color: methodColor.text, padding: '3px 8px', borderRadius: 6, fontSize: '0.8rem', fontWeight: 800 }}>
+              {hunt.method}
+            </div>
+            <div style={{ color: '#eee', fontSize: '0.9rem', fontWeight: 800, textAlign: 'center' }}>
+              {hunt.pokemonName}  •  Started: {startDate}
+            </div>
+            <div style={{ color: '#ccc', fontSize: '0.9rem', textAlign: 'center' }}>
+              Encounters: {hunt.totalEncounters.toLocaleString()}
+              {(hunt.region || hunt.area) && (
+                <>
+                  {"  |  "}
+                  Location: {(hunt.region || 'Unknown Region')} — {hunt.area ? String(hunt.area).toUpperCase() : 'UNKNOWN AREA'}
+                </>
+              )}
+            </div>
+          </div>
+
+          {/* Right action: Found */}
+          <div style={{ flex: '0 0 120px', display: 'flex', justifyContent: 'flex-start' }}>
             <button 
               onClick={() => onMarkFound(hunt)}
-              style={{ backgroundColor: 'rgba(40, 167, 69, 0.2)', color: '#28a745', border: '1px solid #28a745', padding: '6px 10px', borderRadius: 6, fontSize: '0.75rem', cursor: 'pointer', fontWeight: 'bold' }}
+              style={{ backgroundColor: 'rgba(40, 167, 69, 0.2)', color: '#28a745', border: '1px solid #28a745', padding: '8px 12px', borderRadius: 6, fontSize: '0.8rem', cursor: 'pointer', fontWeight: 700 }}
             >
               ✨ Found
             </button>
@@ -114,7 +108,7 @@ export default function ShinyHuntCard({
         </div>
 
         {/* Phase header row */}
-        <div style={{ marginTop: 6, textAlign: 'center', color: '#ffd700', fontWeight: 800, fontSize: '0.9rem' }}>
+        <div style={{ marginTop: 6, textAlign: 'center', color: '#ffd700', fontWeight: 800, fontSize: '0.95rem' }}>
           Phase {hunt.phaseCount}
         </div>
         
