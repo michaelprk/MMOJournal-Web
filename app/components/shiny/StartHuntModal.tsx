@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { supabase } from '../../services/supabase';
 import { shinyHuntService } from '../../services/shinyHuntService';
-import { getSpeciesList, getMethodsForSpecies, getValidLocations, validateEncounter, getDedupedLocationsForSpecies, isMethodValidForLocation, canonicalizeMethod } from '../../lib/pokedex';
+import { getSpeciesList, getMethodsForSpecies, getValidLocations, validateEncounter, getDedupedLocationsForSpecies, isMethodValidForLocation, canonicalizeMethod, getSpeciesAtLocationByMethod } from '../../lib/pokedex';
 
 type SpeciesOption = { id: number; name: string };
 type LocationOption = { label: string; value: string; region: string | null; area: string | null; method: string; rarity: string | null };
@@ -205,6 +205,33 @@ export function StartHuntModal({ isOpen, onClose, onCreated, mode = 'create', in
         setSubmitting(false);
         setErrorMsg(`You already have a hunt for ${species.name} via ${method}${requiresLocation && location ? ` at ${location.label}` : ''}. Resume or edit that hunt instead.`);
         return;
+      }
+      // Block creating a new hunt if this species is a phase candidate of an existing active hunt at the same area/method
+      if (requiresLocation && location) {
+        const normalizeArea = (s: string | null | undefined) => {
+          if (s == null) return null;
+          return String(s).replace(/\s*\((?:NIGHT|DAY|MORNING|EVENING|AFTERNOON|DUSK|DAWN)\)\s*$/i, '').trim();
+        };
+        const parsedLocPhase = safeParse<{ region: string | null; area: string | null }>(location.value) || { region: location.region, area: location.area };
+        const activeParents = activeRows as any[];
+        const conflictParent = activeParents.find((r: any) => (
+          r && (r.is_phase !== true) && r.is_completed !== true &&
+          (r.region ?? null) === parsedLocPhase.region &&
+          normalizeArea(r.area ?? null) === normalizeArea(parsedLocPhase.area ?? null) &&
+          canonicalizeMethod(r.method) === canonicalizeMethod(method)
+        ) && activeParents.find((r: any) => {
+          if (!r) return false;
+          if ((r.region ?? null) !== parsedLocPhase.region) return false;
+          if (normalizeArea(r.area ?? null) !== normalizeArea(parsedLocPhase.area ?? null)) return false;
+          if (canonicalizeMethod(r.method) !== canonicalizeMethod(method)) return false;
+          const candidates = getSpeciesAtLocationByMethod(parsedLocPhase.region ?? null, parsedLocPhase.area ?? null, r.method, r.pokemon_id);
+          return candidates.some((c) => c.id === species.id) ? r : false;
+        });
+        if (conflictParent) {
+          setSubmitting(false);
+          setErrorMsg(`${species.name} is a possible phase for your existing ${conflictParent.pokemon_name} hunt at ${location.label}. Choose a different area to start a dedicated hunt for ${species.name}.`);
+          return;
+        }
       }
       if (mode === 'edit') {
         const parsed = location ? (JSON.parse(location.value) as { region: string | null; area: string | null }) : { region: null, area: null };
