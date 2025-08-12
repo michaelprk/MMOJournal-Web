@@ -56,7 +56,7 @@ export function AddPhaseModal({ isOpen, onClose, parentHunt, onAdded }: AddPhase
     const region = (parentHunt as any)?.region ?? null;
     const area = (parentHunt as any)?.area ?? null;
     const method = (parentHunt as any)?.method ?? '';
-    return getSpeciesAtLocationByMethod(region, area, method);
+    return getSpeciesAtLocationByMethod(region, area, method, (parentHunt as any)?.pokemonId ?? undefined);
   }, [parentHunt]);
 
   const filteredSpecies = useMemo(() => {

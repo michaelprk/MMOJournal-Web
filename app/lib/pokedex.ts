@@ -227,7 +227,8 @@ export function getSpeciesAtLocation(region: string | null, area: string | null)
 export function getSpeciesAtLocationByMethod(
   region: string | null,
   area: string | null,
-  method: string
+  method: string,
+  parentSpeciesId?: number
 ): Array<{ id: number; name: string }> {
   const species: Array<{ id: number; name: string }> = [];
   const seen = new Set<number>();
@@ -260,13 +261,33 @@ export function getSpeciesAtLocationByMethod(
     }
   };
 
+  // Determine allowed encounter surfaces/types for the parent species at this location
+  let allowedSurfaces: Set<string> | null = null;
+  if (typeof parentSpeciesId === 'number') {
+    const parent = findMonsterById(parentSpeciesId);
+    if (parent && Array.isArray(parent.locations)) {
+      allowedSurfaces = new Set<string>();
+      for (const loc of parent.locations) {
+        const r = loc?.region_name ?? null;
+        const a = loc?.location ?? null;
+        if (r === region && a === area) {
+          const t = (loc?.type || '').toLowerCase();
+          if (t) allowedSurfaces.add(t);
+        }
+      }
+      if (allowedSurfaces.size === 0) allowedSurfaces = null;
+    }
+  }
+
   for (const monster of monsters) {
     if (!monster?.id || !monster?.name || !Array.isArray(monster.locations)) continue;
     const ok = monster.locations.some((l) => {
       const r = l?.region_name ?? null;
       const a = l?.location ?? null;
       if (r !== region || a !== area) return false;
-      return methodMatches(l?.type, l?.rarity ?? null);
+      if (!methodMatches(l?.type, l?.rarity ?? null)) return false;
+      if (allowedSurfaces && !allowedSurfaces.has((l?.type || '').toLowerCase())) return false;
+      return true;
     });
     if (ok && !seen.has(monster.id)) {
       seen.add(monster.id);
