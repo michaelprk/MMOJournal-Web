@@ -54,7 +54,6 @@ export default function ShinyHuntCard({
           display: 'flex',
           flexDirection: 'column',
           padding: '8px',
-          paddingBottom: '4px',
           borderRadius: '8px',
           margin: '8px auto',
           maxWidth: '880px',
@@ -88,7 +87,7 @@ export default function ShinyHuntCard({
               </button>
             </div>
             {/* Method below sprite row */}
-            <div style={{ display: 'inline-block', background: methodColor.background, color: methodColor.text, padding: '3px 8px', borderRadius: 6, fontSize: '0.8rem', fontWeight: 800 }}>
+            <div style={{ display: 'inline-block', background: methodColor.background, color: '#fff', padding: '3px 8px', borderRadius: 6, fontSize: '0.8rem', fontWeight: 800 }}>
               {hunt.method}
             </div>
             {/* Species and start date bolded, single row */}
