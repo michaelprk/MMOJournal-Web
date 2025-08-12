@@ -304,7 +304,7 @@ export default function ShinyShowcase() {
           borderRadius: '8px',
           boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
           margin: '0 auto',
-          marginBottom: '28px', // add breathing room below the bar
+          marginBottom: '13px', // slightly reduced gap below the bar
           maxWidth: '1400px',
         }}
       >
@@ -333,11 +333,12 @@ export default function ShinyShowcase() {
           fontSize: '1.8rem',
           fontWeight: 'bold',
           margin: 0,
-          textShadow: '2px 2px 4px rgba(0,0,0,0.8)',
+          textShadow: '2px 2px 4px rgba(0,0,0,0.3)',
           display: 'flex',
           alignItems: 'center',
           height: '50px',
           letterSpacing: '0.5px',
+          transform: 'translateY(0px)',
         }}>
           ✨ Shiny Hunt Tracker ✨
         </h1>
@@ -379,10 +380,10 @@ export default function ShinyShowcase() {
       <div
         style={{
           position: 'fixed',
-          top: '380px', // Start below navbar + utility bar + extra gap for breathing room
+          top: '350px', // Reduced by ~30px to tighten gap below utility bar
           left: 0,
           right: 0,
-          height: 'calc(100vh - 380px)', // Adjust to match new top offset
+          height: 'calc(100vh - 350px)', // Match reduced top offset
           backgroundColor: 'transparent',
           overflowY: 'auto', // Allow scrolling within this container
           overflowX: 'hidden',
