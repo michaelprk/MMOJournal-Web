@@ -25,7 +25,7 @@ export const shinyHuntService = {
     const query = supabase
       .from('shiny_hunts')
       .select(
-        'id,pokemon_id,pokemon_name,method,region,area,location,rarity,phase_count,total_encounters,is_completed,is_phase,parent_hunt_id,start_date,found_at,created_at,meta,is_paused'
+        'id,pokemon_id,pokemon_name,method,region,area,location,rarity,phase_count,total_encounters,is_completed,is_phase,parent_hunt_id,start_date,found_at,created_at,meta'
       )
       .order('created_at', { ascending: false });
 
@@ -77,7 +77,7 @@ export const shinyHuntService = {
   async listActive(): Promise<ShinyHuntRow[]> {
     // Robust client-side filtering to tolerate missing/null columns in dev
     const rows = await this.list();
-    return rows.filter((r: any) => r.is_completed !== true && r.is_phase !== true && r?.is_paused !== true && r?.meta?.paused !== true);
+    return rows.filter((r: any) => r.is_completed !== true && r.is_phase !== true && r?.meta?.paused !== true);
   },
 
   async listCompleted(): Promise<ShinyHuntRow[]> {
@@ -170,7 +170,7 @@ export const shinyHuntService = {
   async listPaused(): Promise<ShinyHuntRow[]> {
     // Robust client-side filtering
     const rows = await this.list();
-    return rows.filter((r: any) => r.is_completed !== true && r.is_phase !== true && (r?.is_paused === true || r?.meta?.paused === true));
+    return rows.filter((r: any) => r.is_completed !== true && r.is_phase !== true && r?.meta?.paused === true);
   },
 
   async updateCounters(id: number, data: { phase_count?: number; total_encounters?: number }): Promise<void> {
