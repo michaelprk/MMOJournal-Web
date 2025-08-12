@@ -36,6 +36,8 @@ export default function ShinyShowcase() {
   
   // Display limit state
   const [displayHuntsLimit, setDisplayHuntsLimit] = useState(6);
+  const [showPausedModal, setShowPausedModal] = useState(false);
+  const [pausedHunts, setPausedHunts] = useState<ShinyHunt[]>([]);
 
   
   // View mode state  
@@ -83,14 +85,15 @@ export default function ShinyShowcase() {
   };
 
   const handleDeleteHunt = async (hunt: ShinyHunt) => {
-    if (!window.confirm('Delete this hunt? If it has phases, they’ll be deleted too.')) return;
+    const proceed = window.confirm('Hunt deletion is disabled. Do you want to pause this hunt instead?');
+    if (!proceed) return;
     try {
-      await shinyHuntService.deleteHunt(hunt.id);
+      await shinyHuntService.pauseHunt(hunt.id);
       setCurrentHunts(prev => prev.filter(h => h.id !== hunt.id));
-      setPortfolio(prev => prev.filter(p => p.id !== hunt.id));
+      setPausedHunts(prev => [{ ...hunt, paused: true }, ...prev]);
     } catch (e) {
-      console.error('[shiny:delete] failed', e);
-      alert('Failed to delete hunt');
+      console.error('[shiny:pause] failed', e);
+      alert('Failed to pause hunt');
     }
   };
 
@@ -280,17 +283,42 @@ export default function ShinyShowcase() {
       });
       // Listen for updates to counters and phases to update UI live
       cleanupUpdate = shinyHuntService.subscribeUpdates(String(user.id), (row) => {
-        // Update current hunts list when an active hunt's counters or phase change
-        setCurrentHunts((prev) => prev.map((h) => (
-          h.id === row.id
-            ? {
-                ...h,
-                phaseCount: row.phase_count,
-                totalEncounters: row.total_encounters,
-                updatedAt: row.created_at,
-              }
-            : h
-        )));
+        const isPaused = (row as any).is_paused === true;
+        if (isPaused) {
+          setCurrentHunts((prev) => prev.filter((h) => h.id !== row.id));
+          setPausedHunts((prev) => {
+            const exists = prev.some((h) => h.id === row.id);
+            if (exists) {
+              return prev.map((h) => h.id === row.id ? { ...h, paused: true } : h);
+            }
+            return ([{
+              id: row.id,
+              pokemonId: row.pokemon_id,
+              pokemonName: row.pokemon_name,
+              method: row.method as any,
+              startDate: (row.start_date || row.created_at) as string,
+              phaseCount: row.phase_count,
+              totalEncounters: row.total_encounters,
+              isCompleted: row.is_completed,
+              phasePokemon: [],
+              createdAt: row.created_at,
+              updatedAt: row.created_at,
+              paused: true,
+            }] as any).concat(prev);
+          });
+        } else {
+          // Update counters live
+          setCurrentHunts((prev) => prev.map((h) => (
+            h.id === row.id
+              ? {
+                  ...h,
+                  phaseCount: row.phase_count,
+                  totalEncounters: row.total_encounters,
+                  updatedAt: row.created_at,
+                }
+              : h
+          )));
+        }
       });
     })();
     return () => {
@@ -471,7 +499,41 @@ export default function ShinyShowcase() {
         {/* Current Hunts Section */}
         <section className="current-hunts-section">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-            <h2>🎯 Current Hunts</h2>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <h2>🎯 Current Hunts</h2>
+              <button
+                onClick={async () => {
+                  try {
+                    const paused = await shinyHuntService.listPaused();
+                    setPausedHunts(paused.map((r) => ({
+                      id: r.id,
+                      pokemonId: r.pokemon_id,
+                      pokemonName: r.pokemon_name,
+                      method: r.method as any,
+                      startDate: (r.start_date || r.created_at) as string,
+                      phaseCount: r.phase_count,
+                      totalEncounters: r.total_encounters,
+                      isCompleted: r.is_completed,
+                      phasePokemon: [],
+                      createdAt: r.created_at,
+                      updatedAt: r.created_at,
+                      paused: true,
+                    })) as any);
+                    setShowPausedModal(true);
+                  } catch (e) {
+                    console.error('[paused:list] error', e);
+                  }
+                }}
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 8,
+                  backgroundColor: 'rgba(255, 215, 0, 0.15)', border: '1px solid rgba(255, 215, 0, 0.5)',
+                  color: '#ffd700', padding: '6px 10px', borderRadius: 8, cursor: 'pointer'
+                }}
+                title="Paused Hunts"
+              >
+                ⏸️ Paused Hunts
+              </button>
+            </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <span style={{ fontSize: '0.875rem', color: 'rgba(255, 255, 255, 0.7)' }}>View:</span>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -596,6 +658,58 @@ export default function ShinyShowcase() {
       </main>
 
       {/* Start Hunt Modal (Supabase-backed, PVP modal pattern) */}
+      {showPausedModal && (
+        <div
+          style={{
+            position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.9)', zIndex: 9999,
+            display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem'
+          }}
+          onClick={(e) => { if (e.target === e.currentTarget) setShowPausedModal(false); }}
+        >
+          <div style={{ background: 'rgba(0,0,0,0.95)', border: '2px solid #ffcb05', borderRadius: 12, padding: 16, width: '100%', maxWidth: 720, color: '#fff' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+              <h3 style={{ margin: 0, color: '#ffd700' }}>⏸️ Paused Hunts</h3>
+              <button type="button" onClick={() => setShowPausedModal(false)} style={{ background: 'transparent', color: '#ffd700', border: 'none', fontSize: '1.25rem', cursor: 'pointer' }}>×</button>
+            </div>
+            {pausedHunts.length === 0 ? (
+              <div style={{ color: '#bbb' }}>No paused hunts.</div>
+            ) : (
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 120px', gap: 8 }}>
+                {pausedHunts.map((h) => (
+                  <React.Fragment key={h.id}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <span style={{ fontWeight: 800 }}>{h.pokemonName}</span>
+                      <span style={{ color: '#ccc', fontSize: '0.9rem' }}>
+                        • {new Date(h.startDate).toLocaleDateString()} • {h.method}
+                      </span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                      <button
+                        onClick={async () => {
+                          try {
+                            await shinyHuntService.resumeHunt(h.id);
+                            // optimistic UI
+                            setPausedHunts((prev) => prev.filter((ph) => ph.id !== h.id));
+                            setCurrentHunts((prev) => [{ ...h, paused: false }, ...prev]);
+                          } catch (e) {
+                            console.error('[paused:resume] error', e);
+                            alert('Failed to resume hunt');
+                          }
+                        }}
+                        style={{ backgroundColor: 'rgba(255, 215, 0, 0.2)', color: '#ffd700', border: '1px solid #ffd700', padding: '6px 10px', borderRadius: 8, fontWeight: 800, cursor: 'pointer' }}
+                      >
+                        ▶️ Resume
+                      </button>
+                    </div>
+                  </React.Fragment>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+      
+      {/* Start Hunt Modal (Supabase-backed, PVP modal pattern) */}
       <StartHuntModal
         isOpen={showStartHunt}
         onClose={() => setShowStartHunt(false)}
@@ -673,6 +787,25 @@ export default function ShinyShowcase() {
             phasePokemon: [],
             createdAt: r.created_at,
             updatedAt: r.created_at,
+          })));
+          const paused = await shinyHuntService.listPaused();
+          setPausedHunts(paused.map((r) => ({
+            id: r.id,
+            pokemonId: r.pokemon_id,
+            pokemonName: r.pokemon_name,
+            method: r.method as any,
+            startDate: (r.start_date || r.created_at) as string,
+            phaseCount: r.phase_count,
+            totalEncounters: r.total_encounters,
+            isCompleted: r.is_completed,
+            region: (r as any).region,
+            area: (r as any).area,
+            location: (r as any).location,
+            rarity: (r as any).rarity,
+            phasePokemon: [],
+            createdAt: r.created_at,
+            updatedAt: r.created_at,
+            paused: true,
           })));
         }}
       />

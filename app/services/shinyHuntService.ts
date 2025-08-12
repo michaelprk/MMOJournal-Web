@@ -17,6 +17,7 @@ export type ShinyHuntRow = {
   start_date: string | null;
   found_at?: string | null;
   created_at: string;
+  is_paused?: boolean;
 };
 
 export const shinyHuntService = {
@@ -77,10 +78,11 @@ export const shinyHuntService = {
     const { data, error } = await supabase
       .from('shiny_hunts')
       .select(
-        'id,pokemon_id,pokemon_name,method,region,area,location,rarity,phase_count,total_encounters,is_completed,is_phase,parent_hunt_id,start_date,found_at,created_at'
+        'id,pokemon_id,pokemon_name,method,region,area,location,rarity,phase_count,total_encounters,is_completed,is_phase,parent_hunt_id,start_date,found_at,created_at,is_paused'
       )
       .eq('is_completed', false)
       .eq('is_phase', false)
+      .eq('is_paused', false)
       .order('created_at', { ascending: false });
     if (error) throw error;
     return (data || []) as ShinyHuntRow[];
@@ -151,6 +153,34 @@ export const shinyHuntService = {
       .update(patch)
       .eq('id', id);
     if (error) throw error;
+  },
+
+  async pauseHunt(id: number): Promise<void> {
+    const { error } = await supabase
+      .from('shiny_hunts')
+      .update({ is_paused: true })
+      .eq('id', id);
+    if (error) throw error;
+  },
+
+  async resumeHunt(id: number): Promise<void> {
+    const { error } = await supabase
+      .from('shiny_hunts')
+      .update({ is_paused: false })
+      .eq('id', id);
+    if (error) throw error;
+  },
+
+  async listPaused(): Promise<ShinyHuntRow[]> {
+    const { data, error } = await supabase
+      .from('shiny_hunts')
+      .select('id,pokemon_id,pokemon_name,method,region,area,location,rarity,phase_count,total_encounters,is_completed,is_phase,parent_hunt_id,start_date,found_at,created_at,is_paused')
+      .eq('is_completed', false)
+      .eq('is_phase', false)
+      .eq('is_paused', true)
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    return (data || []) as ShinyHuntRow[];
   },
 
   async updateCounters(id: number, data: { phase_count?: number; total_encounters?: number }): Promise<void> {

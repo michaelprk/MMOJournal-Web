@@ -165,6 +165,7 @@ export interface ShinyHunt {
   phasePokemon?: PhasePokemon[]; // Array of Pokemon encountered in each phase
   createdAt: string;
   updatedAt: string;
+  paused?: boolean;
 }
 
 export interface PhasePokemon {
