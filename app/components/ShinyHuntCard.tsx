@@ -65,8 +65,8 @@ export default function ShinyHuntCard({
               src={spritePath} 
               alt={`Shiny ${hunt.pokemonName}`}
               style={{
-                width: '40px',
-                height: '40px',
+                width: '56px',
+                height: '56px',
                 filter: `drop-shadow(0 0 8px ${pokemonColors.glow}) drop-shadow(0 0 16px ${pokemonColors.glowLight})`,
               }}
               onError={(e) => {
@@ -84,17 +84,7 @@ export default function ShinyHuntCard({
             }}>
               {hunt.pokemonName}
             </h3>
-            <div style={{ 
-              display: 'inline-block',
-              background: methodColor.background,
-              color: methodColor.text,
-              padding: '2px 6px',
-              borderRadius: '4px',
-              fontSize: '0.7rem',
-              fontWeight: 'bold'
-            }}>
-              {hunt.method}
-            </div>
+            {/* Method badge removed in compact header; retained elsewhere */}
           </div>
           
           <div style={{ flex: '0 0 auto', display: 'flex', gap: '8px' }}>
@@ -131,10 +121,10 @@ export default function ShinyHuntCard({
           </div>
         </div>
         
-        {/* Stats Row */}
-        <div style={{ display: 'flex', gap: '16px', marginBottom: '8px', fontSize: '0.8rem', color: '#ccc' }}>
-          <div><strong>Started:</strong> {startDate}</div>
+        {/* Stats Row with centered start date and without duplicate method */}
+        <div style={{ display: 'flex', gap: '16px', marginBottom: '8px', fontSize: '0.8rem', color: '#ccc', justifyContent: 'space-between', alignItems: 'center' }}>
           <div><strong>Encounters:</strong> {hunt.totalEncounters.toLocaleString()}</div>
+          <div style={{ textAlign: 'center', flex: 1 }}><strong>Started:</strong> {startDate}</div>
           <div><strong>Phase:</strong> {hunt.phaseCount}</div>
         </div>
         
@@ -236,8 +226,8 @@ export default function ShinyHuntCard({
             alt={`Shiny ${hunt.pokemonName}`}
             className="shiny-sprite"
             style={{
-              width: '80px',
-              height: '80px',
+              width: '96px',
+              height: '96px',
               filter: `drop-shadow(0 0 10px ${pokemonColors.glow}) drop-shadow(0 0 20px ${pokemonColors.glowLight})`,
             }}
             onError={(e) => {
@@ -248,14 +238,8 @@ export default function ShinyHuntCard({
         </div>
 
         <h3 className="pokemon-name">{hunt.pokemonName}</h3>
-        {/* Method and Location under name */}
+        {/* Location only; method badge removed to avoid duplication */}
         <div style={{ marginTop: 6, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-          <div style={{ 
-            display: 'inline-block', background: methodColor.background, color: methodColor.text,
-            padding: '2px 8px', borderRadius: 6, fontSize: '0.8rem', fontWeight: 800
-          }}>
-            {hunt.method}
-          </div>
           {(hunt.region || hunt.area) && (
             <div style={{ color: '#ccc', fontSize: '0.8rem' }}>
               {(hunt.region || 'Unknown Region')} — {hunt.area ? String(hunt.area).toUpperCase() : 'UNKNOWN AREA'}

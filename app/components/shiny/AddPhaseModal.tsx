@@ -16,6 +16,8 @@ interface AddPhaseModalProps {
     method: string;
     region?: string | null;
     area?: string | null;
+    totalEncounters?: number;
+    phaseCount?: number;
   };
   onAdded?: () => void;
 }
@@ -26,6 +28,7 @@ export function AddPhaseModal({ isOpen, onClose, parentHunt, onAdded }: AddPhase
   const [species, setSpecies] = useState<SpeciesOption | null>(null);
   const [foundAt, setFoundAt] = useState<string>(() => new Date().toISOString().slice(0, 10));
   const [notes, setNotes] = useState('');
+  const [encounters, setEncounters] = useState<number | ''>('');
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -36,6 +39,7 @@ export function AddPhaseModal({ isOpen, onClose, parentHunt, onAdded }: AddPhase
       setSpecies(null);
       setFoundAt(new Date().toISOString().slice(0, 10));
       setNotes('');
+      setEncounters('');
       setErrorMsg(null);
     }
   }, [isOpen]);
@@ -61,7 +65,7 @@ export function AddPhaseModal({ isOpen, onClose, parentHunt, onAdded }: AddPhase
     return base.filter((s) => s.name.toLowerCase().includes(q)).slice(0, 50);
   }, [speciesQuery, speciesAtLockedLocation]);
 
-  const canSubmit = !!species;
+  const canSubmit = !!species && typeof encounters === 'number' && encounters > 0;
 
   const validateSpeciesAtLocation = (): boolean => {
     if (!species) return false;
@@ -73,6 +77,7 @@ export function AddPhaseModal({ isOpen, onClose, parentHunt, onAdded }: AddPhase
   const handleSubmit = async () => {
     setErrorMsg(null);
     if (!species) { setErrorMsg('Select a species'); return; }
+    if (typeof encounters !== 'number' || encounters <= 0) { setErrorMsg('Enter a valid encounter count (> 0)'); return; }
     if (!validateSpeciesAtLocation()) { setErrorMsg('Species is not available at the selected location'); return; }
     setSubmitting(true);
     try {
@@ -86,7 +91,16 @@ export function AddPhaseModal({ isOpen, onClose, parentHunt, onAdded }: AddPhase
         rarity: null,
         notes: notes || null as any,
         found_at: new Date(foundAt).toISOString(),
+        total_encounters: encounters,
       } as any);
+
+      // Update parent hunt counters: increment phase and total encounters
+      const parentTotal = Number((parentHunt as any)?.totalEncounters || 0);
+      const parentPhase = Number((parentHunt as any)?.phaseCount || 1);
+      await shinyHuntService.updateCounters(parentHunt.id, {
+        total_encounters: parentTotal + (encounters as number),
+        phase_count: parentPhase + 1,
+      });
       onAdded?.();
       onClose();
     } catch (e: any) {
@@ -158,7 +172,7 @@ export function AddPhaseModal({ isOpen, onClose, parentHunt, onAdded }: AddPhase
           )}
         </div>
 
-        {/* Found date and notes */}
+        {/* Found date and encounters */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
           <div>
             <label>Found date</label>
@@ -166,10 +180,22 @@ export function AddPhaseModal({ isOpen, onClose, parentHunt, onAdded }: AddPhase
               style={{ width: '100%', background: 'rgba(255,255,255,0.1)', border: '1px solid #ffcb05', borderRadius: 8, color: '#fff', padding: '8px 10px' }} />
           </div>
           <div>
-            <label>Notes (optional)</label>
-            <input value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Notes"
-              style={{ width: '100%', background: 'rgba(255,255,255,0.1)', border: '1px solid #ffcb05', borderRadius: 8, color: '#fff', padding: '8px 10px' }} />
+            <label>Encounters (for this phase)</label>
+            <input
+              type="number"
+              min={1}
+              value={encounters}
+              onChange={(e) => setEncounters(e.target.value === '' ? '' : Number(e.target.value))}
+              placeholder="e.g. 1234"
+              style={{ width: '100%', background: 'rgba(255,255,255,0.1)', border: '1px solid #ffcb05', borderRadius: 8, color: '#fff', padding: '8px 10px' }}
+            />
           </div>
+        </div>
+
+        <div style={{ marginBottom: 12 }}>
+          <label>Notes (optional)</label>
+          <input value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Notes"
+            style={{ width: '100%', background: 'rgba(255,255,255,0.1)', border: '1px solid #ffcb05', borderRadius: 8, color: '#fff', padding: '8px 10px' }} />
         </div>
 
         {errorMsg && (
