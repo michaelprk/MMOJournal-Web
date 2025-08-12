@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import type { 
   ShinyHunt, 
   ShinyPortfolio, 
@@ -38,6 +39,16 @@ export default function ShinyShowcase() {
   const [displayHuntsLimit, setDisplayHuntsLimit] = useState(6);
   const [showPausedModal, setShowPausedModal] = useState(false);
   const [pausedHunts, setPausedHunts] = useState<ShinyHunt[]>([]);
+
+  // Ensure paused modal sits above navbar/utility bar and disables navbar interactions
+  useEffect(() => {
+    if (showPausedModal) {
+      try { document.body.classList.add('modal-open'); } catch {}
+    } else {
+      try { document.body.classList.remove('modal-open'); } catch {}
+    }
+    return () => { try { document.body.classList.remove('modal-open'); } catch {} };
+  }, [showPausedModal]);
 
   
   // View mode state  
@@ -694,10 +705,10 @@ export default function ShinyShowcase() {
       </main>
 
       {/* Start Hunt Modal (Supabase-backed, PVP modal pattern) */}
-      {showPausedModal && (
+      {showPausedModal && createPortal(
         <div
           style={{
-            position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.9)', zIndex: 9999,
+            position: 'fixed', inset: 0, backgroundColor: 'rgba(0, 0, 0, 0.9)', zIndex: 10000,
             display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem'
           }}
           onClick={(e) => { if (e.target === e.currentTarget) setShowPausedModal(false); }}
@@ -742,7 +753,8 @@ export default function ShinyShowcase() {
               </div>
             )}
           </div>
-        </div>
+        </div>,
+        document.body
       )}
       
       {/* Start Hunt Modal (Supabase-backed, PVP modal pattern) */}
