@@ -275,6 +275,13 @@ export function getSpeciesAtLocationByMethod(
     return t;
   };
 
+  // Normalize area names by stripping time-of-day qualifiers like (NIGHT), (DAY), (MORNING), etc.
+  const normalizeAreaName = (input?: string | null): string | null => {
+    if (input == null) return null;
+    const s = String(input);
+    return s.replace(/\s*\((?:NIGHT|DAY|MORNING|EVENING|AFTERNOON|DUSK|DAWN)\)\s*$/i, '').trim();
+  };
+
   // Determine allowed encounter surfaces/types for the parent species at this location
   let allowedSurfaces: Set<string> | null = null;
   if (typeof parentSpeciesId === 'number') {
@@ -283,8 +290,8 @@ export function getSpeciesAtLocationByMethod(
       allowedSurfaces = new Set<string>();
       for (const loc of parent.locations) {
         const r = loc?.region_name ?? null;
-        const a = loc?.location ?? null;
-        if (r === region && a === area) {
+        const a = normalizeAreaName(loc?.location ?? null);
+        if (r === region && a === normalizeAreaName(area)) {
           const t = normalizeSurface(loc?.type);
           if (t) allowedSurfaces.add(t);
         }
@@ -297,11 +304,11 @@ export function getSpeciesAtLocationByMethod(
     if (!monster?.id || !monster?.name || !Array.isArray(monster.locations)) continue;
     const ok = monster.locations.some((l) => {
       const r = l?.region_name ?? null;
-      const a = l?.location ?? null;
-      if (r !== region || a !== area) return false;
+      const a = normalizeAreaName(l?.location ?? null);
+      if (r !== region || a !== normalizeAreaName(area)) return false;
       if (!methodMatches(l?.type, l?.rarity ?? null)) return false;
-      // For horde hunts, do not enforce surface equality – datasets often omit the specific surface for hordes
-      if (allowedSurfaces && canon !== 'horde') {
+      // Enforce surface equality (after normalization) when we know the parent's surfaces
+      if (allowedSurfaces) {
         const candidateSurface = normalizeSurface(l?.type);
         if (!allowedSurfaces.has(candidateSurface)) return false;
       }
