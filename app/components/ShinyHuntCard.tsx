@@ -58,22 +58,26 @@ export default function ShinyHuntCard({
           marginBottom: '8px',
         }}
       >
-        {/* Compact 3-column layout */}
+        {/* Compact 4-section layout: Name/Date | Sprite/Method | Encounters/Location | Actions */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          {/* Left: name, sprite, method, start date */}
-          <div style={{ flex: '0 0 160px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
-            <h3 style={{ color: '#fff', margin: 0, fontSize: '0.95rem', fontWeight: 800, textAlign: 'center' }}>{hunt.pokemonName}</h3>
+          {/* Left-most: species name and start date stacked */}
+          <div style={{ flex: '0 0 180px', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 4 }}>
+            <h3 style={{ color: '#fff', margin: 0, fontSize: '0.95rem', fontWeight: 800 }}>{hunt.pokemonName}</h3>
+            <div style={{ color: '#bbb', fontSize: '0.8rem' }}>
+              <strong>Started:</strong> {startDate}
+            </div>
+          </div>
+
+          {/* Next: larger sprite and method stacked */}
+          <div style={{ flex: '0 0 140px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
             <img 
               src={spritePath} 
               alt={`Shiny ${hunt.pokemonName}`}
-              style={{ width: '52px', height: '52px', filter: `drop-shadow(0 0 8px ${pokemonColors.glow}) drop-shadow(0 0 16px ${pokemonColors.glowLight})` }}
+              style={{ width: '68px', height: '68px', filter: `drop-shadow(0 0 8px ${pokemonColors.glow}) drop-shadow(0 0 16px ${pokemonColors.glowLight})` }}
               onError={(e) => { e.currentTarget.src = '/images/shiny-sprites/001_Bulbasaur.gif'; }}
             />
             <div style={{ display: 'inline-block', background: methodColor.background, color: methodColor.text, padding: '2px 6px', borderRadius: 6, fontSize: '0.7rem', fontWeight: 800 }}>
               {hunt.method}
-            </div>
-            <div style={{ color: '#bbb', fontSize: '0.75rem' }}>
-              <strong>Started:</strong> {startDate}
             </div>
           </div>
 
