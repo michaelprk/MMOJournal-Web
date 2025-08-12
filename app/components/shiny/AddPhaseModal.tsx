@@ -19,7 +19,7 @@ interface AddPhaseModalProps {
     totalEncounters?: number;
     phaseCount?: number;
   };
-  onAdded?: () => void;
+  onAdded?: (result: { parentId: number; addedEncounters: number }) => void;
 }
 
 export function AddPhaseModal({ isOpen, onClose, parentHunt, onAdded }: AddPhaseModalProps) {
@@ -101,7 +101,7 @@ export function AddPhaseModal({ isOpen, onClose, parentHunt, onAdded }: AddPhase
         total_encounters: parentTotal + (encounters as number),
         phase_count: parentPhase + 1,
       });
-      onAdded?.();
+      onAdded?.({ parentId: parentHunt.id, addedEncounters: encounters as number });
       onClose();
     } catch (e: any) {
       setErrorMsg(e?.message || 'Failed to add phase');

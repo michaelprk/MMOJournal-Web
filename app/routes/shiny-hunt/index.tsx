@@ -682,8 +682,15 @@ export default function ShinyShowcase() {
         isOpen={!!huntForPhase}
         onClose={() => setHuntForPhase(null)}
         parentHunt={huntForPhase as any || { id: 0, pokemonId: 0, pokemonName: '', method: '', region: null, area: null }}
-        onAdded={async () => {
-          // Refresh completed list and optionally child phases under current hunt
+        onAdded={async ({ parentId, addedEncounters }) => {
+          // Optimistic update for current hunts list
+          setCurrentHunts((prev) => prev.map((h) => (
+            h.id === parentId
+              ? { ...h, totalEncounters: h.totalEncounters + addedEncounters, phaseCount: h.phaseCount + 1 }
+              : h
+          )));
+
+          // Refresh completed list to include the new phase in portfolio
           const completed = await shinyHuntService.listCompleted();
           setPortfolio(completed.map((r: any) => ({
             id: r.id,
