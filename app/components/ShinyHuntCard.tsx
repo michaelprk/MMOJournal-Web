@@ -65,6 +65,7 @@ export default function ShinyHuntCard({
             {/* Row: +Phase | Sprite | Found */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <button 
+                type="button"
                 onClick={handleAddPhase}
                 style={{ marginRight: 15, backgroundColor: 'rgba(255, 215, 0, 0.2)', color: '#ffd700', border: '1px solid #ffd700', padding: '8px 12px', borderRadius: 6, fontSize: '0.8rem', cursor: 'pointer', fontWeight: 700 }}
               >
@@ -77,6 +78,7 @@ export default function ShinyHuntCard({
                 onError={(e) => { e.currentTarget.src = '/images/shiny-sprites/001_Bulbasaur.gif'; }}
               />
               <button 
+                type="button"
                 onClick={() => onMarkFound(hunt)}
                 style={{ marginLeft: 15, backgroundColor: 'rgba(40, 167, 69, 0.2)', color: '#28a745', border: '1px solid #28a745', padding: '8px 12px', borderRadius: 6, fontSize: '0.8rem', cursor: 'pointer', fontWeight: 700 }}
               >
