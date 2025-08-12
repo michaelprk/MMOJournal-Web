@@ -198,6 +198,12 @@ export function isMethodValidForLocation(
     const a = loc.location ?? null;
     // Compare by exact values from dataset, as selectors are built from the same source.
     if (r !== region || a !== area) return false;
+    // Strict horde check when canon is horde
+    if (canon === 'horde') {
+      const typeLower = (loc.type || '').toLowerCase();
+      const rarityLower = (loc.rarity || '').toLowerCase();
+      if (!(typeLower.includes('horde') || rarityLower === 'horde')) return false;
+    }
     return methodMatchesType(loc.type, loc.rarity ?? null);
   });
 }

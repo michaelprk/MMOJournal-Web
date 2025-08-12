@@ -135,12 +135,21 @@ export function StartHuntModal({ isOpen, onClose, onCreated, mode = 'create', in
       });
     }
     return deduped;
-  }, [species]);
+  }, [species, method]);
   const filteredLocations = useMemo(() => {
     const q = locationQuery.trim().toLowerCase();
     if (!q) return allLocations.slice(0, 30);
     return allLocations.filter((l) => l.label.toLowerCase().includes(q)).slice(0, 30);
   }, [locationQuery, allLocations]);
+
+  // When method changes in create mode, clear any previously selected location to avoid invalid combos
+  useEffect(() => {
+    if (mode !== 'edit') {
+      setLocation(null);
+      setLocationQuery('');
+      setInvalidCombo(false);
+    }
+  }, [method, mode]);
 
   useEffect(() => {
     if (!species || !method || !location) {
