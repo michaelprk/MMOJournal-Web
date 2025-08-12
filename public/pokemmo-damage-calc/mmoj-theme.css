@@ -1,0 +1,441 @@
+/* MMOJ theme overrides: non-destructive, color-only adjustments */
+
+/* Page background and base text */
+html, body {
+  background: #16171a !important; /* match panel bg for fluid look */
+  color: #ECECEC !important;
+}
+/* Unify top-level container backgrounds */
+.wrapper, nav, body > .wrapper, .page, .container {
+  background: #16171a !important;
+}
+
+/* Replace default heading with logo */
+.mmoj-logo {
+  margin: 0 auto 8px !important;
+  padding-bottom: 10px !important;
+  text-align: center !important;
+  line-height: 0 !important;
+}
+.mmoj-logo img {
+  width: 230px !important;
+  height: auto !important;
+  display: block !important;
+  margin: 0 auto !important;
+  filter: drop-shadow(0 2px 8px rgba(255,203,5,.15));
+}
+
+/* ---------- Scope to the calc shell so we don't affect other pages ---------- */
+.wrapper, .page, .container, #content { color: #fff; }
+.wrapper *, .page *, .container *, #content * { color: #fff; }
+
+/* Keep selected yellow chips/buttons readable (black text on yellow) */
+.wrapper .btn.selected,
+.wrapper .button.selected,
+.wrapper .chip.selected,
+.wrapper .field button.selected {
+  color: #000 !important;
+}
+
+/* Result line (the big “252 SpA … OHKO” summary) stays MMOJ yellow */
+/* Covers both common upstream containers */
+#resultHeader,
+#resultHeader *:not(a),                /* keep links styled below */
+.result-move-header,
+.result-move-header *:not(a) {
+  color: #ffcb05 !important;
+}
+
+/* ---------- Links: Pokémon names, move names, set names ---------- */
+/* General anchor override inside calc */
+.wrapper a,
+.wrapper a:link,
+.wrapper a:visited {
+  color: #fff !important;
+  text-decoration: none;
+}
+.wrapper a:hover,
+.wrapper a:focus {
+  color: #fff !important;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.wrapper a:active { color: #e6e6e6 !important; }
+
+/* Belts-and-suspenders: specific areas that commonly hold links */
+.result-move-header a,    /* move name in the summary line */
+#resultHeader a,          /* sometimes used instead of .result-move-header */
+.move-result a,           /* per-move breakdown rows */
+.poke-info a,             /* species/set links beside selectors */
+.health a                 /* some builds wrap HP text in <a> */
+{ color: #fff !important; text-decoration: none; }
+.result-move-header a:hover,
+#resultHeader a:hover,
+.move-result a:hover,
+.poke-info a:hover,
+.health a:hover { text-decoration: underline; }
+
+/* Ensure strong/em inside links inherit white, not blue */
+.wrapper a strong,
+.wrapper a em { color: inherit !important; }
+
+/* Do NOT touch button backgrounds/borders; only text color above */
+
+/* --------------------------------------------- */
+/* Controls: force white text across the UI      */
+/* (Load last; do not change layout or backgrounds) */
+/* --------------------------------------------- */
+/* Scope to calc shell */
+.wrapper, .page, .container, #content {}
+
+/* 1) Form controls (labels already white). Force the text inside to white */
+.wrapper input[type="text"],
+.wrapper input[type="number"],
+.wrapper input[type="search"],
+.wrapper input[type="checkbox"],
+.wrapper select,
+.wrapper textarea {
+  color: #fff !important;
+  caret-color: #fff;
+}
+/* Safari/WebKit caret fill */
+.wrapper input[type="text"],
+.wrapper input[type="number"],
+.wrapper input[type="search"],
+.wrapper textarea {
+  -webkit-text-fill-color: #fff;
+}
+
+/* 2) Options inside native selects (browser‑dependent but helps) */
+.wrapper select option { color: #fff; background: #222; }
+
+/* 3) Generic chips/buttons in the calc (non‑selected state should be white) */
+.wrapper .btn,
+.wrapper .button,
+.wrapper .chip,
+.wrapper .field button,
+.wrapper .toggle,
+.wrapper .badge,
+.wrapper .tag {
+  color: #fff;
+}
+
+/* Keep selected yellow chips readable: black text on yellow (already set) */
+.wrapper .btn.selected,
+.wrapper .button.selected,
+.wrapper .chip.selected,
+.wrapper .field button.selected {
+  color: #000 !important;
+}
+
+/* 4) Move typing/category “badges” (e.g., Grass / Ice, Physical / Special) */
+.wrapper .type,
+.wrapper .move-type,
+.wrapper .category,
+.wrapper .move-category,
+.wrapper .stat-badge {
+  color: #fff !important;
+}
+
+/* 5) Stat boost dropdowns next to stats */
+.wrapper .boost,
+.wrapper .boost select,
+.wrapper .stat-boost,
+.wrapper .stat-boost select {
+  color: #fff !important;
+}
+
+/* 6) Inputs inside the move rows at the bottom */
+.wrapper .move-list input,
+.wrapper .move-row input,
+.wrapper .move-row select {
+  color: #fff !important;
+}
+
+/* 7) Don’t let hover/focus invert the color unexpectedly */
+.wrapper select:focus,
+.wrapper input:focus,
+.wrapper button:focus {
+  color: #fff !important;
+  outline-color: rgba(255,255,255,.25);
+}
+
+/* ------------------------------------------------------------ */
+/* Force white text for key selects (Type/Gender/Nature/etc.)    */
+/* Loads last; color/contrast only, no layout changes            */
+/* ------------------------------------------------------------ */
+/* Base: force control text white */
+.wrapper select.type1,
+.wrapper select.type2,
+.wrapper select.gender,
+.wrapper select.nature,
+.wrapper select.ability,
+.wrapper select.item,
+.wrapper select.status,
+.wrapper select.move-cat {
+  color: #fff !important;
+  -webkit-text-fill-color: #fff;      /* WebKit */
+  background-color: #1c1c1c !important;
+  border-color: #444 !important;
+}
+
+/* Options in the dropdown menu */
+.wrapper select.type1 option,
+.wrapper select.type2 option,
+.wrapper select.gender option,
+.wrapper select.nature option,
+.wrapper select.ability option,
+.wrapper select.item option,
+.wrapper select.status option,
+.wrapper select.move-cat option {
+  color: #fff !important;
+  background: #1c1c1c !important;     /* dark popup */
+}
+
+/* Keep on focus/hover */
+.wrapper select.type1:focus,
+.wrapper select.type2:focus,
+.wrapper select.gender:focus,
+.wrapper select.nature:focus,
+.wrapper select.ability:focus,
+.wrapper select.item:focus,
+.wrapper select.status:focus,
+.wrapper select.move-cat:focus {
+  color: #fff !important;
+  -webkit-text-fill-color: #fff;
+  outline-color: rgba(255,255,255,.25);
+}
+
+/* Firefox-specific help for option text */
+@-moz-document url-prefix() {
+  .wrapper select.type1,
+  .wrapper select.type2,
+  .wrapper select.gender,
+  .wrapper select.nature,
+  .wrapper select.ability,
+  .wrapper select.item,
+  .wrapper select.status,
+  .wrapper select.move-cat,
+  .wrapper select.type1 option,
+  .wrapper select.type2 option,
+  .wrapper select.gender option,
+  .wrapper select.nature option,
+  .wrapper select.ability option,
+  .wrapper select.item option,
+  .wrapper select.status option,
+  .wrapper select.move-cat option {
+    color: #fff !important;
+    background: #1c1c1c !important;
+  }
+}
+
+/* Optional: ensure the tiny up/down arrows don’t force blue text on Windows */
+.wrapper select::-ms-value { color: #fff !important; }
+
+/* === MMOJ polish pack === */
+/* Soft depth on main columns (safe, shallow shadow) */
+.wrapper .left,
+.wrapper .middle,
+.wrapper .right {
+  box-shadow: 0 0 12px rgba(255, 204, 0, 0.08);
+}
+
+/* Center + scale logo (target common logo hooks; avoids layout changes) */
+.wrapper .logo img,
+#logo,
+#logo img {
+  display: block;
+  margin: 0 auto 12px auto;
+  width: 220px;
+  max-width: 90%;
+}
+
+/* Subtle move row separators (only if these exist in this build) */
+.move-list tr + tr,
+.moves tr + tr,
+.damageMoves tr + tr {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* HP bar polish (preserve inline gradient + width from script) */
+.hpbar {
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.hpbar > div {
+  width: auto;
+  transition: width 180ms ease;
+}
+
+/* Subtle focus/hover feedback (no layout shift) */
+.wrapper button:hover,
+.wrapper button:focus,
+.wrapper select:hover,
+.wrapper select:focus {
+  box-shadow: 0 0 6px rgba(255, 204, 0, 0.28);
+  outline: none;
+}
+
+/* Hide original title text if present */
+.title-text, .main-title-text { display: none !important; }
+
+/* Panels/boxes: keep structure, soften borders */
+fieldset, .panel, .move-result-group, .main-result-group {
+  border-color: rgba(255,255,255,.12) !important;
+}
+
+/* Section headings */
+.result-move-header, legend {
+  color: #ffcb05 !important;
+}
+
+/* Add breathing room below result headers */
+[id^="resultHeader"],
+.result-move-header {
+  padding-bottom: 14px !important;
+}
+
+/* Summary text / prominent result line */
+.big-text, .main-title-text {
+  color: #ffcb05 !important;
+}
+
+/* Pills/buttons: inactive vs active */
+.btn, .button, .greenbutton, label.btn {
+  background: rgba(0,0,0,.35) !important;
+  color: #ECECEC !important;
+  border-color: rgba(255,255,255,.18) !important;
+}
+.btn:hover, .button:hover, .greenbutton:hover, label.btn:hover {
+  border-color: rgba(255,203,5,.45) !important;
+}
+.active, .btn-on, .btn:focus, .btn:active, input:checked + label.btn {
+  color: #ffcb05 !important;
+  background: rgba(255,203,5,0.12) !important;
+  border-color: rgba(255,203,5,0.45) !important;
+  box-shadow: 0 0 0 1px rgba(255,203,5,.25) inset !important;
+}
+
+/* Inputs/selects */
+input, select, textarea {
+  background: #141518 !important;
+  color: #ECECEC !important;
+  border-color: rgba(255,255,255,.22) !important;
+}
+input:focus, select:focus, textarea:focus {
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(255,203,5,.35) !important;
+  border-color: rgba(255,203,5,.45) !important;
+}
+
+/* Health bars */
+/* Only adjust track-like containers (not the fill element itself) */
+.hpbar-back, .hpbar .bar-back {
+  background: rgba(255,255,255,.08) !important;
+}
+/* Smooth background transition for gradient updates */
+.hpbar { transition: background 180ms ease; }
+/* Allow inline script width on the fill element to take effect */
+.hpbar > div {
+  width: auto !important;
+  transition: width 180ms ease;
+}
+/* Keep green fill as-is */
+
+/* Tables */
+table, th, td {
+  border-color: rgba(255,255,255,.12) !important;
+}
+
+/* Scoped link overrides inside calculator containers */
+.wrapper a:link,
+.wrapper a:visited,
+.wrapper a:hover,
+.wrapper a:focus,
+.wrapper a:active,
+.page a:link,
+.page a:visited,
+.page a:hover,
+.page a:focus,
+.page a:active,
+.container a:link,
+.container a:visited,
+.container a:hover,
+.container a:focus,
+.container a:active,
+#content a:link,
+#content a:visited,
+#content a:hover,
+#content a:focus,
+#content a:active {
+  color: #ffcb05 !important;
+  text-decoration: none !important;
+}
+.wrapper a:hover,
+.wrapper a:focus,
+.page a:hover,
+.page a:focus,
+.container a:hover,
+.container a:focus,
+#content a:hover,
+#content a:focus {
+  text-decoration: underline !important;
+  text-shadow: 0 0 6px rgba(255, 232, 102, 0.8) !important;
+}
+
+/* Pokémon names / set selectors / moves to yellow with hover feedback */
+.set-selector,
+.poke-info select,
+.result-move-header strong,
+.result-move-header a {
+  color: #ffcb05 !important;
+  text-decoration: none !important;
+  transition: color 0.2s ease !important;
+}
+.result-move-header a:hover,
+.result-move-header strong:hover {
+  color: #ffd84d !important;
+}
+
+/* Move list labels (clickable moves) to yellow */
+.move-result-subgroup label.btn { color: #ffcb05 !important; }
+.move-result-subgroup label.btn:hover { color: #ffd84d !important; }
+
+/* Inline damage result line and any links inside to yellow */
+#mainResult, .big-text, .big-text a, .big-text strong { color: #ffcb05 !important; }
+.big-text a:hover, .big-text strong:hover { color: #ffd84d !important; }
+
+/* Links in results sections to yellow */
+.move-result-group a, .main-result-group a { color: #ffcb05 !important; }
+.move-result-group a:hover, .main-result-group a:hover { color: #ffd84d !important; }
+
+/* Allow script-set inline width to control the HP bar fill */
+.wrapper .hpbar,
+.wrapper .health .hpbar,
+.wrapper .health .bar {
+  display: block !important;            /* avoid flex containers on the track */
+}
+
+/* Common inner fill selectors (cover both upstream variants) */
+.wrapper .hpbar > div,
+.wrapper .hpbar .bar,
+.wrapper .health .hpbar > div,
+.wrapper .health .bar > div,
+.wrapper .health .hpbar .inner,
+.wrapper .hpbar .inner {
+  flex: 0 0 auto !important;            /* stop flex-grow:1 from stretching it */
+  width: auto !important;               /* let inline style set width:% */
+  max-width: 100% !important;
+  height: 100% !important;
+  box-sizing: border-box !important;
+  transition: width 180ms ease !important;
+}
+
+/* If any global reset forces children to stretch, neutralize it within the hpbar */
+.wrapper .hpbar *,
+.wrapper .health .hpbar * {
+  flex: 0 0 auto !important;
+}
+
+

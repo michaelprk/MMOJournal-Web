@@ -235,3 +235,20 @@ MIT License — free to use and modify.
 ---
 
 **Note**: This project showcases full-stack development skills while creating a tool specifically designed for PokeMMO players, though it can be adapted for general competitive Pokémon team building. The project is currently in active development as a learning exercise with plans for future online deployment.
+
+---
+
+## Damage Calculator
+
+- Route: `/damage-calc`
+- Engine and data adapted from `c4vv/pokemmo-damage-calc`.
+- Background toggle (top-right) persists in `localStorage` as `damageCalcPlainBg`.
+
+Adapter: `app/routes/damage-calc/engine-adapter.ts`
+- Strongly-typed API for the UI, lazy-loads engine from `app/routes/damage-calc/engine/`.
+- To update from upstream:
+  1. Copy engine modules (damage math, type chart, moves/species/items data) into `app/routes/damage-calc/engine/`.
+  2. Export `calculate(req)`, `parseImport(text)`, `serialize(state)` to match the adapter.
+  3. Ensure all data is bundled locally (no runtime fetches).
+
+Attribution: Damage engine and data adapted from `c4vv/pokemmo-damage-calc`.

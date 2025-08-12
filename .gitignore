@@ -8,3 +8,5 @@
 # Environment files (never commit secrets)
 .env
 .env.*
+
+third_party/pokemmo-damage-calc/

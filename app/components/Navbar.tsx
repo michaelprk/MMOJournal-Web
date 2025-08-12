@@ -199,6 +199,46 @@ export function Navbar() {
           >
             journal
           </NavLink>
+
+          <div style={{ 
+            width: "1px",
+            height: "20px",
+            background: "linear-gradient(180deg, transparent, rgba(255, 255, 255, 0.2), transparent)",
+          }} />
+
+                      <NavLink
+              to="/damage-calc"
+              style={({ isActive }) => ({
+                color: isActive ? "#ffcb05" : "rgba(255, 255, 255, 0.9)",
+                textDecoration: "none",
+                padding: "0.4rem 1rem",
+                borderRadius: "20px",
+                transition: "all 0.3s ease",
+                whiteSpace: "nowrap",
+                position: "relative",
+                overflow: "hidden",
+                background: isActive 
+                  ? "linear-gradient(135deg, rgba(255, 203, 5, 0.2), rgba(255, 203, 5, 0.1))" 
+                  : "transparent",
+                border: isActive ? "1px solid rgba(255, 203, 5, 0.3)" : "1px solid transparent",
+              })}
+            onMouseEnter={(e) => {
+              if (!e.currentTarget.getAttribute("aria-current")) {
+                e.currentTarget.style.background = "rgba(255, 255, 255, 0.1)";
+                e.currentTarget.style.color = "#ffcb05";
+                e.currentTarget.style.transform = "scale(1.05)";
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!e.currentTarget.getAttribute("aria-current")) {
+                e.currentTarget.style.background = "transparent";
+                e.currentTarget.style.color = "rgba(255, 255, 255, 0.9)";
+                e.currentTarget.style.transform = "scale(1)";
+              }
+            }}
+          >
+            damage calc
+          </NavLink>
                   </div>
       </div>
 

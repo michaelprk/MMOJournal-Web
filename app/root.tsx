@@ -7,6 +7,7 @@ import {
   ScrollRestoration,
 } from "react-router";
 
+import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import type { Route } from "./+types/root";
 import "./app.css";
@@ -30,6 +31,31 @@ export const links: Route.LinksFunction = () => [
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
+  const [plainDamageCalcBg, setPlainDamageCalcBg] = useState(false);
+
+  useEffect(() => {
+    if (location.pathname === "/damage-calc") {
+      try {
+        const flag = window.localStorage.getItem("damageCalcPlainBg");
+        setPlainDamageCalcBg(flag === "true");
+      } catch {}
+    }
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === "damageCalcPlainBg" && location.pathname === "/damage-calc") {
+        setPlainDamageCalcBg(e.newValue === "true");
+      }
+    };
+    const onCustom = (e: Event) => {
+      const ce = e as CustomEvent<{ plain: boolean }>;
+      if (location.pathname === "/damage-calc") setPlainDamageCalcBg(!!ce.detail?.plain);
+    };
+    window.addEventListener("storage", onStorage);
+    window.addEventListener("damageCalc:bg", onCustom as EventListener);
+    return () => {
+      window.removeEventListener("storage", onStorage);
+      window.removeEventListener("damageCalc:bg", onCustom as EventListener);
+    };
+  }, [location.pathname]);
   const showNavbar = location.pathname !== "/login" && location.pathname !== "/create-account";
 
   return (
@@ -57,6 +83,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             height: "100%",
             objectFit: "cover",
             objectPosition: "center",
+            display: location.pathname === "/damage-calc" && plainDamageCalcBg ? "none" : "block",
             filter:
               location.pathname === "/login" || location.pathname === "/create-account"
                 ? "grayscale(50%) brightness(80%) contrast(95%) blur(4px)"
@@ -84,7 +111,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
               location.pathname === "/" ||
               location.pathname === "/pvp" ||
               location.pathname === "/shiny-hunt" ||
-              location.pathname === "/journey"
+              location.pathname === "/journey" ||
+              location.pathname === "/damage-calc"
             ? "transparent"
             : "rgba(0,0,0,0.7)",
             paddingTop: showNavbar ? "200px" : "0", // Add padding to account for fixed navbar
