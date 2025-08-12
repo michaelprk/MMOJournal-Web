@@ -214,18 +214,19 @@ export function StartHuntModal({ isOpen, onClose, onCreated, mode = 'create', in
         };
         const parsedLocPhase = safeParse<{ region: string | null; area: string | null }>(location.value) || { region: location.region, area: location.area };
         const activeParents = activeRows as any[];
-        const conflictParent = activeParents.find((r: any) => (
-          r && (r.is_phase !== true) && r.is_completed !== true &&
-          (r.region ?? null) === parsedLocPhase.region &&
-          normalizeArea(r.area ?? null) === normalizeArea(parsedLocPhase.area ?? null) &&
-          canonicalizeMethod(r.method) === canonicalizeMethod(method)
-        ) && activeParents.find((r: any) => {
+        const conflictParent = activeParents.find((r: any) => {
           if (!r) return false;
+          if (r.is_phase === true || r.is_completed === true) return false;
           if ((r.region ?? null) !== parsedLocPhase.region) return false;
           if (normalizeArea(r.area ?? null) !== normalizeArea(parsedLocPhase.area ?? null)) return false;
           if (canonicalizeMethod(r.method) !== canonicalizeMethod(method)) return false;
-          const candidates = getSpeciesAtLocationByMethod(parsedLocPhase.region ?? null, parsedLocPhase.area ?? null, r.method, r.pokemon_id);
-          return candidates.some((c) => c.id === species.id) ? r : false;
+          const candidates = getSpeciesAtLocationByMethod(
+            parsedLocPhase.region ?? null,
+            parsedLocPhase.area ?? null,
+            r.method,
+            r.pokemon_id
+          );
+          return candidates.some((c) => c.id === species.id);
         });
         if (conflictParent) {
           setSubmitting(false);
