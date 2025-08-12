@@ -55,6 +55,24 @@ export const shinyHuntService = {
     };
   },
 
+  subscribeUpdates(userId: string, onUpdate: (row: ShinyHuntRow) => void) {
+    const channel = supabase
+      .channel('shiny_hunts_updates')
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'shiny_hunts', filter: `user_id=eq.${userId}` },
+        (payload) => {
+          const updatedRow = payload.new as ShinyHuntRow;
+          onUpdate(updatedRow);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  },
+
   async listActive(): Promise<ShinyHuntRow[]> {
     const { data, error } = await supabase
       .from('shiny_hunts')

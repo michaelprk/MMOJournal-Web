@@ -208,7 +208,8 @@ export default function ShinyShowcase() {
   // Load hunts from Supabase (active & completed separated)
   useEffect(() => {
     if (initializing || !user) return;
-    let cleanup: (() => void) | undefined;
+    let cleanupInsert: (() => void) | undefined;
+    let cleanupUpdate: (() => void) | undefined;
     (async () => {
       try {
         const active = await shinyHuntService.listActive();
@@ -246,7 +247,7 @@ export default function ShinyShowcase() {
       } catch (err: any) {
         console.error('[shiny:list] error', err);
       }
-      cleanup = shinyHuntService.subscribe(String(user.id), (row) => {
+      cleanupInsert = shinyHuntService.subscribe(String(user.id), (row) => {
         if (row.is_completed) {
           setPortfolio((prev) => ([{
             id: row.id,
@@ -277,9 +278,24 @@ export default function ShinyShowcase() {
           }] as any).concat(prev));
         }
       });
+      // Listen for updates to counters and phases to update UI live
+      cleanupUpdate = shinyHuntService.subscribeUpdates(String(user.id), (row) => {
+        // Update current hunts list when an active hunt's counters or phase change
+        setCurrentHunts((prev) => prev.map((h) => (
+          h.id === row.id
+            ? {
+                ...h,
+                phaseCount: row.phase_count,
+                totalEncounters: row.total_encounters,
+                updatedAt: row.created_at,
+              }
+            : h
+        )));
+      });
     })();
     return () => {
-      cleanup && cleanup();
+      cleanupInsert && cleanupInsert();
+      cleanupUpdate && cleanupUpdate();
     };
   }, [initializing, user]);
 
