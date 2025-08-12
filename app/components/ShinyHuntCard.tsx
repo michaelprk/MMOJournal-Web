@@ -141,57 +141,7 @@ export default function ShinyHuntCard({
         height: '100%'
       }}
     >
-      <div className="hunt-card-header">
-        <button 
-          className="edit-btn"
-          onClick={() => onEdit(hunt)}
-        >
-          ✏️
-        </button>
-        {onDelete && (
-          <button
-            onClick={() => {
-              const ok = window.confirm(
-                'Pause this hunt? It will be moved to Paused Hunts and no longer appear under Current Hunts until you resume it.'
-              );
-              if (ok) onDelete(hunt);
-            }}
-            title="Pause hunt"
-            style={{
-              marginLeft: 8,
-              background: 'transparent',
-              color: '#ffd700',
-              border: '1px solid rgba(255, 215, 0, 0.6)',
-              borderRadius: 6,
-              padding: '2px 8px',
-              cursor: 'pointer',
-              fontWeight: 800,
-            }}
-          >
-            ⏸️
-          </button>
-        )}
-        <div
-          className="method-badge"
-          style={{
-            background: (() => {
-              const m = String(hunt.method || '').toLowerCase();
-              if (m.includes('fish') || m.includes('rod')) return 'linear-gradient(45deg, #2196f3, #42a5f5)';
-              if (m.includes('horde')) return 'linear-gradient(45deg, #ef5350, #e53935)';
-              if (m.includes('safari')) return 'linear-gradient(45deg, #66bb6a, #43a047)';
-              if (m.includes('egg')) return 'linear-gradient(45deg, #ffca28, #ffc107)';
-              if (m.includes('fossil')) return 'linear-gradient(45deg, #9e9e9e, #757575)';
-              if (m.includes('honey') || m.includes('headbutt')) return 'linear-gradient(45deg, #ffd54f, #ffca28)';
-              // Singles / Lures and default: magenta/purple
-              if (m.includes('lure') || m.includes('single')) return 'linear-gradient(45deg, #ec4899, #a855f7)';
-              return methodColor.background;
-            })(),
-            color: '#fff',
-          }}
-        >
-          {hunt.method}
-        </div>
-      </div>
+      {/* Header removed per new layout; actions pinned bottom */}
 
       {/* Top action row for grid cards */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, marginBottom: 12 }}>
@@ -276,8 +226,8 @@ export default function ShinyHuntCard({
           <div><strong>Started:</strong> {startDate}</div>
         </div>
 
-        {/* Bottom bar: edit/pause left, method badge right; pinned to bottom */}
-        <div style={{ marginTop: 'auto', paddingTop: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        {/* Bottom bar: edit/pause left, method badge right; pinned to bottom; reserve height to avoid nudge */}
+        <div style={{ marginTop: 'auto', paddingTop: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center', minHeight: 36 }}>
           <div>
             <button 
               className="edit-btn"
