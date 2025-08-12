@@ -238,17 +238,20 @@ MIT License — free to use and modify.
 
 ---
 
-## Damage Calculator
+## Damage Calculator (Standalone)
 
-- Route: `/damage-calc`
-- Engine and data adapted from `c4vv/pokemmo-damage-calc`.
-- Background toggle (top-right) persists in `localStorage` as `damageCalcPlainBg`.
+- Entry: visit `/calc` → HTTP 302 redirect to the static calculator at `/pokemmo-damage-calc/index.html?gen=5`.
+- No site chrome: the static page runs standalone (not wrapped by the app layout).
+- Vendored build lives under `public/pokemmo-damage-calc/` (copied from `third_party/pokemmo-damage-calc/`).
+- Theming: MMOJ visual tweaks in `public/pokemmo-damage-calc/mmoj-theme.css` (loaded after stock CSS). Additional runtime overrides and height sync exist in `public/pokemmo-damage-calc/theme/loader.js`.
+- SEO: `/calc` loader sets `X-Robots-Tag: noindex` to discourage indexing.
 
-Adapter: `app/routes/damage-calc/engine-adapter.ts`
-- Strongly-typed API for the UI, lazy-loads engine from `app/routes/damage-calc/engine/`.
-- To update from upstream:
-  1. Copy engine modules (damage math, type chart, moves/species/items data) into `app/routes/damage-calc/engine/`.
-  2. Export `calculate(req)`, `parseImport(text)`, `serialize(state)` to match the adapter.
-  3. Ensure all data is bundled locally (no runtime fetches).
+Update workflow (vendored calc):
+1) Update from upstream into `third_party/pokemmo-damage-calc/`.
+2) Copy updated files into `public/pokemmo-damage-calc/` (preserve our `mmoj-theme.css` and `theme/loader.js`).
+3) Do not modify upstream JS/HTML structure beyond linking our theme and removing the internal footer credits if desired.
 
-Attribution: Damage engine and data adapted from `c4vv/pokemmo-damage-calc`.
+Notes:
+- Legacy `/damage-calc` in-app UI has been removed in favor of the standalone embed.
+- All calculator logic remains upstream; our changes are CSS-only for branding and readability.
+- Attribution: Engine/UI by upstream project `c4vv/pokemmo-damage-calc`.
