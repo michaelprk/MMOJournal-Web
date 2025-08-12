@@ -92,28 +92,24 @@ export default function CompletionModal({
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      padding: '20px',
+      padding: 20,
     }}>
       <div style={{
         background: 'rgba(0, 0, 0, 0.95)',
         border: '2px solid #ffd700',
-        borderRadius: '12px',
-        padding: '24px',
-        maxWidth: '600px',
+        borderRadius: 12,
+        padding: 24,
+        maxWidth: 700,
         width: '100%',
         maxHeight: '90vh',
         overflowY: 'auto',
+        color: '#fff'
       }}>
-        <h3 style={{ 
-          color: '#ffd700', 
-          margin: '0 0 20px 0',
-          fontSize: '1.5rem',
-          textAlign: 'center'
-        }}>
+        <h3 style={{ color: '#ffd700', margin: '0 0 20px 0', fontSize: '1.5rem', textAlign: 'center' }}>
           🎉 Shiny {hunt.pokemonName} Found!
         </h3>
         
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <div>
             <label style={{ color: '#ffd700', display: 'block', marginBottom: '8px' }}>Gender:</label>
             <select 
@@ -177,8 +173,8 @@ export default function CompletionModal({
           </div>
           
           <div>
-            <label style={{ color: '#ffd700', display: 'block', marginBottom: '8px' }}>IVs (Optional):</label>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
+            <label style={{ color: '#ffd700', display: 'block', marginBottom: 8 }}>IVs (Optional):</label>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
               {[
                 { key: 'hp', label: 'HP' },
                 { key: 'attack', label: 'Atk' },
@@ -188,7 +184,7 @@ export default function CompletionModal({
                 { key: 'speed', label: 'Spe' }
               ].map(({ key, label }) => (
                 <div key={key}>
-                  <label style={{ color: '#ccc', fontSize: '0.8rem', display: 'block', marginBottom: '4px' }}>{label}:</label>
+                  <label style={{ color: '#ccc', fontSize: '0.8rem', display: 'block', marginBottom: 4 }}>{label}:</label>
                   <input 
                     type="number" 
                     min="0" 
@@ -196,13 +192,9 @@ export default function CompletionModal({
                     value={completionData.ivs[key as keyof PokemonStats]}
                     onChange={(e) => handleIVChange(key as keyof PokemonStats, parseInt(e.target.value) || 0)}
                     style={{
-                      width: '100%',
-                      padding: '6px',
-                      border: '1px solid rgba(255, 215, 0, 0.3)',
-                      borderRadius: '4px',
-                      background: 'rgba(0, 0, 0, 0.4)',
-                      color: '#fff',
-                      fontSize: '0.8rem',
+                      width: '100%', padding: 8,
+                      border: '1px solid rgba(255, 215, 0, 0.3)', borderRadius: 6,
+                      background: 'rgba(0, 0, 0, 0.4)', color: '#fff', fontSize: '0.9rem'
                     }}
                   />
                 </div>
@@ -212,7 +204,7 @@ export default function CompletionModal({
           
         </div>
         
-        <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '20px' }}>
+        <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', marginTop: 20 }}>
           <button
             onClick={onClose}
             style={{

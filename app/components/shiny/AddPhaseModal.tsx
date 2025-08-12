@@ -136,45 +136,46 @@ export function AddPhaseModal({ isOpen, onClose, parentHunt, onAdded }: AddPhase
   return createPortal(
     <div
       style={{
-        position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.9)', zIndex: 9999,
-        display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem'
+        position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.95)', zIndex: 10000,
+        display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px'
       }}
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div
         style={{
-          background: 'rgba(0,0,0,0.95)', border: '2px solid #ffcb05', borderRadius: 12,
-          padding: 16, width: '100%', maxWidth: 700, color: '#fff', position: 'relative', zIndex: 10000
+          background: 'rgba(0,0,0,0.95)', border: '2px solid #ffd700', borderRadius: 12,
+          padding: 24, width: '100%', maxWidth: 700, color: '#fff', position: 'relative', zIndex: 10000,
+          maxHeight: '90vh', overflowY: 'auto'
         }}
       >
-        <h2 style={{ marginTop: 0, marginBottom: 12 }}>➕ Add Phase</h2>
+        <h2 style={{ marginTop: 0, marginBottom: 20, color: '#ffd700', fontSize: '1.5rem', textAlign: 'center' }}>➕ Add Phase</h2>
 
         {/* Locked Location & Method */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
           <div>
-            <label>Location</label>
+            <label style={{ color: '#ffd700', display: 'block', marginBottom: 8 }}>Location</label>
             <input value={lockedLocation?.label || ''} readOnly
-              style={{ width: '100%', background: 'rgba(255,255,255,0.1)', border: '1px solid #ffcb05', borderRadius: 8, color: '#fff', padding: '8px 10px' }} />
+              style={{ width: '100%', background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255, 215, 0, 0.3)', borderRadius: 6, color: '#fff', padding: 8, fontSize: '0.9rem' }} />
           </div>
           <div>
-            <label>Method</label>
+            <label style={{ color: '#ffd700', display: 'block', marginBottom: 8 }}>Method</label>
             <input value={parentHunt.method} readOnly
-              style={{ width: '100%', background: 'rgba(255,255,255,0.1)', border: '1px solid #ffcb05', borderRadius: 8, color: '#fff', padding: '8px 10px' }} />
+              style={{ width: '100%', background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255, 215, 0, 0.3)', borderRadius: 6, color: '#fff', padding: 8, fontSize: '0.9rem' }} />
           </div>
         </div>
 
         {/* Species Select */}
         <div style={{ marginBottom: 12 }}>
-          <label>Species</label>
+          <label style={{ color: '#ffd700', display: 'block', marginBottom: 8 }}>Species</label>
           <input
             placeholder={species ? species.name : 'Search species...'}
             value={speciesQuery}
             onChange={(e) => setSpeciesQuery(e.target.value)}
             onFocus={() => setSpeciesOpen(true)}
-            style={{ width: '100%', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,203,5,0.5)', borderRadius: 8, color: '#fff', padding: '8px 10px', marginBottom: 8 }}
+            style={{ width: '100%', background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,215,0,0.3)', borderRadius: 6, color: '#fff', padding: 8, marginBottom: 8, fontSize: '0.9rem' }}
           />
           {speciesOpen && (
-            <div style={{ maxHeight: 180, overflowY: 'auto', border: '1px solid rgba(255,203,5,0.3)', borderRadius: 8, backgroundColor: 'rgba(0,0,0,0.95)' }} onMouseLeave={() => setSpeciesOpen(false)}>
+            <div style={{ maxHeight: 180, overflowY: 'auto', border: '1px solid rgba(255,203,5,0.3)', borderRadius: 6, backgroundColor: 'rgba(0,0,0,0.95)' }} onMouseLeave={() => setSpeciesOpen(false)}>
               {filteredSpecies.length === 0 && (
                 <div style={{ padding: '8px 10px', color: '#bbb' }}>No species available at this location</div>
               )}
@@ -198,18 +199,18 @@ export function AddPhaseModal({ isOpen, onClose, parentHunt, onAdded }: AddPhase
         {/* Gender and Nature */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
           <div>
-            <label>Gender</label>
+            <label style={{ color: '#ffd700', display: 'block', marginBottom: 8 }}>Gender</label>
             <select value={gender} onChange={(e) => setGender(e.target.value as any)}
-              style={{ width: '100%', background: 'rgba(255,255,255,0.1)', border: '1px solid #ffcb05', borderRadius: 8, color: '#fff', padding: '8px 10px' }}>
+              style={{ width: '100%', background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,215,0,0.3)', borderRadius: 6, color: '#fff', padding: 8, fontSize: '0.9rem' }}>
               <option value="Male">Male</option>
               <option value="Female">Female</option>
               <option value="Genderless">Genderless</option>
             </select>
           </div>
           <div>
-            <label>Nature</label>
+            <label style={{ color: '#ffd700', display: 'block', marginBottom: 8 }}>Nature</label>
             <select value={nature} onChange={(e) => setNature(e.target.value)}
-              style={{ width: '100%', background: 'rgba(255,255,255,0.1)', border: '1px solid #ffcb05', borderRadius: 8, color: '#fff', padding: '8px 10px' }}>
+              style={{ width: '100%', background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,215,0,0.3)', borderRadius: 6, color: '#fff', padding: 8, fontSize: '0.9rem' }}>
               <option value="">Select Nature</option>
               {POKEMON_NATURES.map(n => <option key={n} value={n}>{n}</option>)}
             </select>
@@ -218,7 +219,7 @@ export function AddPhaseModal({ isOpen, onClose, parentHunt, onAdded }: AddPhase
 
         {/* IVs */}
         <div style={{ marginBottom: 12 }}>
-          <label>IVs</label>
+          <label style={{ color: '#ffd700', display: 'block', marginBottom: 8 }}>IVs</label>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 8, marginTop: 6 }}>
             {[
               ['hp','HP'], ['attack','Atk'], ['defense','Def'], ['sp_attack','SpA'], ['sp_defense','SpD'], ['speed','Spe']
@@ -228,7 +229,7 @@ export function AddPhaseModal({ isOpen, onClose, parentHunt, onAdded }: AddPhase
                 <input type="number" min={0} max={31}
                   value={(ivs as any)[key] ?? 0}
                   onChange={(e) => setIvs(prev => ({ ...prev, [key]: Math.max(0, Math.min(31, Number(e.target.value) || 0)) }))}
-                  style={{ width: '100%', background: 'rgba(255,255,255,0.1)', border: '1px solid #ffcb05', borderRadius: 8, color: '#fff', padding: '8px 10px' }} />
+                  style={{ width: '100%', background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,215,0,0.3)', borderRadius: 6, color: '#fff', padding: 8, fontSize: '0.9rem' }} />
               </div>
             ))}
           </div>
@@ -237,19 +238,19 @@ export function AddPhaseModal({ isOpen, onClose, parentHunt, onAdded }: AddPhase
         {/* Found date and encounters */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
           <div>
-            <label>Found date</label>
+            <label style={{ color: '#ffd700', display: 'block', marginBottom: 8 }}>Found date</label>
             <input type="date" value={foundAt} onChange={(e) => setFoundAt(e.target.value)}
-              style={{ width: '100%', background: 'rgba(255,255,255,0.1)', border: '1px solid #ffcb05', borderRadius: 8, color: '#fff', padding: '8px 10px' }} />
+              style={{ width: '100%', background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,215,0,0.3)', borderRadius: 6, color: '#fff', padding: 8, fontSize: '0.9rem' }} />
           </div>
           <div>
-            <label>Encounters (for this phase)</label>
+            <label style={{ color: '#ffd700', display: 'block', marginBottom: 8 }}>Encounters (for this phase)</label>
             <input
               type="number"
               min={1}
               value={encounters}
               onChange={(e) => setEncounters(e.target.value === '' ? '' : Number(e.target.value))}
               placeholder="e.g. 1234"
-              style={{ width: '100%', background: 'rgba(255,255,255,0.1)', border: '1px solid #ffcb05', borderRadius: 8, color: '#fff', padding: '8px 10px' }}
+              style={{ width: '100%', background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,215,0,0.3)', borderRadius: 6, color: '#fff', padding: 8, fontSize: '0.9rem' }}
             />
           </div>
         </div>
@@ -259,13 +260,13 @@ export function AddPhaseModal({ isOpen, onClose, parentHunt, onAdded }: AddPhase
         )}
 
         {/* Actions */}
-        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: 20 }}>
           <button onClick={onClose}
             style={{ backgroundColor: 'rgba(220, 53, 69, 0.2)', border: '2px solid #dc3545', color: '#dc3545', padding: '10px 16px', borderRadius: 8, fontWeight: 700, cursor: 'pointer' }}>
             Cancel
           </button>
           <button onClick={handleSubmit} disabled={!canSubmit}
-            style={{ backgroundColor: canSubmit ? '#ffcb05' : 'rgba(255,203,5,0.3)', color: canSubmit ? '#000' : '#666', border: 'none', padding: '10px 16px', borderRadius: 8, fontWeight: 700, cursor: canSubmit ? 'pointer' : 'not-allowed' }}>
+            style={{ backgroundColor: canSubmit ? '#ffd700' : 'rgba(255,203,5,0.3)', color: canSubmit ? '#000' : '#666', border: 'none', padding: '10px 16px', borderRadius: 8, fontWeight: 700, cursor: canSubmit ? 'pointer' : 'not-allowed' }}>
             {submitting ? 'Saving…' : 'Add Phase'}
           </button>
         </div>
