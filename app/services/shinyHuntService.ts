@@ -75,26 +75,9 @@ export const shinyHuntService = {
   },
 
   async listActive(): Promise<ShinyHuntRow[]> {
-    // Try to filter paused hunts server-side if column exists; otherwise fall back to client-side filter
-    let query = supabase
-      .from('shiny_hunts')
-      .select(
-        'id,pokemon_id,pokemon_name,method,region,area,location,rarity,phase_count,total_encounters,is_completed,is_phase,parent_hunt_id,start_date,found_at,created_at'
-      )
-      .eq('is_completed', false)
-      .eq('is_phase', false)
-      .order('created_at', { ascending: false });
-
-    // Attempt server-side filter for paused
-    let { data, error } = await query.eq('is_paused', false);
-    if (error) {
-      // Retry without paused filter (column may not exist yet in local DB)
-      const retry = await query;
-      if (retry.error) throw retry.error;
-      const rows = (retry.data || []) as ShinyHuntRow[];
-      return rows.filter((r) => (r as any).is_paused !== true);
-    }
-    return (data || []) as ShinyHuntRow[];
+    // Robust client-side filtering to tolerate missing/null columns in dev
+    const rows = await this.list();
+    return rows.filter((r) => r.is_completed !== true && r.is_phase !== true && (r as any).is_paused !== true);
   },
 
   async listCompleted(): Promise<ShinyHuntRow[]> {
@@ -181,19 +164,9 @@ export const shinyHuntService = {
   },
 
   async listPaused(): Promise<ShinyHuntRow[]> {
-    // If is_paused column isn't available, treat as no paused hunts
-    const base = supabase
-      .from('shiny_hunts')
-      .select('id,pokemon_id,pokemon_name,method,region,area,location,rarity,phase_count,total_encounters,is_completed,is_phase,parent_hunt_id,start_date,found_at,created_at')
-      .eq('is_completed', false)
-      .eq('is_phase', false)
-      .order('created_at', { ascending: false });
-    const { data, error } = await base.eq('is_paused', true);
-    if (error) {
-      // Column missing or not enabled locally → return empty paused list
-      return [];
-    }
-    return (data || []) as ShinyHuntRow[];
+    // Robust client-side filtering
+    const rows = await this.list();
+    return rows.filter((r) => r.is_completed !== true && r.is_phase !== true && (r as any).is_paused === true);
   },
 
   async updateCounters(id: number, data: { phase_count?: number; total_encounters?: number }): Promise<void> {

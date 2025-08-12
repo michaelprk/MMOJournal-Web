@@ -220,7 +220,7 @@ export default function ShinyShowcase() {
           shinyHuntService.listCompleted(),
           shinyHuntService.listPaused().catch(() => []),
         ]);
-        setCurrentHunts(active.filter((r: any) => (r as any).is_paused !== true).map((r) => ({
+        setCurrentHunts(active.map((r) => ({
           id: r.id,
           pokemonId: r.pokemon_id,
           pokemonName: r.pokemon_name,
