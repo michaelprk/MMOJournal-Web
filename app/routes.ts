@@ -8,7 +8,8 @@ const routes = [
   route("/pvp/teams", "./routes/pvp/teams.tsx"),
   route("/shiny-hunt", "./routes/shiny-hunt/index.tsx"),
   route("/journey", "./routes/journey/index.tsx"),
-  route("/damage-calc", "./routes/damage-calc/index.tsx"),
+  route("/journal", "./routes/journal.tsx"),
+  route("/calc", "./routes/calc.tsx"),
 ];
 
 export default routes;
