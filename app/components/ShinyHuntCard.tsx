@@ -182,7 +182,7 @@ export default function ShinyHuntCard({
         </button>
       </div>
 
-      <div className="hunt-card-content" style={{ flex: 1 }}>
+      <div className="hunt-card-content" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
           <div className="shiny-sprite-container">
           <img 
             src={spritePath} 
@@ -201,13 +201,17 @@ export default function ShinyHuntCard({
         </div>
 
         <h3 className="pokemon-name">{hunt.pokemonName}</h3>
-        {/* Location only; method badge removed to avoid duplication */}
-        <div style={{ marginTop: 6, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-          {(hunt.region || hunt.area) && (
-            <div style={{ color: '#ccc', fontSize: '0.8rem' }}>
-              {(hunt.region || 'Unknown Region')} — {hunt.area ? String(hunt.area).toUpperCase() : 'UNKNOWN AREA'}
-            </div>
-          )}
+        {/* Location row with reserved space to keep footer pinned */}
+        <div className="location-row" style={{ marginTop: 6, minHeight: 20, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          { (hunt.region || hunt.area)
+            ? (
+              <div style={{ color: '#ccc', fontSize: '0.8rem' }}>
+                {(hunt.region || 'Unknown Region')} — {hunt.area ? String(hunt.area).toUpperCase() : 'UNKNOWN AREA'}
+              </div>
+            ) : (
+              // Keep space even when empty
+              <span style={{ visibility: 'hidden', fontSize: '0.8rem' }}>placeholder</span>
+            ) }
         </div>
         
         <div className="hunt-stats">
@@ -255,7 +259,7 @@ export default function ShinyHuntCard({
               </button>
             )}
           </div>
-          <div className="method-badge" style={{ background: (() => {
+        <div className="method-badge" style={{ background: (() => {
                 const m = String(hunt.method || '').toLowerCase();
                 if (m.includes('fish') || m.includes('rod')) return 'linear-gradient(45deg, #2196f3, #42a5f5)';
                 if (m.includes('horde')) return 'linear-gradient(45deg, #ef5350, #e53935)';
