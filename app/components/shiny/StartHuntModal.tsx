@@ -111,9 +111,8 @@ export function StartHuntModal({ isOpen, onClose, onCreated, mode = 'create', in
           return (l.method || '').toLowerCase().includes('safari');
         case 'egg':
         case 'alpha_egg':
-          return false; // no locations for eggs
         case 'fossil':
-          return (l.method || '').toLowerCase().includes('fossil');
+          return false; // no locations for eggs
         default:
           return true;
       }
@@ -163,9 +162,9 @@ export function StartHuntModal({ isOpen, onClose, onCreated, mode = 'create', in
     setInvalidCombo(!ok);
   }, [species, method, location]);
 
-  // Eggs skip location entirely
+  // Eggs and Fossils skip location entirely
   const canonMethod = canonicalizeMethod(method);
-  const requiresLocation = !(canonMethod === 'egg' || canonMethod === 'alpha_egg');
+  const requiresLocation = !(canonMethod === 'egg' || canonMethod === 'alpha_egg' || canonMethod === 'fossil');
   const canSubmit = mode === 'edit'
     ? !submitting && !!species
     : (!!species && !!method && (!requiresLocation || !!location) && !invalidCombo && !submitting);
@@ -402,8 +401,8 @@ export function StartHuntModal({ isOpen, onClose, onCreated, mode = 'create', in
           )}
         </div>
 
-        {/* Location (hidden/disabled for egg hunts) */}
-        <div style={{ marginBottom: '0.5rem', display: (canonMethod === 'egg' || canonMethod === 'alpha_egg') ? 'none' : 'block' }}>
+        {/* Location (hidden/disabled for egg and fossil hunts) */}
+        <div style={{ marginBottom: '0.5rem', display: (canonMethod === 'egg' || canonMethod === 'alpha_egg' || canonMethod === 'fossil') ? 'none' : 'block' }}>
           <label style={{ display: 'block', color: '#ffcb05', marginBottom: 6 }}>Location</label>
           <input
             type="text"
