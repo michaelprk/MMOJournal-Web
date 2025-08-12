@@ -300,7 +300,8 @@ export function getSpeciesAtLocationByMethod(
       const a = l?.location ?? null;
       if (r !== region || a !== area) return false;
       if (!methodMatches(l?.type, l?.rarity ?? null)) return false;
-      if (allowedSurfaces) {
+      // For horde hunts, do not enforce surface equality – datasets often omit the specific surface for hordes
+      if (allowedSurfaces && canon !== 'horde') {
         const candidateSurface = normalizeSurface(l?.type);
         if (!allowedSurfaces.has(candidateSurface)) return false;
       }
