@@ -135,19 +135,25 @@ export default function ShinyHuntCard({
         </button>
         {onDelete && (
           <button
-            onClick={() => onDelete(hunt)}
-            title="Delete hunt"
+            onClick={() => {
+              const ok = window.confirm(
+                'Pause this hunt? It will be moved to Paused Hunts and no longer appear under Current Hunts until you resume it.'
+              );
+              if (ok) onDelete(hunt);
+            }}
+            title="Pause hunt"
             style={{
               marginLeft: 8,
               background: 'transparent',
-              color: '#ff6b6b',
-              border: '1px solid rgba(255, 107, 107, 0.5)',
+              color: '#ffd700',
+              border: '1px solid rgba(255, 215, 0, 0.6)',
               borderRadius: 6,
-              padding: '2px 6px',
+              padding: '2px 8px',
               cursor: 'pointer',
+              fontWeight: 800,
             }}
           >
-            🗑️
+            ⏸️
           </button>
         )}
         <div className="method-badge" style={{ background: methodColor.background }}>
