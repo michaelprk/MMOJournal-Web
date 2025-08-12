@@ -81,6 +81,14 @@ export function AddPhaseModal({ isOpen, onClose, parentHunt, onAdded }: AddPhase
     if (!validateSpeciesAtLocation()) { setErrorMsg('Species is not available at the selected location'); return; }
     setSubmitting(true);
     try {
+      // Duplicate prevention for phase: Check if a paused/active parent or existing phases already contain same species at same location
+      const existingPhases = await shinyHuntService.listPhases(parentHunt.id);
+      const isDupPhase = existingPhases.some((p: any) => p.pokemon_id === species.id);
+      if (isDupPhase) {
+        setSubmitting(false);
+        setErrorMsg(`This hunt already has a phase for ${species.name}. You cannot add duplicate phase entries.`);
+        return;
+      }
       await shinyHuntService.addPhase(parentHunt.id, {
         pokemon_id: species.id,
         pokemon_name: species.name,

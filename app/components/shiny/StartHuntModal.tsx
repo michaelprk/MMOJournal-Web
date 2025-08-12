@@ -186,6 +186,27 @@ export function StartHuntModal({ isOpen, onClose, onCreated, mode = 'create', in
     if (!canSubmit || !species) return;
     setSubmitting(true);
     try {
+      // Duplicate prevention: check existing open (active or paused) hunts for same species/method/location
+      const canon = canonicalizeMethod(method);
+      const [activeRows, pausedRows] = await Promise.all([
+        shinyHuntService.listActive(),
+        shinyHuntService.listPaused().catch(() => []),
+      ]);
+      const allOpen = (activeRows as any[]).concat(pausedRows as any[]).filter((r) => r && (r as any).is_phase !== true);
+      const parsedLocDup = location ? (safeParse<{ region: string | null; area: string | null }>(location.value) || { region: location.region, area: location.area }) : { region: null, area: null };
+      const isDup = allOpen.some((r: any) => {
+        const sameSpecies = r.pokemon_id === species.id;
+        const sameMethod = canonicalizeMethod(r.method) === canon;
+        const sameLoc = (requiresLocation
+          ? (r.region ?? null) === (parsedLocDup.region ?? null) && (r.area ?? null) === (parsedLocDup.area ?? null)
+          : true);
+        return sameSpecies && sameMethod && sameLoc;
+      });
+      if (isDup) {
+        setSubmitting(false);
+        setErrorMsg(`You already have a hunt for ${species.name} via ${method}${requiresLocation && location ? ` at ${location.label}` : ''}. Resume or edit that hunt instead.`);
+        return;
+      }
       if (mode === 'edit') {
         const parsed = location ? (JSON.parse(location.value) as { region: string | null; area: string | null }) : { region: null, area: null };
         await shinyHuntService.updateHunt(initial?.id as number, {
