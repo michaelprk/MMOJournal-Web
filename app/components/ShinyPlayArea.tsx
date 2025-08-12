@@ -219,8 +219,8 @@ export default function ShinyCalendar({ portfolio, onEdit }: ShinyCalendarProps)
                     pokemonName: shiny.pokemonName,
                     method: shiny.method as any,
                     date: shiny.dateFound,
-                    nature: shiny.nature || null,
-                    encounters: shiny.encounterCount ?? null,
+                    nature: shiny.nature || (shiny as any)?.meta?.nature || null,
+                    encounters: shiny.encounterCount ?? (shiny as any)?.total_encounters ?? null,
                     notes: shiny.notes || null,
                     isPhase: (shiny as any).is_phase || false,
                   };

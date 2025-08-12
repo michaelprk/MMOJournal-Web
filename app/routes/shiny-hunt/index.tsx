@@ -148,7 +148,16 @@ export default function ShinyShowcase() {
     try {
       await shinyHuntService.markFound(huntId as any);
       if (data.ivs || data.nature) {
-        await shinyHuntService.updateMeta(huntId as any, { ivs: data.ivs, nature: data.nature });
+        // Normalize IV keys to canonical shape and merge into meta
+        const ivs = data.ivs ? {
+          hp: data.ivs.hp ?? (data.ivs as any).atk ?? 0,
+          attack: data.ivs.attack ?? (data.ivs as any).atk ?? 0,
+          defense: data.ivs.defense ?? (data.ivs as any).def ?? 0,
+          sp_attack: data.ivs.sp_attack ?? (data.ivs as any).sp_atk ?? 0,
+          sp_defense: data.ivs.sp_defense ?? (data.ivs as any).sp_def ?? 0,
+          speed: data.ivs.speed ?? (data.ivs as any).spd ?? 0,
+        } : undefined;
+        await shinyHuntService.updateMeta(huntId as any, { ivs, nature: data.nature });
       }
       if (typeof data.encounterCount === 'number') {
         await shinyHuntService.updateCounters(huntId as any, { total_encounters: data.encounterCount });

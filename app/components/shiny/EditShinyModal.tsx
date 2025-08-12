@@ -27,12 +27,12 @@ export function EditShinyModal({ isOpen, onClose, initial, onSave }: EditShinyMo
   const [phaseCount, setPhaseCount] = useState<number>(initial.phase_count || 1);
   const [encounters, setEncounters] = useState<number>(initial.total_encounters || 0);
   const [ivs, setIvs] = useState<any>({
-    hp: initial.meta?.ivs?.hp || 0,
-    atk: initial.meta?.ivs?.atk || 0,
-    def: initial.meta?.ivs?.def || 0,
-    sp_atk: initial.meta?.ivs?.sp_atk || 0,
-    sp_def: initial.meta?.ivs?.sp_def || 0,
-    spd: initial.meta?.ivs?.spd || 0,
+    hp: initial.meta?.ivs?.hp ?? 0,
+    attack: (initial.meta?.ivs?.attack ?? initial.meta?.ivs?.atk) ?? 0,
+    defense: (initial.meta?.ivs?.defense ?? initial.meta?.ivs?.def) ?? 0,
+    sp_attack: (initial.meta?.ivs?.sp_attack ?? initial.meta?.ivs?.sp_atk) ?? 0,
+    sp_defense: (initial.meta?.ivs?.sp_defense ?? initial.meta?.ivs?.sp_def) ?? 0,
+    speed: (initial.meta?.ivs?.speed ?? initial.meta?.ivs?.spd) ?? 0,
   });
   const [nature, setNature] = useState<string>(initial.meta?.nature || '');
   const [saving, setSaving] = useState(false);
@@ -93,10 +93,17 @@ export function EditShinyModal({ isOpen, onClose, initial, onSave }: EditShinyMo
         <div style={{ marginBottom: 12 }}>
           <label>IVs</label>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 8 }}>
-            {(['hp','atk','def','sp_atk','sp_def','spd'] as const).map(key => (
+            {([
+              ['hp','HP'],
+              ['attack','Atk'],
+              ['defense','Def'],
+              ['sp_attack','SpA'],
+              ['sp_defense','SpD'],
+              ['speed','Spe']
+            ] as const).map(([key, label]) => (
               <input key={key} type="number" min={0} max={31} value={ivs[key]}
                 onChange={(e) => setIvs({ ...ivs, [key]: parseInt(e.target.value) || 0 })}
-                placeholder={key.toUpperCase()}
+                placeholder={label}
                 style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid #ffcb05', borderRadius: 8, color: '#fff', padding: '8px 10px' }} />
             ))}
           </div>

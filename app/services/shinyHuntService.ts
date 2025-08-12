@@ -109,12 +109,25 @@ export const shinyHuntService = {
   },
 
   async addPhase(parentId: number, payload: Partial<ShinyHuntRow> & { pokemon_id: number; pokemon_name: string; method: string; found_at?: string | null }): Promise<void> {
+    // ensure meta.ivs is saved under canonical keys
+    const meta = (payload as any).meta || {};
+    const ivs = meta.ivs
+      ? {
+          hp: Number(meta.ivs.hp ?? meta.ivs?.hp ?? 0),
+          attack: Number(meta.ivs.attack ?? meta.ivs?.atk ?? 0),
+          defense: Number(meta.ivs.defense ?? meta.ivs?.def ?? 0),
+          sp_attack: Number(meta.ivs.sp_attack ?? meta.ivs?.sp_atk ?? 0),
+          sp_defense: Number(meta.ivs.sp_defense ?? meta.ivs?.sp_def ?? 0),
+          speed: Number(meta.ivs.speed ?? meta.ivs?.spd ?? 0),
+        }
+      : undefined;
     const insert = {
       ...payload,
+      meta: { ...meta, ivs },
       is_completed: true,
       is_phase: true,
       parent_hunt_id: Number(parentId),
-      found_at: payload.found_at || new Date().toISOString(),
+      found_at: (payload as any).found_at || new Date().toISOString(),
     } as any;
     const { error } = await supabase.from('shiny_hunts').insert([insert]);
     if (error) throw error;
@@ -189,7 +202,19 @@ export const shinyHuntService = {
       .eq('id', id)
       .single();
     if (error) throw error;
-    const newMeta = { ...(data?.meta || {}), ...partialMeta };
+    // Normalize IV keys if present
+    const normalized = { ...partialMeta };
+    if (normalized.ivs) {
+      normalized.ivs = {
+        hp: Number(normalized.ivs.hp ?? normalized.ivs?.hp ?? 0),
+        attack: Number(normalized.ivs.attack ?? normalized.ivs?.atk ?? 0),
+        defense: Number(normalized.ivs.defense ?? normalized.ivs?.def ?? 0),
+        sp_attack: Number(normalized.ivs.sp_attack ?? normalized.ivs?.sp_atk ?? 0),
+        sp_defense: Number(normalized.ivs.sp_defense ?? normalized.ivs?.sp_def ?? 0),
+        speed: Number(normalized.ivs.speed ?? normalized.ivs?.spd ?? 0),
+      };
+    }
+    const newMeta = { ...(data?.meta || {}), ...normalized };
     const { error: upErr } = await supabase
       .from('shiny_hunts')
       .update({ meta: newMeta })

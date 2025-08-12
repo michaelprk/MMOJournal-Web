@@ -111,7 +111,14 @@ export function AddPhaseModal({ isOpen, onClose, parentHunt, onAdded }: AddPhase
         rarity: null,
         found_at: new Date(foundAt).toISOString(),
         total_encounters: encounters,
-        meta: { gender, nature, ivs }
+        meta: { gender, nature, ivs: {
+          hp: Number(ivs.hp ?? 0),
+          attack: Number(ivs.attack ?? 0),
+          defense: Number(ivs.defense ?? 0),
+          sp_attack: Number(ivs.sp_attack ?? 0),
+          sp_defense: Number(ivs.sp_defense ?? 0),
+          speed: Number(ivs.speed ?? 0),
+        } }
       } as any);
 
       // Update parent hunt counters: increment phase and total encounters
