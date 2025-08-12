@@ -215,8 +215,11 @@ export default function ShinyShowcase() {
     let cleanupUpdate: (() => void) | undefined;
     (async () => {
       try {
-        const active = await shinyHuntService.listActive();
-        const completed = await shinyHuntService.listCompleted();
+        const [active, completed, paused] = await Promise.all([
+          shinyHuntService.listActive(),
+          shinyHuntService.listCompleted(),
+          shinyHuntService.listPaused().catch(() => []),
+        ]);
         setCurrentHunts(active.map((r) => ({
           id: r.id,
           pokemonId: r.pokemon_id,
@@ -246,6 +249,24 @@ export default function ShinyShowcase() {
           createdAt: r.created_at,
           updatedAt: r.created_at,
           is_phase: r.is_phase,
+        })) as any);
+        setPausedHunts(paused.map((r: any) => ({
+          id: r.id,
+          pokemonId: r.pokemon_id,
+          pokemonName: r.pokemon_name,
+          method: r.method as any,
+          startDate: (r.start_date || r.created_at) as string,
+          phaseCount: r.phase_count,
+          totalEncounters: r.total_encounters,
+          isCompleted: r.is_completed,
+          region: (r as any).region,
+          area: (r as any).area,
+          location: (r as any).location,
+          rarity: (r as any).rarity,
+          phasePokemon: [],
+          createdAt: r.created_at,
+          updatedAt: r.created_at,
+          paused: true,
         })) as any);
       } catch (err: any) {
         console.error('[shiny:list] error', err);
