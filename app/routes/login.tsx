@@ -185,6 +185,24 @@ export default function Login() {
         >
           Create Account
         </button>
+
+        {/* Forgot password link */}
+        <button
+          type="button"
+          onClick={() => navigate('/forgot')}
+          style={{
+            marginTop: '0.5rem',
+            alignSelf: 'center',
+            background: 'transparent',
+            border: 'none',
+            color: '#ffd700',
+            fontStyle: 'italic',
+            textDecoration: 'underline',
+            cursor: 'pointer',
+          }}
+        >
+          Forgot password?
+        </button>
       </form>
 
       <Modal isOpen={modalOpen} title={modalTitle} onClose={closeModal} variant={modalVariant}>
