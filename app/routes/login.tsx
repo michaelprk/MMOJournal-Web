@@ -23,7 +23,7 @@ export default function Login() {
   // Auth guard: if already signed in, redirect immediately without flicker
   useEffect(() => {
     if (!initializing && user) {
-      navigate("/pvp", { replace: true });
+      navigate("/home", { replace: true });
     }
   }, [user, initializing, navigate]);
 
@@ -42,7 +42,7 @@ export default function Login() {
     setModalOpen(false);
     // If success modal closes, navigate immediately
     if (modalVariant === "success") {
-      navigate("/pvp", { replace: true });
+      navigate("/home", { replace: true });
     }
   };
 

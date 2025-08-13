@@ -39,8 +39,9 @@ export function EditShinyModal({ isOpen, onClose, initial, onSave }: EditShinyMo
   const [nature, setNature] = useState<string>(initial.meta?.nature || '');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const initialAlpha = !!initial.meta?.alpha || !!initial.meta?.is_alpha;
   const [secret, setSecret] = useState<boolean>(!!initial.meta?.secret_shiny || !!initial.meta?.is_secret_shiny);
-  const [alpha, setAlpha] = useState<boolean>(!!initial.meta?.alpha || !!initial.meta?.is_alpha);
+  const [alpha, setAlpha] = useState<boolean>(initialAlpha);
 
   useEffect(() => { setMounted(true); }, []);
   // Sync when a different shiny is opened
@@ -136,8 +137,8 @@ export function EditShinyModal({ isOpen, onClose, initial, onSave }: EditShinyMo
               <input type="checkbox" checked={secret} onChange={(e) => setSecret(e.target.checked)} aria-label="Secret Shiny" />
               <span style={{ color: '#ffd700', fontWeight: 700 }}>Secret Shiny</span>
             </label>
-            <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-              <input type="checkbox" checked={alpha} onChange={(e) => setAlpha(e.target.checked)} aria-label="Alpha" />
+            <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }} title={initialAlpha ? undefined : 'Cannot convert a non-Alpha shiny into Alpha from Edit.'}>
+              <input type="checkbox" checked={alpha} onChange={(e) => setAlpha(e.target.checked)} aria-label="Alpha" disabled={!initialAlpha} />
               <span style={{ color: '#ffd700', fontWeight: 700 }}>Alpha</span>
             </label>
           </div>

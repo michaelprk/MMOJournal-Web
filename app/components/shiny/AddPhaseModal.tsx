@@ -231,7 +231,7 @@ export function AddPhaseModal({ isOpen, onClose, parentHunt, onAdded }: AddPhase
         </div>
 
         {/* Secret Shiny toggle (disabled for horde methods) */}
-        <div style={{ marginBottom: 12 }}>
+        <div style={{ marginBottom: 12, display: 'flex', justifyContent: 'center' }}>
           {(() => {
             const isHorde = String(parentHunt.method || '').toLowerCase().includes('horde');
             return (
@@ -245,17 +245,17 @@ export function AddPhaseModal({ isOpen, onClose, parentHunt, onAdded }: AddPhase
 
         {/* IVs */}
         <div style={{ marginBottom: 12 }}>
-          <label style={{ color: '#ffd700', display: 'block', marginBottom: 8 }}>IVs</label>
+          <label style={{ color: '#ffd700', display: 'block', marginBottom: 8, textAlign: 'center' }}>IVs</label>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 8, marginTop: 6 }}>
             {[
               ['hp','HP'], ['attack','Atk'], ['defense','Def'], ['sp_attack','SpA'], ['sp_defense','SpD'], ['speed','Spe']
             ].map(([key,label]) => (
-              <div key={key}>
-                <label style={{ fontSize: '0.8rem', color: '#ccc' }}>{label}</label>
+              <div key={key} style={{ position: 'relative', minWidth: 0 }}>
+                <span style={{ position: 'absolute', top: -8, left: 10, fontSize: 10, color: '#ffd700', background: 'rgba(0,0,0,0.95)', padding: '0 4px', lineHeight: 1 }}>{label}</span>
                 <input type="number" min={0} max={31}
                   value={(ivs as any)[key] ?? 0}
                   onChange={(e) => setIvs(prev => ({ ...prev, [key]: Math.max(0, Math.min(31, Number(e.target.value) || 0)) }))}
-                  style={{ width: '100%', background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,215,0,0.3)', borderRadius: 6, color: '#fff', padding: 8, fontSize: '0.9rem' }} />
+                  style={{ width: '100%', background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,215,0,0.3)', borderRadius: 6, color: '#fff', padding: '10px 10px 8px', fontSize: '0.9rem' }} />
               </div>
             ))}
           </div>

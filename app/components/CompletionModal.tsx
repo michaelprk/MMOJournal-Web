@@ -182,12 +182,9 @@ export default function CompletionModal({
               }}
             />
           </div>
-          
-          <div>
-            <label style={{ color: '#ffd700', display: 'block', marginBottom: 8 }}>IVs (Optional):</label>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(90px, 1fr))', gap: 8 }}>
-          {/* Secret Shiny toggle (not allowed for horde) */}
-          <div>
+
+          {/* Secret / Alpha toggles above IVs */}
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 16 }}>
             {(() => {
               const isHorde = String(hunt.method || '').toLowerCase().includes('horde');
               return (
@@ -197,10 +194,6 @@ export default function CompletionModal({
                 </label>
               );
             })()}
-          </div>
-
-          {/* Alpha toggle: read-only true for Alpha Egg; optional for Singles/Lures; hidden otherwise */}
-          <div>
             {(() => {
               const methodLower = String(hunt.method || '').toLowerCase();
               const isAlphaEgg = methodLower.includes('alpha') && methodLower.includes('egg');
@@ -224,6 +217,10 @@ export default function CompletionModal({
               return null;
             })()}
           </div>
+          
+          <div>
+            <label style={{ color: '#ffd700', display: 'block', marginBottom: 8, textAlign: 'center' }}>IVs (Optional)</label>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 8 }}>
               {[
                 { key: 'hp', label: 'HP' },
                 { key: 'attack', label: 'Atk' },
@@ -232,19 +229,15 @@ export default function CompletionModal({
                 { key: 'sp_defense', label: 'SpD' },
                 { key: 'speed', label: 'Spe' }
               ].map(({ key, label }) => (
-                <div key={key} style={{ minWidth: 0 }}>
-                  <label style={{ color: '#ccc', fontSize: '0.8rem', display: 'block', marginBottom: 4 }}>{label}:</label>
+                <div key={key} style={{ position: 'relative', minWidth: 0 }}>
+                  <span style={{ position: 'absolute', top: -8, left: 10, fontSize: 10, color: '#ffd700', background: 'rgba(0,0,0,0.95)', padding: '0 4px', lineHeight: 1 }}>{label}</span>
                   <input 
                     type="number" 
                     min="0" 
                     max="31"
                     value={completionData.ivs[key as keyof PokemonStats]}
                     onChange={(e) => handleIVChange(key as keyof PokemonStats, parseInt(e.target.value) || 0)}
-                    style={{
-                      width: '100%', padding: 8,
-                      border: '1px solid rgba(255, 215, 0, 0.3)', borderRadius: 6,
-                      background: 'rgba(0, 0, 0, 0.4)', color: '#fff', fontSize: '0.9rem'
-                    }}
+                    style={{ width: '100%', background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,215,0,0.3)', borderRadius: 6, color: '#fff', padding: '10px 10px 8px' }}
                   />
                 </div>
               ))}

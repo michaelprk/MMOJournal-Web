@@ -39,7 +39,7 @@ export function Navbar() {
               transition: "all 0.3s ease",
               filter: "drop-shadow(0 0 25px rgba(255, 203, 5, 0.3))",
             }}
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/home")}
             onMouseEnter={(e) => {
               e.currentTarget.style.transform = "scale(1.05)";
               e.currentTarget.style.filter = "drop-shadow(0 0 35px rgba(255, 203, 5, 0.5))";
