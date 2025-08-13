@@ -29,8 +29,8 @@ export default function ForgotPassword() {
 	};
 
 	return (
-		<div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
-			<div style={{ width: '100%', maxWidth: 420, background: 'rgba(0,0,0,0.85)', border: '2px solid #ffd700', borderRadius: 12, color: '#fff', padding: 20 }}>
+		<div style={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
+			<div style={{ width: '100%', maxWidth: 420, background: 'rgba(0,0,0,0.55)', border: '2px solid #ffd700', borderRadius: 12, color: '#fff', padding: 20 }}>
 				<h1 style={{ margin: 0, marginBottom: 12, textAlign: 'center', color: '#ffd700' }}>Forgot Password</h1>
 				<p style={{ color: '#ccc', marginTop: 0, marginBottom: 16, textAlign: 'center' }}>
 					Enter your email address and we'll send you a link to reset your password.

@@ -55,6 +55,8 @@ export default function ShinyHuntCard({
   const startDate = new Date(hunt.startDate).toLocaleDateString();
   const pokemonColors = getPokemonColors(hunt.pokemonId);
 
+  const isEggHunt = String(hunt.method || '').toLowerCase().includes('egg');
+
   if (viewMode === 'compact') {
     return (
       <div 
@@ -77,13 +79,15 @@ export default function ShinyHuntCard({
           <div style={{ flex: '1 1 auto', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
             {/* Row: +Phase | Sprite | Found */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <button 
-                type="button"
-                onClick={handleAddPhase}
-                style={{ marginRight: 15, backgroundColor: 'rgba(255, 215, 0, 0.2)', color: '#ffd700', border: '1px solid #ffd700', padding: '8px 12px', borderRadius: 6, fontSize: '0.8rem', cursor: 'pointer', fontWeight: 700 }}
-              >
-                + Phase
-              </button>
+              {!isEggHunt && (
+                <button 
+                  type="button"
+                  onClick={handleAddPhase}
+                  style={{ marginRight: 15, backgroundColor: 'rgba(255, 215, 0, 0.2)', color: '#ffd700', border: '1px solid #ffd700', padding: '8px 12px', borderRadius: 6, fontSize: '0.8rem', cursor: 'pointer', fontWeight: 700 }}
+                >
+                  + Phase
+                </button>
+              )}
               <img 
                 src={spritePath} 
                 alt={`Shiny ${hunt.pokemonName}`}
@@ -143,25 +147,27 @@ export default function ShinyHuntCard({
     >
       {/* Header removed per new layout; actions pinned bottom */}
 
-      {/* Top action row for grid cards */}
+      {/* Top action row for grid cards: +Phase left, Found right */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, marginBottom: 12 }}>
-        <button 
-          className="phase-btn"
-          onClick={handleAddPhase}
-          style={{
-            backgroundColor: 'rgba(255, 215, 0, 0.2)',
-            color: '#ffd700',
-            border: '1px solid #ffd700',
-            padding: '6px 12px',
-            borderRadius: '6px',
-            fontSize: '0.8rem',
-            cursor: 'pointer',
-            fontWeight: 'bold',
-            transition: 'all 0.2s ease'
-          }}
-        >
-          + Phase
-        </button>
+        {!isEggHunt && (
+          <button 
+            className="phase-btn"
+            onClick={handleAddPhase}
+            style={{
+              backgroundColor: 'rgba(255, 215, 0, 0.2)',
+              color: '#ffd700',
+              border: '1px solid #ffd700',
+              padding: '6px 12px',
+              borderRadius: '6px',
+              fontSize: '0.8rem',
+              cursor: 'pointer',
+              fontWeight: 'bold',
+              transition: 'all 0.2s ease'
+            }}
+          >
+            + Phase
+          </button>
+        )}
 
         <button 
           className="found-btn"
@@ -182,7 +188,7 @@ export default function ShinyHuntCard({
         </button>
       </div>
 
-      <div className="hunt-card-content" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+        <div className="hunt-card-content" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
           <div className="shiny-sprite-container">
           <img 
             src={spritePath} 

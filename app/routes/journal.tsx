@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 
 export default function JournalComingSoon() {
-  const navbarApproxHeightPx = 220; // approximate space taken by fixed navbar/logo cluster
+  const navbarApproxHeightPx = 0; // approximate space taken by fixed navbar/logo cluster
 
   return (
     <div
@@ -16,7 +16,7 @@ export default function JournalComingSoon() {
           <img
             src="/images/MMOJournal_logo.svg"
             alt="MMO Journal"
-            className="mx-auto mb-6 w-[200px] max-w-[70vw] h-auto drop-shadow-[0_0_20px_rgba(255,203,5,0.25)]"
+            className="mx-auto mb-6 w-[350px] max-w-[70vw] h-auto drop-shadow-[0_0_20px_rgba(255,203,5,0.25)]"
           />
 
           <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">

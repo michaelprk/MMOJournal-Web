@@ -262,6 +262,7 @@ export default function ShinyShowcase() {
           method: r.method as any,
           dateFound: (r.found_at || r.start_date || r.created_at) as string,
           nature: r.meta?.nature,
+          gender: r.meta?.gender,
           encounterCount: r.total_encounters,
           ivs: r.meta?.ivs,
           createdAt: r.created_at,
@@ -298,6 +299,7 @@ export default function ShinyShowcase() {
             method: row.method as any,
             dateFound: (row.found_at || row.start_date || row.created_at) as string,
             nature: (row as any).meta?.nature,
+            gender: (row as any).meta?.gender,
             encounterCount: row.total_encounters,
             ivs: (row as any).meta?.ivs,
             createdAt: row.created_at,
@@ -889,6 +891,7 @@ export default function ShinyShowcase() {
             method: r.method as any,
             dateFound: (r.found_at || r.start_date || r.created_at) as string,
             nature: r.meta?.nature,
+            gender: r.meta?.gender,
             encounterCount: r.total_encounters,
             ivs: r.meta?.ivs,
             createdAt: r.created_at,
@@ -913,8 +916,9 @@ export default function ShinyShowcase() {
           id: editingShiny?.id || 0,
           phase_count: 0,
           total_encounters: editingShiny?.encounterCount || 0,
-          meta: { ivs: editingShiny?.ivs, nature: (editingShiny as any)?.nature },
-          pokemonName: editingShiny?.pokemonName || ''
+          meta: { ivs: editingShiny?.ivs || (editingShiny as any)?.meta?.ivs, nature: (editingShiny as any)?.nature || (editingShiny as any)?.meta?.nature },
+          pokemonName: editingShiny?.pokemonName || '',
+          pokemonId: editingShiny?.pokemonId
         }}
         onSave={async ({ id, phase_count, total_encounters, meta }) => {
           await shinyHuntService.updateCounters(id, { phase_count, total_encounters });

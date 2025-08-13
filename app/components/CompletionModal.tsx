@@ -109,7 +109,7 @@ export default function CompletionModal({
           🎉 Shiny {hunt.pokemonName} Found!
         </h3>
         
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <div>
             <label style={{ color: '#ffd700', display: 'block', marginBottom: '8px' }}>Gender:</label>
             <select 
@@ -174,7 +174,7 @@ export default function CompletionModal({
           
           <div>
             <label style={{ color: '#ffd700', display: 'block', marginBottom: 8 }}>IVs (Optional):</label>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(90px, 1fr))', gap: 8 }}>
               {[
                 { key: 'hp', label: 'HP' },
                 { key: 'attack', label: 'Atk' },
@@ -183,7 +183,7 @@ export default function CompletionModal({
                 { key: 'sp_defense', label: 'SpD' },
                 { key: 'speed', label: 'Spe' }
               ].map(({ key, label }) => (
-                <div key={key}>
+                <div key={key} style={{ minWidth: 0 }}>
                   <label style={{ color: '#ccc', fontSize: '0.8rem', display: 'block', marginBottom: 4 }}>{label}:</label>
                   <input 
                     type="number" 
