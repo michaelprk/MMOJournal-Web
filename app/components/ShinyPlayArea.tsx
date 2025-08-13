@@ -340,7 +340,7 @@ export default function ShinyCalendar({ portfolio, onEdit }: ShinyCalendarProps)
                 return 0;
               })
               .map((shiny, index) => {
-                const details: ShinyHoverDetails = {
+                  const details: ShinyHoverDetails = {
                   id: shiny.id,
                   pokemonId: shiny.pokemonId,
                   pokemonName: shiny.pokemonName,
@@ -353,6 +353,8 @@ export default function ShinyCalendar({ portfolio, onEdit }: ShinyCalendarProps)
                   gender: (shiny as any)?.gender || (shiny as any)?.meta?.gender || null,
                   encounters: shiny.encounterCount ?? (shiny as any)?.total_encounters ?? null,
                   ivs: (shiny as any)?.ivs || (shiny as any)?.meta?.ivs || null,
+                    is_secret_shiny: (shiny as any)?.is_secret_shiny ?? (shiny as any)?.meta?.secret_shiny ?? null,
+                    is_alpha: (shiny as any)?.is_alpha ?? (shiny as any)?.meta?.alpha ?? null,
                   notes: shiny.notes ?? null,
                   isPhase: (shiny as any).is_phase || false,
                 };

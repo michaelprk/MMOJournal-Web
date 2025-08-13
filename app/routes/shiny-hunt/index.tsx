@@ -255,7 +255,7 @@ export default function ShinyShowcase() {
           createdAt: r.created_at,
           updatedAt: r.created_at,
         })));
-        setPortfolio(completed.map((r: any) => ({
+          setPortfolio(completed.map((r: any) => ({
           id: r.id,
           pokemonId: r.pokemon_id,
           pokemonName: r.pokemon_name,
@@ -264,7 +264,9 @@ export default function ShinyShowcase() {
           nature: r.meta?.nature,
           gender: r.meta?.gender,
           encounterCount: r.total_encounters,
-          ivs: r.meta?.ivs,
+            ivs: r.meta?.ivs,
+            is_secret_shiny: r.is_secret_shiny ?? r.meta?.secret_shiny ?? false,
+            is_alpha: r.is_alpha ?? r.meta?.alpha ?? false,
           createdAt: r.created_at,
           updatedAt: r.created_at,
           is_phase: r.is_phase,
@@ -302,6 +304,8 @@ export default function ShinyShowcase() {
             gender: (row as any).meta?.gender,
             encounterCount: row.total_encounters,
             ivs: (row as any).meta?.ivs,
+            is_secret_shiny: (row as any).is_secret_shiny ?? (row as any).meta?.secret_shiny ?? false,
+            is_alpha: (row as any).is_alpha ?? (row as any).meta?.alpha ?? false,
             createdAt: row.created_at,
             updatedAt: row.created_at,
             is_phase: (row as any).is_phase,
@@ -894,6 +898,8 @@ export default function ShinyShowcase() {
             gender: r.meta?.gender,
             encounterCount: r.total_encounters,
             ivs: r.meta?.ivs,
+            is_secret_shiny: r.is_secret_shiny ?? r.meta?.secret_shiny ?? false,
+            is_alpha: r.is_alpha ?? r.meta?.alpha ?? false,
             createdAt: r.created_at,
             updatedAt: r.created_at,
           })) as any);

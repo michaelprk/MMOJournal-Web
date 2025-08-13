@@ -23,6 +23,8 @@ export type ShinyHoverDetails = {
     sp_defense: number;
     speed: number;
   }> | null;
+  is_secret_shiny?: boolean | null;
+  is_alpha?: boolean | null;
 };
 
 type ShinyTileProps = {
@@ -97,6 +99,8 @@ export function ShinyTile({ details, size = 56, showName = true, onEdit, onDelet
             height: size,
             display: 'block',
             filter: `drop-shadow(0 0 10px ${colors.glow}) drop-shadow(0 0 20px ${colors.glowLight})`,
+            outline: details.is_alpha ? '2px solid #ffd700' : undefined,
+            outlineOffset: details.is_alpha ? -2 : undefined,
           }}
           loading="lazy"
           onError={(e) => {
@@ -177,6 +181,11 @@ export function ShinyHoverCard({ details, onEdit, onDelete }: { details: ShinyHo
         </div>
       </div>
       <div style={{ fontSize: '0.85rem', color: '#ccc', lineHeight: 1.4 }}>
+        {details.is_secret_shiny && (
+          <div style={{ marginBottom: 6 }}>
+            <span style={{ fontSize: 10, fontWeight: 800, color: '#000', background: '#ffd700', borderRadius: 999, padding: '2px 6px' }}>SECRET</span>
+          </div>
+        )}
         {details.method ? (
           <div style={{ marginBottom: 6 }}>
             <strong style={{ color: '#ffd700' }}>Method:</strong> {details.method}

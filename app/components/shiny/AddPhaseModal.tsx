@@ -33,6 +33,7 @@ export function AddPhaseModal({ isOpen, onClose, parentHunt, onAdded }: AddPhase
   const [nature, setNature] = useState<string>('');
   const [ivs, setIvs] = useState<Partial<PokemonStats>>({ hp: 0, attack: 0, defense: 0, sp_attack: 0, sp_defense: 0, speed: 0 });
   const [encounters, setEncounters] = useState<number | ''>('');
+  const [secretShiny, setSecretShiny] = useState<boolean>(false);
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -46,6 +47,7 @@ export function AddPhaseModal({ isOpen, onClose, parentHunt, onAdded }: AddPhase
       setNature('');
       setIvs({ hp: 0, attack: 0, defense: 0, sp_attack: 0, sp_defense: 0, speed: 0 });
       setEncounters('');
+      setSecretShiny(false);
       setErrorMsg(null);
     }
   }, [isOpen]);
@@ -101,6 +103,8 @@ export function AddPhaseModal({ isOpen, onClose, parentHunt, onAdded }: AddPhase
     }
     setSubmitting(true);
     try {
+      const methodLower = String(parentHunt.method || '').toLowerCase();
+      const isHorde = methodLower.includes('horde');
       await shinyHuntService.addPhase(parentHunt.id, {
         pokemon_id: species.id,
         pokemon_name: species.name,
@@ -111,6 +115,8 @@ export function AddPhaseModal({ isOpen, onClose, parentHunt, onAdded }: AddPhase
         rarity: null,
         found_at: new Date(foundAt).toISOString(),
         total_encounters: encounters,
+        is_secret_shiny: isHorde ? false : !!secretShiny,
+        is_alpha: false,
         meta: { gender, nature, ivs: {
           hp: Number(ivs.hp ?? 0),
           attack: Number(ivs.attack ?? 0),
@@ -222,6 +228,19 @@ export function AddPhaseModal({ isOpen, onClose, parentHunt, onAdded }: AddPhase
               {POKEMON_NATURES.map(n => <option key={n} value={n}>{n}</option>)}
             </select>
           </div>
+        </div>
+
+        {/* Secret Shiny toggle (disabled for horde methods) */}
+        <div style={{ marginBottom: 12 }}>
+          {(() => {
+            const isHorde = String(parentHunt.method || '').toLowerCase().includes('horde');
+            return (
+              <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8, color: isHorde ? 'rgba(255,255,255,0.5)' : '#fff' }} title={isHorde ? 'Secret Shinies do not apply to Horde hunts' : 'Mark this as a Secret Shiny'}>
+                <input type="checkbox" checked={!isHorde && secretShiny} onChange={(e) => !isHorde && setSecretShiny(e.target.checked)} aria-label="Secret Shiny" disabled={isHorde} />
+                <span style={{ color: '#ffd700', fontWeight: 700 }}>Secret Shiny</span>
+              </label>
+            );
+          })()}
         </div>
 
         {/* IVs */}

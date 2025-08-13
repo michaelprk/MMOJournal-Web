@@ -12,6 +12,8 @@ interface CompletionModalProps {
     ivs?: Partial<PokemonStats>;
     encounterCount?: number;
     notes?: string;
+    is_secret_shiny?: boolean;
+    is_alpha?: boolean;
   }) => void;
 }
 
@@ -32,7 +34,9 @@ export default function CompletionModal({
       sp_attack: 0,
       sp_defense: 0,
       speed: 0
-    }
+    },
+    secret: false,
+    alpha: false
   });
 
   const handleInputChange = (field: string, value: string | number) => {
@@ -55,11 +59,16 @@ export default function CompletionModal({
   const handleSubmit = () => {
     if (!hunt) return;
     
+    const methodLower = String(hunt.method || '').toLowerCase();
+    const isHorde = methodLower.includes('horde');
+    const isAlphaEgg = methodLower.includes('alpha') && methodLower.includes('egg');
     onCompleteHunt(hunt.id, {
       nature: completionData.nature || undefined,
       ivs: completionData.ivs,
       encounterCount: completionData.encounterCount,
       notes: undefined,
+      is_secret_shiny: isHorde ? false : completionData.secret,
+      is_alpha: isAlphaEgg ? true : (methodLower.includes('single') || methodLower.includes('lure')) ? completionData.alpha : false,
     });
     
     // Reset form
@@ -74,7 +83,9 @@ export default function CompletionModal({
         sp_attack: 0,
         sp_defense: 0,
         speed: 0
-      }
+      },
+      secret: false,
+      alpha: false
     });
   };
 
@@ -175,6 +186,44 @@ export default function CompletionModal({
           <div>
             <label style={{ color: '#ffd700', display: 'block', marginBottom: 8 }}>IVs (Optional):</label>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(90px, 1fr))', gap: 8 }}>
+          {/* Secret Shiny toggle (not allowed for horde) */}
+          <div>
+            {(() => {
+              const isHorde = String(hunt.method || '').toLowerCase().includes('horde');
+              return (
+                <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8, color: isHorde ? 'rgba(255,255,255,0.5)' : '#fff' }} title={isHorde ? 'Secret Shinies do not apply to Horde hunts' : 'Mark this as a Secret Shiny'}>
+                  <input type="checkbox" checked={!isHorde && completionData.secret} onChange={(e) => handleInputChange('secret', e.target.checked)} aria-label="Secret Shiny" disabled={isHorde} />
+                  <span style={{ color: '#ffd700', fontWeight: 700 }}>Secret Shiny</span>
+                </label>
+              );
+            })()}
+          </div>
+
+          {/* Alpha toggle: read-only true for Alpha Egg; optional for Singles/Lures; hidden otherwise */}
+          <div>
+            {(() => {
+              const methodLower = String(hunt.method || '').toLowerCase();
+              const isAlphaEgg = methodLower.includes('alpha') && methodLower.includes('egg');
+              const canAlphaToggle = methodLower.includes('single') || methodLower.includes('lure');
+              if (isAlphaEgg) {
+                return (
+                  <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8, color: '#fff' }} title="Alpha is always true for Alpha Egg Hunts">
+                    <input type="checkbox" checked readOnly aria-label="Alpha" />
+                    <span style={{ color: '#ffd700', fontWeight: 700 }}>Alpha</span>
+                  </label>
+                );
+              }
+              if (canAlphaToggle) {
+                return (
+                  <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8, color: '#fff' }} title="Mark as Alpha shiny">
+                    <input type="checkbox" checked={completionData.alpha} onChange={(e) => handleInputChange('alpha', e.target.checked)} aria-label="Alpha" />
+                    <span style={{ color: '#ffd700', fontWeight: 700 }}>Alpha</span>
+                  </label>
+                );
+              }
+              return null;
+            })()}
+          </div>
               {[
                 { key: 'hp', label: 'HP' },
                 { key: 'attack', label: 'Atk' },

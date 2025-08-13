@@ -39,6 +39,8 @@ export function EditShinyModal({ isOpen, onClose, initial, onSave }: EditShinyMo
   const [nature, setNature] = useState<string>(initial.meta?.nature || '');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [secret, setSecret] = useState<boolean>(!!initial.meta?.secret_shiny || !!initial.meta?.is_secret_shiny);
+  const [alpha, setAlpha] = useState<boolean>(!!initial.meta?.alpha || !!initial.meta?.is_alpha);
 
   useEffect(() => { setMounted(true); }, []);
   // Sync when a different shiny is opened
@@ -54,6 +56,8 @@ export function EditShinyModal({ isOpen, onClose, initial, onSave }: EditShinyMo
       speed: (initial.meta?.ivs?.speed ?? initial.meta?.ivs?.spd) ?? 0,
     });
     setNature(initial.meta?.nature || '');
+    setSecret(!!initial.meta?.secret_shiny || !!initial.meta?.is_secret_shiny);
+    setAlpha(!!initial.meta?.alpha || !!initial.meta?.is_alpha);
   }, [initial.id]);
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
@@ -65,7 +69,7 @@ export function EditShinyModal({ isOpen, onClose, initial, onSave }: EditShinyMo
     setError(null);
     setSaving(true);
     try {
-      const meta = { ...(initial.meta || {}), ivs, nature };
+      const meta = { ...(initial.meta || {}), ivs, nature, secret_shiny: secret, alpha };
       await onSave({ id: initial.id, phase_count: phaseCount, total_encounters: encounters, meta });
       onClose();
     } catch (e: any) {
@@ -124,6 +128,18 @@ export function EditShinyModal({ isOpen, onClose, initial, onSave }: EditShinyMo
               <option value="">Select nature</option>
               {NATURES.map(n => <option key={n} value={n}>{n}</option>)}
             </select>
+          </div>
+
+          {/* Secret / Alpha flags (respect method rules outside this modal) */}
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 16, marginBottom: 12 }}>
+            <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+              <input type="checkbox" checked={secret} onChange={(e) => setSecret(e.target.checked)} aria-label="Secret Shiny" />
+              <span style={{ color: '#ffd700', fontWeight: 700 }}>Secret Shiny</span>
+            </label>
+            <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+              <input type="checkbox" checked={alpha} onChange={(e) => setAlpha(e.target.checked)} aria-label="Alpha" />
+              <span style={{ color: '#ffd700', fontWeight: 700 }}>Alpha</span>
+            </label>
           </div>
 
           <div style={{ marginBottom: 12, maxWidth: 520, marginLeft: 'auto', marginRight: 'auto' }}>

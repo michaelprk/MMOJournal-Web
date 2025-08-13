@@ -18,6 +18,8 @@ export type ShinyHuntRow = {
   found_at?: string | null;
   created_at: string;
   is_paused?: boolean;
+  is_secret_shiny?: boolean;
+  is_alpha?: boolean;
 };
 
 export const shinyHuntService = {
@@ -25,7 +27,7 @@ export const shinyHuntService = {
     const query = supabase
       .from('shiny_hunts')
       .select(
-        'id,pokemon_id,pokemon_name,method,region,area,location,rarity,phase_count,total_encounters,is_completed,is_phase,parent_hunt_id,start_date,found_at,created_at,meta'
+        'id,pokemon_id,pokemon_name,method,region,area,location,rarity,phase_count,total_encounters,is_completed,is_phase,parent_hunt_id,start_date,found_at,created_at,is_secret_shiny,is_alpha,meta'
       )
       .order('created_at', { ascending: false });
 
@@ -84,7 +86,7 @@ export const shinyHuntService = {
     const { data, error } = await supabase
       .from('shiny_hunts')
       .select(
-        'id,pokemon_id,pokemon_name,method,region,area,location,rarity,phase_count,total_encounters,is_completed,is_phase,parent_hunt_id,start_date,created_at,found_at,completed_month,completed_year,meta'
+        'id,pokemon_id,pokemon_name,method,region,area,location,rarity,phase_count,total_encounters,is_completed,is_phase,parent_hunt_id,start_date,created_at,found_at,completed_month,completed_year,is_secret_shiny,is_alpha,meta'
       )
       .eq('is_completed', true)
       .order('found_at', { ascending: false });
@@ -123,7 +125,7 @@ export const shinyHuntService = {
       : undefined;
     const insert = {
       ...payload,
-      meta: { ...meta, ivs },
+      meta: { ...meta, ivs, secret_shiny: (payload as any)?.is_secret_shiny ?? meta?.secret_shiny ?? false, alpha: (payload as any)?.is_alpha ?? meta?.alpha ?? false },
       is_completed: true,
       is_phase: true,
       parent_hunt_id: Number(parentId),
@@ -220,6 +222,23 @@ export const shinyHuntService = {
       .update({ meta: newMeta })
       .eq('id', id);
     if (upErr) throw upErr;
+  },
+
+  async updateFlags(id: number, flags: { is_secret_shiny?: boolean; is_alpha?: boolean }): Promise<void> {
+    // Try column update; fall back to meta merge if columns are missing
+    const { error } = await supabase
+      .from('shiny_hunts')
+      .update({
+        ...(typeof flags.is_secret_shiny === 'boolean' ? { is_secret_shiny: flags.is_secret_shiny } : {}),
+        ...(typeof flags.is_alpha === 'boolean' ? { is_alpha: flags.is_alpha } : {}),
+      } as any)
+      .eq('id', id);
+    if (error) {
+      const fallback: any = {};
+      if (typeof flags.is_secret_shiny === 'boolean') fallback.secret_shiny = flags.is_secret_shiny;
+      if (typeof flags.is_alpha === 'boolean') fallback.alpha = flags.is_alpha;
+      await this.updateMeta(id, fallback);
+    }
   },
 
   async deleteHunt(id: number): Promise<void> {
