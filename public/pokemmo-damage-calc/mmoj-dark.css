@@ -274,3 +274,36 @@ html.mmoj-dark #pokemon2 select {
   color: #e8eaed !important;
   border-color: rgba(255,255,255,.18) !important;
 }
+
+/* === FINAL PROD OVERRIDES: force dark native selects in calc === */
+/* Use high specificity + !important, override the 'background' shorthand */
+html.mmoj-dark select,
+html.mmoj-dark .poke-info select,
+html.mmoj-dark .poke-info table select,
+html.mmoj-dark #pokemon1 select,
+html.mmoj-dark #pokemon2 select {
+  background: #121417 none !important;              /* overrides any background shorthand */
+  background-image: none !important;                 /* kill white sprite if any */
+  color: #e8eaed !important;
+  border: 1px solid rgba(255,255,255,.18) !important;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+html.mmoj-dark select:focus,
+html.mmoj-dark .poke-info select:focus {
+  box-shadow: 0 0 0 2px rgba(255,203,5,.35) !important;
+  outline: none !important;
+}
+
+html.mmoj-dark option,
+html.mmoj-dark optgroup {
+  background: #121417 !important;
+  color: #e8eaed !important;
+}
+
+html.mmoj-dark select:disabled {
+  background: #0b0d10 !important;
+  color: #9aa0a6 !important;
+}
