@@ -88,8 +88,8 @@ export default function AccountSettingsModal({ isOpen, onClose }: Props) {
     <Modal isOpen={isOpen} onClose={onClose} title="Account Settings">
       <div className="space-y-4">
         <p className="text-white/80 text-sm">
-          Download your data or delete your account data. Deleting will remove your builds, hunts, and profile
-          records. Your Supabase auth identity removal is handled by support (see DSAR runbook).
+          Download a copy of your data, or delete your account data. Deleting will permanently remove your
+          builds, hunts, and profile from MMOJournal. This cannot be undone.
         </p>
 
         {error && (
