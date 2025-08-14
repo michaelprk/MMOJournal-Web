@@ -35,6 +35,11 @@ Note: Supabase Auth identity deletion
 - In Authentication → Users, confirm the account is removed if requested and approved.
 
 ### Response Timelines
+### Consent (if analytics ever enabled)
+
+- Current state: No non-essential cookies or analytics are used by the app. If analytics are introduced later, add a consent banner with Accept/Reject stored in localStorage and ensure scripts load only after Accept.
+- To revoke consent (future): clear the localStorage key (e.g., `mmojournal:consent=none`) and reload the page.
+
 
 - Acknowledge DSAR within legal timeframes (typically 30 days). Track in ticket.
 
