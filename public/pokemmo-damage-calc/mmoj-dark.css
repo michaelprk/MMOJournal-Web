@@ -241,3 +241,36 @@ html.mmoj-dark,
   background-color: #16181d !important;
   color: #e8e8e8 !important;
 }
+
+/* === PROD FIX: darken native selects (high specificity, no layout changes) === */
+html.mmoj-dark select,
+html.mmoj-dark select:focus {
+  background-color: #121417 !important;   /* near the input tone used in dev */
+  color: #e8eaed !important;
+  border: 1px solid rgba(255,255,255,.18) !important;
+  outline: none !important;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+/* Keep dropdown list dark where supported */
+html.mmoj-dark option,
+html.mmoj-dark optgroup {
+  background-color: #121417 !important;
+  color: #e8eaed !important;
+}
+
+/* Hover/focus ring: soft brand yellow glow (no layout shift) */
+html.mmoj-dark select:focus-visible {
+  box-shadow: 0 0 0 2px rgba(255,203,5,.35) !important;
+}
+
+/* If any calc skin selector is more specific, backstop with these */
+html.mmoj-dark .poke-info select,
+html.mmoj-dark #pokemon1 select,
+html.mmoj-dark #pokemon2 select {
+  background-color: #121417 !important;
+  color: #e8eaed !important;
+  border-color: rgba(255,255,255,.18) !important;
+}
