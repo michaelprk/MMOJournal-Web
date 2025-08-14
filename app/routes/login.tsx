@@ -4,9 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import Modal from "../components/ui/Modal";
 
-export async function loader() {
-  return null; // no data needed here for now
-}
+
 
 export default function Login() {
   const [identifier, setIdentifier] = useState("");

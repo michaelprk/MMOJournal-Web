@@ -1,17 +1,11 @@
-import type { Route } from "../+types/root";
-
-export const loader: Route.LoaderFunction = async () => {
-  return new Response(null, {
-    status: 302,
-    headers: {
-      Location: "/pokemmo-damage-calc/index.html?gen=5",
-      "X-Robots-Tag": "noindex",
-    },
-  });
-};
+import { useEffect } from "react";
 
 export default function CalcRedirect() {
-  // This component never renders because the loader redirects immediately.
+  useEffect(() => {
+    // Client-side redirect for SPA mode
+    window.location.href = "/pokemmo-damage-calc/index.html?gen=5";
+  }, []);
+
   return null;
 }
 
