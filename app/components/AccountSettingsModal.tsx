@@ -15,7 +15,7 @@ export default function AccountSettingsModal({ isOpen, onClose }: Props) {
   const [confirming, setConfirming] = useState(false);
   const [confirmText, setConfirmText] = useState("");
 
-  const canDelete = useMemo(() => confirmText.trim().toUpperCase() === "DELETE", [confirmText]);
+  const canDelete = useMemo(() => confirmText.trim().toUpperCase() === "DELETE MY ACCOUNT", [confirmText]);
 
   const handleDownload = async () => {
     if (!user?.id) return;
@@ -118,13 +118,13 @@ export default function AccountSettingsModal({ isOpen, onClose }: Props) {
         {confirming && (
           <div className="mt-2 space-y-2 rounded-md border border-white/15 p-3">
             <p className="text-white/70 text-sm">
-              Type <span className="font-mono font-bold text-white">DELETE</span> to confirm. This permanently
-              removes your data from MMOJournal tables.
+              Type <span className="font-mono font-bold text-white">DELETE MY ACCOUNT</span> to confirm. This
+              permanently removes your data from MMOJournal tables.
             </p>
             <input
               value={confirmText}
               onChange={(e) => setConfirmText(e.target.value)}
-              placeholder="DELETE"
+              placeholder="DELETE MY ACCOUNT"
               className="w-full rounded-md border border-white/20 bg-transparent px-3 py-2 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-yellow-400"
             />
             <div className="flex items-center gap-2">
