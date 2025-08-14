@@ -15,6 +15,10 @@ Version: 2025-08-14
 If UI export is unavailable:
 - Use Supabase Table Editor to export CSV/JSON from each table filtered by `user_id = <auth.uid()>`.
 
+Screenshots:
+- [ ] screenshot placeholder: Account → Download My Data button
+- [ ] screenshot placeholder: exported JSON file in downloads
+
 ### Deletion (Self-Service for app tables)
 
 1) Sign in as the user.
@@ -24,6 +28,10 @@ If UI export is unavailable:
    - `shiny_hunts` where `user_id = auth.uid()`
    - `profiles` where `user_id = auth.uid()`
 4) User is signed out automatically.
+
+Screenshots:
+- [ ] screenshot placeholder: Account → Delete Account confirmation field
+- [ ] screenshot placeholder: post-delete sign-in screen
 
 Note: Supabase Auth identity deletion
 - The app does not delete the Supabase auth user. An admin should delete the auth user from Supabase Dashboard → Authentication → Users.

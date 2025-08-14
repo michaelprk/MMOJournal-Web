@@ -32,6 +32,15 @@ Version: 2025-08-14
     - Test “Download My Data (JSON)” downloads a file containing profile/builds/hunts
     - Test “Delete Account…” requires typing DELETE and removes the user’s rows; user is signed out
 
+- [ ] Backups & restore (Supabase)
+  - Confirm project backups schedule in Supabase (Pro plans) or manual SQL dump procedure
+  - Test restore on a non-prod instance (export/import or point-in-time if available)
+
+- [ ] Admin access & MFA
+  - GitHub: 2FA/MFA enforced for org/repo maintainers
+  - Vercel: 2FA enabled for project owners
+  - Supabase: 2FA enabled for project owners; rotate service keys if applicable
+
 - [ ] Retention note
   - Retention statement present in docs; no auto-deletes enabled yet
 
