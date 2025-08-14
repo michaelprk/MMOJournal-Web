@@ -106,11 +106,12 @@ The `PokemonBuild` model includes:
 
 ## 🔧 Tech Stack
 
-- **Runtime**: Node.js
+- **Runtime**: Node.js (v18+ recommended)
 - **Framework**: Express.js
 - **Database**: SQLite with Prisma ORM
 - **External API**: PokeAPI integration
-- **Dependencies**: cors, node-fetch@2
+- **HTTP client**: Built-in global `fetch` (no `node-fetch` dependency)
+- **Dependencies**: cors
 
 ## 🎯 Features
 

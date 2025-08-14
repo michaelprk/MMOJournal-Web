@@ -8,6 +8,7 @@ interface AutocompleteInputProps {
   onSearch: (query: string) => void;
   style?: React.CSSProperties;
   disabled?: boolean;
+  endAdornment?: React.ReactNode;
 }
 
 export function AutocompleteInput({
@@ -18,6 +19,7 @@ export function AutocompleteInput({
   onSearch,
   style,
   disabled = false
+  , endAdornment
 }: AutocompleteInputProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
@@ -91,14 +93,33 @@ export function AutocompleteInput({
         disabled={disabled}
         style={{
           width: '100%',
-          backgroundColor: 'rgba(255, 255, 255, 0.1)',
-          border: '1px solid #ffcb05',
+          backgroundColor: 'rgba(0, 0, 0, 0.35)',
+          border: '1px solid rgba(82,82,91,0.6)',
           borderRadius: '8px',
           color: '#fff',
-          padding: '8px 12px',
+          padding: '4px 28px 4px 8px',
+          height: '28px',
+          fontSize: '12px',
           ...style,
         }}
       />
+
+      {endAdornment && (
+        <div
+          style={{
+            position: 'absolute',
+            right: 6,
+            top: 0,
+            height: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 4,
+            pointerEvents: 'none',
+          }}
+        >
+          {endAdornment}
+        </div>
+      )}
 
       {isOpen && suggestions.length > 0 && (
         <div
@@ -122,11 +143,12 @@ export function AutocompleteInput({
               key={suggestion}
               onClick={() => handleSuggestionClick(suggestion)}
               style={{
-                padding: '8px 12px',
+                padding: '6px 8px',
                 cursor: 'pointer',
                 backgroundColor: selectedIndex === index ? 'rgba(255, 203, 5, 0.2)' : 'transparent',
                 color: selectedIndex === index ? '#ffcb05' : '#fff',
                 borderBottom: index < suggestions.length - 1 ? '1px solid rgba(255, 203, 5, 0.1)' : 'none',
+                fontSize: '12px',
               }}
               onMouseEnter={() => setSelectedIndex(index)}
             >

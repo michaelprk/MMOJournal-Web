@@ -4,11 +4,11 @@
 html, body {
   margin: 0;
   padding: 0;
-  height: 100vh;
+  min-height: 100vh;
   background: transparent; /* no bg here */
   color: white;
   font-family: "Inter", sans-serif;
-  overflow: hidden;
+  /* allow normal page scrolling */
 }
 
 /* No filter on body or html */
@@ -46,8 +46,191 @@ html, body {
 
 /* Ensure the root app container fills the viewport */
 #root {
-  height: 100vh;
-  overflow: hidden;
+  min-height: 100vh;
+}
+
+/* Light theme overrides for solid white background */
+.theme-light body,
+.theme-light {
+  color: #000000;
+}
+
+/* =============================
+   LIGHT THEME TOKENS & OVERRIDES
+   ============================= */
+.theme-light {
+  /* Tokens */
+  --page-bg: #ffffff;
+  --surface: #f7f7fb;
+  --subsurface: #f9fafb;
+  --border: #e5e7eb;
+  --border-strong: #d1d5db;
+  --heading: #0f172a;
+  --body: #111827;
+  --muted: #6b7280;
+  --gold: #ffd700;
+  --gold-dark: #b89000;
+  --focus-gold: rgba(255, 215, 0, 0.4);
+}
+
+.theme-light body {
+  background: var(--page-bg) !important;
+  color: var(--body) !important;
+  transition: background-color 180ms ease, color 180ms ease;
+}
+
+/* Text utility remaps */
+.theme-light .text-white,
+.theme-light .text-white\/90 { color: var(--heading) !important; }
+.theme-light .text-white\/80,
+.theme-light .text-white\/70,
+.theme-light .text-white\/60 { color: var(--muted) !important; }
+
+/* Headings and base copy */
+.theme-light h1, .theme-light h2, .theme-light h3, .theme-light h4, .theme-light h5, .theme-light h6 { color: var(--heading) !important; }
+.theme-light p, .theme-light li, .theme-light span, .theme-light div { color: inherit; }
+
+/* Focus ring */
+.theme-light :focus-visible {
+  outline: none !important;
+  box-shadow: 0 0 0 2px var(--focus-gold) !important;
+}
+
+/* Navbar & tabs */
+.theme-light .navbar {
+  background: #ffffff !important;
+  color: var(--body) !important;
+  border-bottom: 1px solid var(--border) !important;
+  backdrop-filter: none !important;
+}
+.theme-light .navbar a { color: var(--muted) !important; }
+.theme-light .navbar a[aria-current] { color: var(--heading) !important; border-color: var(--gold) !important; }
+.theme-light .navbar a:hover { color: var(--heading) !important; }
+
+/* Override dark glassy nav pills container used inline */
+.theme-light .navbar div[style*="background: rgba(0, 0, 0, 0.15)"] {
+  background: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+  backdrop-filter: none !important;
+}
+
+/* Utility bars */
+.theme-light .shiny-utility-bar {
+  background: #ffffff !important;
+  border: 1px solid var(--border) !important;
+  color: var(--body) !important;
+}
+.theme-light .sticky-header { background: var(--surface) !important; border-color: rgba(255, 215, 0, 0.3) !important; }
+.theme-light .sticky-header h1, .theme-light .sticky-header h3 { color: var(--gold) !important; text-shadow: none !important; }
+
+/* Cards & panels (generic) */
+.theme-light .pokemon-card,
+.theme-light .portfolio-card,
+.theme-light .shiny-hunt-card,
+.theme-light .completion-modal {
+  background: #ffffff !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.05) !important;
+}
+.theme-light .completion-modal-overlay { background: rgba(0,0,0,0.5) !important; }
+
+/* Remove dark gradients/overlays inside cards */
+.theme-light .pokemon-card::before,
+.theme-light .pokemon-card::after,
+.theme-light .portfolio-card::before,
+.theme-light .portfolio-card::after { display: none !important; }
+
+/* Buttons */
+.theme-light .start-hunt-btn,
+.theme-light .submit-btn,
+.theme-light .navbar button,
+.theme-light button[style*="background: '#ffd700'"] {
+  background: var(--gold) !important; color: #000 !important; border-color: var(--gold-dark) !important;
+}
+.theme-light .start-hunt-btn:hover,
+.theme-light .submit-btn:hover { filter: none !important; background: #e6be00 !important; }
+
+.theme-light .cancel-btn,
+.theme-light button[style*="background: rgba(255, 255, 255, 0.1)"] {
+  background: #f3f4f6 !important; color: #000 !important; border: 1px solid var(--border) !important;
+}
+.theme-light .cancel-btn:hover { background: #e5e7eb !important; }
+
+/* Inputs & selects */
+.theme-light input, .theme-light select, .theme-light textarea {
+  background: var(--subsurface) !important;
+  color: var(--body) !important;
+  border: 1px solid #d1d5db !important;
+}
+.theme-light input::placeholder, .theme-light textarea::placeholder { color: var(--muted) !important; }
+
+/* Dropdown menus */
+.theme-light .dropdown-menu, .theme-light [role="menu"] {
+  background: #ffffff !important;
+  border: 1px solid var(--border) !important;
+  color: var(--body) !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08) !important;
+}
+
+/* Sprite & badge adjustments */
+.theme-light .shiny-sprite, .theme-light .portfolio-sprite, .theme-light .calendar-sprite, .theme-light img {
+  filter: none !important;
+}
+.theme-light .shiny-sprite, .theme-light .portfolio-sprite {
+  filter: drop-shadow(0 1px 4px rgba(0,0,0,0.15)) !important;
+}
+.theme-light .method-badge, .theme-light .portfolio-method, .theme-light .stat-badge {
+  background: #f3f4f6 !important; color: var(--muted) !important; border: 1px solid var(--border) !important;
+}
+.theme-light .found-btn { background: rgba(255, 215, 0, 0.2) !important; color: #000 !important; border-color: var(--gold) !important; }
+.theme-light .phase-btn, .theme-light .info-btn { background: #f3f4f6 !important; color: #000 !important; border-color: var(--border) !important; }
+
+/* Alpha / Secret indicators */
+.theme-light .shiny-sprite[style*="outline:"] { outline-color: var(--gold) !important; }
+.theme-light .recent-badge, .theme-light .shiny-date-marker { background: var(--gold) !important; color: #000 !important; box-shadow: none !important; }
+
+/* Calendar color adjustments */
+.theme-light .calendar-month, .theme-light .calendar-shiny, .theme-light .empty-month {
+  background: #F8FAFC !important; border-color: var(--border) !important;
+}
+.theme-light .month-count, .theme-light .portfolio-date, .theme-light .portfolio-encounters, .theme-light .detail-label { color: var(--muted) !important; }
+.theme-light .day-number { color: var(--body) !important; text-shadow: none !important; }
+
+/* Home dashboard (override inline dark glass using attribute selectors) */
+.theme-light [style*="background: rgba(0, 0, 0, 0.25)"],
+.theme-light [style*="background: rgba(0,0,0,0.25)"],
+.theme-light [style*="background: rgba(0, 0, 0, 0.35)"],
+.theme-light [style*="background: rgba(0, 0, 0, 0.2)"],
+.theme-light [style*="background: 'rgba(0,0,0,0.25)'"] {
+  background: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.05) !important;
+}
+.theme-light [style*="border: '1px solid rgba(255,215,0,0.12)'"] { border: 1px solid var(--border) !important; }
+.theme-light [style*="color: '#ccc'"] { color: var(--muted) !important; }
+.theme-light [style*="color: '#bbb'"] { color: var(--muted) !important; }
+.theme-light [style*="backdrop-filter"] { backdrop-filter: none !important; }
+
+/* Footer tweaks for light */
+.theme-light footer button { color: var(--body) !important; }
+.theme-light .AuthBar, .theme-light [style*="backgroundColor: 'rgba(0,0,0,0.6)'"] {
+  background: transparent !important;
+  color: var(--body) !important;
+  box-shadow: none !important;
+  border: 1px solid var(--border) !important;
+}
+
+
+/* Keep accent gold unchanged */
+.accent-gold,
+.theme-light .accent-gold {
+  color: #ffd700;
+}
+
+/* Footer and popover focus ring color */
+.focus-gold:focus {
+  outline: none !important;
+  box-shadow: 0 0 0 2px #ffd700 !important;
 }
 
 /* Custom scrollbar styling */
@@ -410,6 +593,7 @@ html, body {
   );
   z-index: 1;
   animation: portfolioShimmer 4s ease-in-out infinite;
+  pointer-events: none;
 }
 
 .hunt-card-header {
@@ -1284,5 +1468,28 @@ html, body {
   100% {
     opacity: 1;
     transform: translateX(0);
+  }
+}
+
+/* Utility bar spacing for content */
+.content-with-utility-bar {
+  padding-top: 400px; /* Mobile/tablet - ensure content starts well below utility bar */
+}
+
+@media (min-width: 768px) {
+  .content-with-utility-bar {
+    padding-top: 380px; /* Desktop - ensure content starts well below utility bar */
+  }
+}
+
+/* Footer expand animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

@@ -4,7 +4,8 @@ const cookieParser = require('cookie-parser');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { PrismaClient } = require('@prisma/client');
-const fetch = require('node-fetch');
+// Use Node 18+ global fetch (Node 22 here). No external 'node-fetch' needed.
+const fetch = global.fetch;
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');

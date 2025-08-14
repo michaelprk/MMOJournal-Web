@@ -165,6 +165,7 @@ export interface ShinyHunt {
   phasePokemon?: PhasePokemon[]; // Array of Pokemon encountered in each phase
   createdAt: string;
   updatedAt: string;
+  paused?: boolean;
 }
 
 export interface PhasePokemon {
@@ -201,7 +202,8 @@ export const HUNTING_METHODS: HuntingMethod[] = [
 export const HUNTING_METHOD_COLORS: Record<HuntingMethod, { background: string; text: string }> = {
   'Hordes 5x': { background: 'linear-gradient(45deg, #ff6b35, #f7931e)', text: '#fff' },
   'Hordes 3x': { background: 'linear-gradient(45deg, #ff9800, #ffb74d)', text: '#fff' },
-  'Singles / Lures': { background: 'linear-gradient(45deg, #4fc3f7, #29b6f6)', text: '#fff' },
+  // Shift Singles/Lures away from blue to a magenta/purple family to avoid similarity with Fishing
+  'Singles / Lures': { background: 'linear-gradient(45deg, #ec4899, #a855f7)', text: '#fff' },
   'Safari': { background: 'linear-gradient(45deg, #81c784, #66bb6a)', text: '#fff' },
   'Egg (including Alphas)': { background: 'linear-gradient(45deg, #ba68c8, #ab47bc)', text: '#fff' },
   'Honey': { background: 'linear-gradient(45deg, #ffd54f, #ffcc02)', text: '#000' }

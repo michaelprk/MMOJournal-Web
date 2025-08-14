@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { supabase } from '../../services/supabase';
 import { shinyHuntService } from '../../services/shinyHuntService';
-import { getSpeciesList, getMethodsForSpecies, getValidLocations, validateEncounter, getDedupedLocationsForSpecies, isMethodValidForLocation, canonicalizeMethod } from '../../lib/pokedex';
+import { getSpeciesList, getMethodsForSpecies, getValidLocations, validateEncounter, getDedupedLocationsForSpecies, isMethodValidForLocation, canonicalizeMethod, getSpeciesAtLocationByMethod } from '../../lib/pokedex';
 
 type SpeciesOption = { id: number; name: string };
 type LocationOption = { label: string; value: string; region: string | null; area: string | null; method: string; rarity: string | null };
@@ -81,31 +81,74 @@ export function StartHuntModal({ isOpen, onClose, onCreated, mode = 'create', in
   const METHOD_LABELS: Array<{ label: string; key: ReturnType<typeof canonicalizeMethod> }> = [
     { label: '5x Horde', key: 'horde' },
     { label: '3x Horde', key: 'horde' },
-    { label: 'Single/Lures', key: 'single_lures' },
+    { label: 'Singles / Lures', key: 'single_lures' },
     { label: 'Fishing', key: 'fishing' },
     { label: 'Egg Hunt', key: 'egg' },
-    { label: 'Alpha Egg Hunt', key: 'egg' },
+    { label: 'Alpha Egg Hunt', key: 'alpha_egg' },
     { label: 'Fossil', key: 'fossil' },
   ];
   const METHOD_OPTIONS = METHOD_LABELS.map((m) => m.label);
   const methodOptions = METHOD_OPTIONS;
   const allLocations = useMemo(() => {
     if (!species) return [] as LocationOption[];
+    // Show location options that match the selected method constraints
+    const raw = getValidLocations(species.id);
+    const canon = canonicalizeMethod(method);
+    const filtered = raw.filter((l) => {
+      switch (canon) {
+        case 'horde':
+          return (l.method || '').toLowerCase().includes('horde') || (l.rarity || '').toLowerCase() === 'horde';
+        case 'single_lures':
+          return ['very common','common','uncommon','rare','very rare','lure'].includes((l.rarity || '').toLowerCase());
+        case 'fishing':
+          // rod types, or water+rarity=lure
+          const typeLower = (l.method || '').toLowerCase();
+          const rarityLower = (l.rarity || '').toLowerCase();
+          const isRod = typeLower.includes('rod') || typeLower.includes('fishing');
+          const isWaterLure = (typeLower.includes('water') || typeLower.includes('surf')) && rarityLower === 'lure';
+          return isRod || isWaterLure;
+        case 'safari':
+          return (l.method || '').toLowerCase().includes('safari');
+        case 'egg':
+        case 'alpha_egg':
+        case 'fossil':
+          return false; // no locations for eggs
+        default:
+          return true;
+      }
+    });
     // De-dup by (region, area)
-    return getDedupedLocationsForSpecies(species.id).map((l) => ({
-      label: l.label,
-      value: l.value,
-      region: l.region,
-      area: l.area,
-      method: '',
-      rarity: null,
-    }));
-  }, [species]);
+    const dedupe = new Set<string>();
+    const deduped: LocationOption[] = [];
+    for (const l of filtered) {
+      const key = `${l.region ?? ''}|${l.area ?? ''}`;
+      if (dedupe.has(key)) continue;
+      dedupe.add(key);
+      deduped.push({
+        label: l.label,
+        value: l.value,
+        region: l.region,
+        area: l.area,
+        method: l.method,
+        rarity: l.rarity,
+      });
+    }
+    return deduped;
+  }, [species, method]);
   const filteredLocations = useMemo(() => {
     const q = locationQuery.trim().toLowerCase();
     if (!q) return allLocations.slice(0, 30);
     return allLocations.filter((l) => l.label.toLowerCase().includes(q)).slice(0, 30);
   }, [locationQuery, allLocations]);
+
+  // When method changes in create mode, clear any previously selected location to avoid invalid combos
+  useEffect(() => {
+    if (mode !== 'edit') {
+      setLocation(null);
+      setLocationQuery('');
+      setInvalidCombo(false);
+    }
+  }, [method, mode]);
 
   useEffect(() => {
     if (!species || !method || !location) {
@@ -119,7 +162,12 @@ export function StartHuntModal({ isOpen, onClose, onCreated, mode = 'create', in
     setInvalidCombo(!ok);
   }, [species, method, location]);
 
-  const canSubmit = mode === 'edit' ? !submitting && !!species : (!!species && !!method && !!location && !invalidCombo && !submitting);
+  // Eggs and Fossils skip location entirely
+  const canonMethod = canonicalizeMethod(method);
+  const requiresLocation = !(canonMethod === 'egg' || canonMethod === 'alpha_egg' || canonMethod === 'fossil');
+  const canSubmit = mode === 'edit'
+    ? !submitting && !!species
+    : (!!species && !!method && (!requiresLocation || !!location) && !invalidCombo && !submitting);
 
   const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) onClose();
@@ -137,6 +185,55 @@ export function StartHuntModal({ isOpen, onClose, onCreated, mode = 'create', in
     if (!canSubmit || !species) return;
     setSubmitting(true);
     try {
+      // Duplicate prevention: check existing open (active or paused) hunts for same species/method/location
+      const canon = canonicalizeMethod(method);
+      const [activeRows, pausedRows] = await Promise.all([
+        shinyHuntService.listActive(),
+        shinyHuntService.listPaused().catch(() => []),
+      ]);
+      const allOpen = (activeRows as any[]).concat(pausedRows as any[]).filter((r) => r && (r as any).is_phase !== true);
+      const parsedLocDup = location ? (safeParse<{ region: string | null; area: string | null }>(location.value) || { region: location.region, area: location.area }) : { region: null, area: null };
+      const isDup = allOpen.some((r: any) => {
+        const sameSpecies = r.pokemon_id === species.id;
+        const sameMethod = canonicalizeMethod(r.method) === canon;
+        const sameLoc = (requiresLocation
+          ? (r.region ?? null) === (parsedLocDup.region ?? null) && (r.area ?? null) === (parsedLocDup.area ?? null)
+          : true);
+        return sameSpecies && sameMethod && sameLoc;
+      });
+      if (isDup) {
+        setSubmitting(false);
+        setErrorMsg(`You already have a hunt for ${species.name} via ${method}${requiresLocation && location ? ` at ${location.label}` : ''}. Resume or edit that hunt instead.`);
+        return;
+      }
+      // Block creating a new hunt if this species is a phase candidate of an existing active hunt at the same area/method
+      if (requiresLocation && location) {
+        const normalizeArea = (s: string | null | undefined) => {
+          if (s == null) return null;
+          return String(s).replace(/\s*\((?:NIGHT|DAY|MORNING|EVENING|AFTERNOON|DUSK|DAWN)\)\s*$/i, '').trim();
+        };
+        const parsedLocPhase = safeParse<{ region: string | null; area: string | null }>(location.value) || { region: location.region, area: location.area };
+        const activeParents = activeRows as any[];
+        const conflictParent = activeParents.find((r: any) => {
+          if (!r) return false;
+          if (r.is_phase === true || r.is_completed === true) return false;
+          if ((r.region ?? null) !== parsedLocPhase.region) return false;
+          if (normalizeArea(r.area ?? null) !== normalizeArea(parsedLocPhase.area ?? null)) return false;
+          if (canonicalizeMethod(r.method) !== canonicalizeMethod(method)) return false;
+          const candidates = getSpeciesAtLocationByMethod(
+            parsedLocPhase.region ?? null,
+            parsedLocPhase.area ?? null,
+            r.method,
+            r.pokemon_id
+          );
+          return candidates.some((c) => c.id === species.id);
+        });
+        if (conflictParent) {
+          setSubmitting(false);
+          setErrorMsg(`${species.name} is a possible phase for your existing ${conflictParent.pokemon_name} hunt at ${location.label}. Choose a different area to start a dedicated hunt for ${species.name}.`);
+          return;
+        }
+      }
       if (mode === 'edit') {
         const parsed = location ? (JSON.parse(location.value) as { region: string | null; area: string | null }) : { region: null, area: null };
         await shinyHuntService.updateHunt(initial?.id as number, {
@@ -152,23 +249,22 @@ export function StartHuntModal({ isOpen, onClose, onCreated, mode = 'create', in
         onClose();
         return;
       }
-      if (!location) return;
-      const parsed = JSON.parse(location.value) as { region: string | null; area: string | null };
+       const parsed = location ? (JSON.parse(location.value) as { region: string | null; area: string | null }) : { region: null, area: null };
       const insert: Record<string, any> = {
         pokemon_id: species.id,
         pokemon_name: species.name,
-        method,
+         method,
         start_date: startDate,
         phase_count: 1,
         total_encounters: 0,
         is_completed: false,
         notes: notes || null,
       };
-      // Optional fields now stored
-      insert.region = parsed.region;
-      insert.area = parsed.area;
-      insert.location = parsed.area;
-      insert.rarity = location.rarity;
+       // Optional fields now stored (skip for egg hunts)
+       insert.region = requiresLocation ? parsed.region : null;
+       insert.area = requiresLocation ? parsed.area : null;
+       insert.location = requiresLocation ? parsed.area : null;
+       insert.rarity = requiresLocation ? (location?.rarity ?? null) : null;
       // insert.status = 'active';
 
       const { data, error } = await supabase
@@ -333,8 +429,8 @@ export function StartHuntModal({ isOpen, onClose, onCreated, mode = 'create', in
           )}
         </div>
 
-        {/* Location */}
-        <div style={{ marginBottom: '0.5rem' }}>
+        {/* Location (hidden/disabled for egg and fossil hunts) */}
+        <div style={{ marginBottom: '0.5rem', display: (canonMethod === 'egg' || canonMethod === 'alpha_egg' || canonMethod === 'fossil') ? 'none' : 'block' }}>
           <label style={{ display: 'block', color: '#ffcb05', marginBottom: 6 }}>Location</label>
           <input
             type="text"

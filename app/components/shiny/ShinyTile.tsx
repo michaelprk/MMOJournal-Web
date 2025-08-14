@@ -11,9 +11,20 @@ export type ShinyHoverDetails = {
   area?: string | null;
   rarity?: string | null;
   nature?: string | null;
+  gender?: string | null;
   encounters?: number | null;
   notes?: string | null;
   isPhase?: boolean | null;
+  ivs?: Partial<{
+    hp: number;
+    attack: number;
+    defense: number;
+    sp_attack: number;
+    sp_defense: number;
+    speed: number;
+  }> | null;
+  is_secret_shiny?: boolean | null;
+  is_alpha?: boolean | null;
 };
 
 type ShinyTileProps = {
@@ -30,7 +41,7 @@ export function ShinyTile({ details, size = 56, showName = true, onEdit, onDelet
   const [closing, setClosing] = useState<ReturnType<typeof setTimeout> | null>(null);
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const popRef = useRef<HTMLDivElement | null>(null);
-  const [placement, setPlacement] = useState<'right' | 'left'>('right');
+  const [placement, setPlacement] = useState<'above' | 'below'>('below');
 
   const clearCloseTimer = () => {
     if (closing) {
@@ -56,9 +67,8 @@ export function ShinyTile({ details, size = 56, showName = true, onEdit, onDelet
     if (!wrapper || !pop) return;
     const wrapperRect = wrapper.getBoundingClientRect();
     const popRect = pop.getBoundingClientRect();
-    const spaceRight = window.innerWidth - wrapperRect.right;
-    const willOverflowRight = spaceRight < popRect.width + 16;
-    setPlacement(willOverflowRight ? 'left' : 'right');
+    const spaceBelow = window.innerHeight - wrapperRect.bottom;
+    setPlacement(spaceBelow < popRect.height + 16 ? 'above' : 'below');
   }, [open]);
 
   return (
@@ -80,23 +90,7 @@ export function ShinyTile({ details, size = 56, showName = true, onEdit, onDelet
           transition: 'box-shadow 120ms ease, transform 120ms ease',
         }}
       >
-        {details.isPhase ? (
-          <div
-            style={{
-              position: 'absolute',
-              top: 6,
-              left: 6,
-              background: 'rgba(255,215,0,0.9)',
-              color: '#000',
-              fontSize: 10,
-              fontWeight: 800,
-              padding: '2px 4px',
-              borderRadius: 4,
-            }}
-          >
-            PHASE
-          </div>
-        ) : null}
+        {/* Phase badge removed per design: keep data, no visual label */}
         <img
           src={getShinySpritePath(details.pokemonId, details.pokemonName)}
           alt={`Shiny ${details.pokemonName}`}
@@ -105,6 +99,8 @@ export function ShinyTile({ details, size = 56, showName = true, onEdit, onDelet
             height: size,
             display: 'block',
             filter: `drop-shadow(0 0 10px ${colors.glow}) drop-shadow(0 0 20px ${colors.glowLight})`,
+            outline: details.is_alpha ? '2px solid #ffd700' : undefined,
+            outlineOffset: details.is_alpha ? -2 : undefined,
           }}
           loading="lazy"
           onError={(e) => {
@@ -133,8 +129,9 @@ export function ShinyTile({ details, size = 56, showName = true, onEdit, onDelet
           onMouseLeave={requestClose}
           style={{
             position: 'absolute',
-            top: 0,
-            [placement === 'right' ? 'left' : 'right']: 'calc(100% + 8px)'
+            left: '50%',
+            transform: 'translateX(-50%)',
+            [placement === 'below' ? 'top' : 'bottom']: 'calc(100% + 8px)'
           } as React.CSSProperties}
         >
           <ShinyHoverCard details={details} onEdit={onEdit} onDelete={onDelete} />
@@ -146,17 +143,30 @@ export function ShinyTile({ details, size = 56, showName = true, onEdit, onDelet
 
 export function ShinyHoverCard({ details, onEdit, onDelete }: { details: ShinyHoverDetails; onEdit?: (d: ShinyHoverDetails) => void; onDelete?: (id: number) => void }) {
   const colors = getPokemonColors(details.pokemonId);
+  const ivsLine = details.ivs
+    ? [
+        details.ivs.hp,
+        details.ivs.attack,
+        details.ivs.defense,
+        details.ivs.sp_attack,
+        details.ivs.sp_defense,
+        details.ivs.speed,
+      ]
+        .map((v) => (typeof v === 'number' ? String(v) : '—'))
+        .join(', ')
+    : null;
   return (
     <div
       style={{
-        background: 'rgba(0, 0, 0, 0.95)',
+        background: 'rgba(0, 0, 0, 0.82)',
         border: `2px solid ${colors.glowLight}`,
         borderRadius: 12,
         padding: 12,
         minWidth: 260,
-        maxWidth: 320,
+        maxWidth: 360,
         zIndex: 20,
         boxShadow: `0 8px 25px ${colors.glow}`,
+        animation: 'fadeInScale 160ms ease-out',
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
@@ -171,6 +181,11 @@ export function ShinyHoverCard({ details, onEdit, onDelete }: { details: ShinyHo
         </div>
       </div>
       <div style={{ fontSize: '0.85rem', color: '#ccc', lineHeight: 1.4 }}>
+        {details.is_secret_shiny && (
+          <div style={{ marginBottom: 6 }}>
+            <span style={{ fontSize: 10, fontWeight: 800, color: '#000', background: '#ffd700', borderRadius: 999, padding: '2px 6px' }}>SECRET</span>
+          </div>
+        )}
         {details.method ? (
           <div style={{ marginBottom: 6 }}>
             <strong style={{ color: '#ffd700' }}>Method:</strong> {details.method}
@@ -197,9 +212,19 @@ export function ShinyHoverCard({ details, onEdit, onDelete }: { details: ShinyHo
             <strong style={{ color: '#ffd700' }}>Nature:</strong> {details.nature}
           </div>
         ) : null}
+        {details.gender ? (
+          <div style={{ marginBottom: 6 }}>
+            <strong style={{ color: '#ffd700' }}>Gender:</strong> {details.gender}
+          </div>
+        ) : null}
         {typeof details.encounters === 'number' ? (
           <div style={{ marginBottom: 6 }}>
             <strong style={{ color: '#ffd700' }}>Encounters:</strong> {details.encounters.toLocaleString()}
+          </div>
+        ) : null}
+        {ivsLine ? (
+          <div style={{ marginBottom: 6 }}>
+            <strong style={{ color: '#ffd700' }}>IVs:</strong> {ivsLine}
           </div>
         ) : null}
         {details.notes ? (

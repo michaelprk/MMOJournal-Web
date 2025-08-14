@@ -4,9 +4,12 @@
 # React Router
 /.react-router/
 /build/
+backend/dist/
 
 # Environment files (never commit secrets)
 .env
 .env.*
 
 third_party/pokemmo-damage-calc/
+
+.vercel

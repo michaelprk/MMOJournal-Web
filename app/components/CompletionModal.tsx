@@ -12,6 +12,8 @@ interface CompletionModalProps {
     ivs?: Partial<PokemonStats>;
     encounterCount?: number;
     notes?: string;
+    is_secret_shiny?: boolean;
+    is_alpha?: boolean;
   }) => void;
 }
 
@@ -22,9 +24,9 @@ export default function CompletionModal({
   onCompleteHunt
 }: CompletionModalProps) {
   const [completionData, setCompletionData] = useState({
+    gender: 'Genderless' as 'Male' | 'Female' | 'Genderless',
     nature: '',
     encounterCount: hunt?.totalEncounters || 0,
-    notes: '',
     ivs: {
       hp: 0,
       attack: 0,
@@ -32,7 +34,9 @@ export default function CompletionModal({
       sp_attack: 0,
       sp_defense: 0,
       speed: 0
-    }
+    },
+    secret: false,
+    alpha: false
   });
 
   const handleInputChange = (field: string, value: string | number) => {
@@ -55,18 +59,23 @@ export default function CompletionModal({
   const handleSubmit = () => {
     if (!hunt) return;
     
+    const methodLower = String(hunt.method || '').toLowerCase();
+    const isHorde = methodLower.includes('horde');
+    const isAlphaEgg = methodLower.includes('alpha') && methodLower.includes('egg');
     onCompleteHunt(hunt.id, {
       nature: completionData.nature || undefined,
       ivs: completionData.ivs,
       encounterCount: completionData.encounterCount,
-      notes: completionData.notes || undefined
+      notes: undefined,
+      is_secret_shiny: isHorde ? false : completionData.secret,
+      is_alpha: isAlphaEgg ? true : (methodLower.includes('single') || methodLower.includes('lure')) ? completionData.alpha : false,
     });
     
     // Reset form
     setCompletionData({
+      gender: 'Genderless',
       nature: '',
       encounterCount: 0,
-      notes: '',
       ivs: {
         hp: 0,
         attack: 0,
@@ -74,7 +83,9 @@ export default function CompletionModal({
         sp_attack: 0,
         sp_defense: 0,
         speed: 0
-      }
+      },
+      secret: false,
+      alpha: false
     });
   };
 
@@ -92,28 +103,45 @@ export default function CompletionModal({
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      padding: '20px',
+      padding: 20,
     }}>
       <div style={{
         background: 'rgba(0, 0, 0, 0.95)',
         border: '2px solid #ffd700',
-        borderRadius: '12px',
-        padding: '24px',
-        maxWidth: '600px',
+        borderRadius: 12,
+        padding: 24,
+        maxWidth: 700,
         width: '100%',
         maxHeight: '90vh',
         overflowY: 'auto',
+        color: '#fff'
       }}>
-        <h3 style={{ 
-          color: '#ffd700', 
-          margin: '0 0 20px 0',
-          fontSize: '1.5rem',
-          textAlign: 'center'
-        }}>
+        <h3 style={{ color: '#ffd700', margin: '0 0 20px 0', fontSize: '1.5rem', textAlign: 'center' }}>
           🎉 Shiny {hunt.pokemonName} Found!
         </h3>
         
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div>
+            <label style={{ color: '#ffd700', display: 'block', marginBottom: '8px' }}>Gender:</label>
+            <select 
+              value={completionData.gender}
+              onChange={(e) => handleInputChange('gender', e.target.value)}
+              style={{
+                width: '100%',
+                padding: '8px',
+                border: '1px solid rgba(255, 215, 0, 0.3)',
+                borderRadius: '6px',
+                background: 'rgba(0, 0, 0, 0.4)',
+                color: '#fff',
+                fontSize: '0.9rem',
+              }}
+            >
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Genderless">Genderless</option>
+            </select>
+          </div>
+          
           <div>
             <label style={{ color: '#ffd700', display: 'block', marginBottom: '8px' }}>Nature:</label>
             <select 
@@ -154,10 +182,45 @@ export default function CompletionModal({
               }}
             />
           </div>
+
+          {/* Secret / Alpha toggles above IVs */}
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 16 }}>
+            {(() => {
+              const isHorde = String(hunt.method || '').toLowerCase().includes('horde');
+              return (
+                <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8, color: isHorde ? 'rgba(255,255,255,0.5)' : '#fff' }} title={isHorde ? 'Secret Shinies do not apply to Horde hunts' : 'Mark this as a Secret Shiny'}>
+                  <input type="checkbox" checked={!isHorde && completionData.secret} onChange={(e) => handleInputChange('secret', e.target.checked)} aria-label="Secret Shiny" disabled={isHorde} />
+                  <span style={{ color: '#ffd700', fontWeight: 700 }}>Secret Shiny</span>
+                </label>
+              );
+            })()}
+            {(() => {
+              const methodLower = String(hunt.method || '').toLowerCase();
+              const isAlphaEgg = methodLower.includes('alpha') && methodLower.includes('egg');
+              const canAlphaToggle = methodLower.includes('single') || methodLower.includes('lure');
+              if (isAlphaEgg) {
+                return (
+                  <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8, color: '#fff' }} title="Alpha is always true for Alpha Egg Hunts">
+                    <input type="checkbox" checked readOnly aria-label="Alpha" />
+                    <span style={{ color: '#ffd700', fontWeight: 700 }}>Alpha</span>
+                  </label>
+                );
+              }
+              if (canAlphaToggle) {
+                return (
+                  <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8, color: '#fff' }} title="Mark as Alpha shiny">
+                    <input type="checkbox" checked={completionData.alpha} onChange={(e) => handleInputChange('alpha', e.target.checked)} aria-label="Alpha" />
+                    <span style={{ color: '#ffd700', fontWeight: 700 }}>Alpha</span>
+                  </label>
+                );
+              }
+              return null;
+            })()}
+          </div>
           
           <div>
-            <label style={{ color: '#ffd700', display: 'block', marginBottom: '8px' }}>IVs (Optional):</label>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
+            <label style={{ color: '#ffd700', display: 'block', marginBottom: 8, textAlign: 'center' }}>IVs (Optional)</label>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 8 }}>
               {[
                 { key: 'hp', label: 'HP' },
                 { key: 'attack', label: 'Atk' },
@@ -166,52 +229,24 @@ export default function CompletionModal({
                 { key: 'sp_defense', label: 'SpD' },
                 { key: 'speed', label: 'Spe' }
               ].map(({ key, label }) => (
-                <div key={key}>
-                  <label style={{ color: '#ccc', fontSize: '0.8rem', display: 'block', marginBottom: '4px' }}>{label}:</label>
+                <div key={key} style={{ position: 'relative', minWidth: 0 }}>
+                  <span style={{ position: 'absolute', top: -8, left: 10, fontSize: 10, color: '#ffd700', background: 'rgba(0,0,0,0.95)', padding: '0 4px', lineHeight: 1 }}>{label}</span>
                   <input 
                     type="number" 
                     min="0" 
                     max="31"
                     value={completionData.ivs[key as keyof PokemonStats]}
                     onChange={(e) => handleIVChange(key as keyof PokemonStats, parseInt(e.target.value) || 0)}
-                    style={{
-                      width: '100%',
-                      padding: '6px',
-                      border: '1px solid rgba(255, 215, 0, 0.3)',
-                      borderRadius: '4px',
-                      background: 'rgba(0, 0, 0, 0.4)',
-                      color: '#fff',
-                      fontSize: '0.8rem',
-                    }}
+                    style={{ width: '100%', background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,215,0,0.3)', borderRadius: 6, color: '#fff', padding: '10px 10px 8px' }}
                   />
                 </div>
               ))}
             </div>
           </div>
           
-          <div>
-            <label style={{ color: '#ffd700', display: 'block', marginBottom: '8px' }}>Notes:</label>
-            <textarea
-              value={completionData.notes}
-              onChange={(e) => handleInputChange('notes', e.target.value)}
-              placeholder="Add any notes about this shiny..."
-              rows={3}
-              style={{
-                width: '100%',
-                padding: '8px',
-                border: '1px solid rgba(255, 215, 0, 0.3)',
-                borderRadius: '6px',
-                background: 'rgba(0, 0, 0, 0.4)',
-                color: '#fff',
-                fontSize: '0.9rem',
-                resize: 'vertical',
-                fontFamily: 'inherit',
-              }}
-            />
-          </div>
         </div>
         
-        <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '20px' }}>
+        <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', marginTop: 20 }}>
           <button
             onClick={onClose}
             style={{

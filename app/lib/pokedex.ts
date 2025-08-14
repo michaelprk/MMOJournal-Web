@@ -52,6 +52,7 @@ export function canonicalizeMethod(methodRaw: string):
   | 'fishing'
   | 'safari'
   | 'egg'
+  | 'alpha_egg'
   | 'fossil'
   | 'honey'
   | 'unknown' {
@@ -61,6 +62,7 @@ export function canonicalizeMethod(methodRaw: string):
   if (m.includes('lure') || m.includes('single')) return 'single_lures';
   if (m.includes('fish') || m.includes('rod')) return 'fishing';
   if (m.includes('safari')) return 'safari';
+  if (m.includes('alpha') && m.includes('egg')) return 'alpha_egg';
   if (m.includes('egg')) return 'egg';
   if (m.includes('fossil')) return 'fossil';
   if (m.includes('honey') || m.includes('headbutt')) return 'honey';
@@ -157,25 +159,30 @@ export function isMethodValidForLocation(
   if (!monster || !Array.isArray(monster.locations)) return false;
   const canon = canonicalizeMethod(method);
 
-  const methodMatchesType = (locTypeRaw?: string) => {
+  const methodMatchesType = (locTypeRaw?: string, locRarityRaw?: string | null) => {
     const t = (locTypeRaw || '').toLowerCase();
+    const rarity = (locRarityRaw || '').toLowerCase();
     if (!t) return false;
     switch (canon) {
       case 'horde':
-        // Dataset often uses rarity "Horde" but type may be grass/cave/water.
-        // Accept common encounter surfaces for hordes.
-        return t.includes('horde') || t.includes('grass') || t.includes('cave') || t.includes('water');
+        // Only allow locations explicitly marked as Horde by type or rarity
+        return t.includes('horde') || rarity === 'horde';
       case 'single_lures':
-        // Singles/Lures are typically grass encounters, but in caves the dataset
-        // often labels the area as "Cave" even when the encounter is grass in-cave.
-        // Accept cave as valid for singles/lures to cover places like Meteor Falls, Relic Castle.
-        return t.includes('grass') || t.includes('cave') || t.includes('lure') || t.includes('single');
+        // Limit to general overworld + lure-able entries
+        return (
+          rarity === 'very common' || rarity === 'common' || rarity === 'uncommon' ||
+          rarity === 'rare' || rarity === 'very rare' || rarity === 'lure'
+        );
       case 'safari':
         return t.includes('safari');
       case 'fishing':
-        return t.includes('rod') || t.includes('fishing') || t.includes('water') || t.includes('surf');
+        // Fishing if type is any rod, or (type water and rarity lure)
+        const isRod = t.includes('rod') || t.includes('fishing');
+        const isWaterLure = (t.includes('water') || t.includes('surf')) && rarity === 'lure';
+        return isRod || isWaterLure;
       case 'egg':
-        return true; // eggs don't depend on location type
+      case 'alpha_egg':
+        return true; // eggs don't depend on location
       case 'fossil':
         return t.includes('fossil');
       case 'honey':
@@ -191,7 +198,13 @@ export function isMethodValidForLocation(
     const a = loc.location ?? null;
     // Compare by exact values from dataset, as selectors are built from the same source.
     if (r !== region || a !== area) return false;
-    return methodMatchesType(loc.type);
+    // Strict horde check when canon is horde
+    if (canon === 'horde') {
+      const typeLower = (loc.type || '').toLowerCase();
+      const rarityLower = (loc.rarity || '').toLowerCase();
+      if (!(typeLower.includes('horde') || rarityLower === 'horde')) return false;
+    }
+    return methodMatchesType(loc.type, loc.rarity ?? null);
   });
 }
 
@@ -205,6 +218,105 @@ export function getSpeciesAtLocation(region: string | null, area: string | null)
         seen.add(monster.id);
         species.push({ id: monster.id, name: monster.name });
       }
+    }
+  }
+  return species;
+}
+
+// Filter species by location and encounter method grouping (horde, fishing, singles/lures, etc.)
+export function getSpeciesAtLocationByMethod(
+  region: string | null,
+  area: string | null,
+  method: string,
+  parentSpeciesId?: number
+): Array<{ id: number; name: string }> {
+  const species: Array<{ id: number; name: string }> = [];
+  const seen = new Set<number>();
+  const canon = canonicalizeMethod(method);
+
+  const methodMatches = (locTypeRaw?: string, locRarityRaw?: string | null) => {
+    const t = (locTypeRaw || '').toLowerCase();
+    const rarity = (locRarityRaw || '').toLowerCase();
+    switch (canon) {
+      case 'horde':
+        return t.includes('horde') || rarity === 'horde';
+      case 'single_lures':
+        return (
+          rarity === 'very common' || rarity === 'common' || rarity === 'uncommon' ||
+          rarity === 'rare' || rarity === 'very rare' || rarity === 'lure'
+        );
+      case 'safari':
+        return t.includes('safari');
+      case 'fishing':
+        return (t.includes('rod') || t.includes('fishing')) || ((t.includes('water') || t.includes('surf')) && rarity === 'lure');
+      case 'egg':
+      case 'alpha_egg':
+        return false;
+      case 'fossil':
+        return t.includes('fossil');
+      case 'honey':
+        return t.includes('honey') || t.includes('headbutt');
+      default:
+        return true;
+    }
+  };
+
+  // Normalize encounter surface/type into broad groups for resilient matching
+  const normalizeSurface = (input?: string): string => {
+    const t = (input || '').toLowerCase();
+    if (!t) return '';
+    if (t.includes('grass')) return 'grass';
+    if (t.includes('cave')) return 'cave';
+    if (t.includes('rod') || t.includes('fish')) return 'rod';
+    if (t.includes('water') || t.includes('surf')) return 'water';
+    if (t.includes('desert') || t.includes('sand')) return 'desert';
+    if (t.includes('safari')) return 'safari';
+    if (t.includes('honey') || t.includes('headbutt')) return 'honey';
+    return t;
+  };
+
+  // Normalize area names by stripping time-of-day qualifiers like (NIGHT), (DAY), (MORNING), etc.
+  const normalizeAreaName = (input?: string | null): string | null => {
+    if (input == null) return null;
+    const s = String(input);
+    return s.replace(/\s*\((?:NIGHT|DAY|MORNING|EVENING|AFTERNOON|DUSK|DAWN)\)\s*$/i, '').trim();
+  };
+
+  // Determine allowed encounter surfaces/types for the parent species at this location
+  let allowedSurfaces: Set<string> | null = null;
+  if (typeof parentSpeciesId === 'number') {
+    const parent = findMonsterById(parentSpeciesId);
+    if (parent && Array.isArray(parent.locations)) {
+      allowedSurfaces = new Set<string>();
+      for (const loc of parent.locations) {
+        const r = loc?.region_name ?? null;
+        const a = normalizeAreaName(loc?.location ?? null);
+        if (r === region && a === normalizeAreaName(area)) {
+          const t = normalizeSurface(loc?.type);
+          if (t) allowedSurfaces.add(t);
+        }
+      }
+      if (allowedSurfaces.size === 0) allowedSurfaces = null;
+    }
+  }
+
+  for (const monster of monsters) {
+    if (!monster?.id || !monster?.name || !Array.isArray(monster.locations)) continue;
+    const ok = monster.locations.some((l) => {
+      const r = l?.region_name ?? null;
+      const a = normalizeAreaName(l?.location ?? null);
+      if (r !== region || a !== normalizeAreaName(area)) return false;
+      if (!methodMatches(l?.type, l?.rarity ?? null)) return false;
+      // Enforce surface equality (after normalization) when we know the parent's surfaces
+      if (allowedSurfaces) {
+        const candidateSurface = normalizeSurface(l?.type);
+        if (!allowedSurfaces.has(candidateSurface)) return false;
+      }
+      return true;
+    });
+    if (ok && !seen.has(monster.id)) {
+      seen.add(monster.id);
+      species.push({ id: monster.id, name: monster.name });
     }
   }
   return species;

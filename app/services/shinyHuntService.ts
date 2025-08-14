@@ -17,6 +17,9 @@ export type ShinyHuntRow = {
   start_date: string | null;
   found_at?: string | null;
   created_at: string;
+  is_paused?: boolean;
+  is_secret_shiny?: boolean;
+  is_alpha?: boolean;
 };
 
 export const shinyHuntService = {
@@ -24,7 +27,7 @@ export const shinyHuntService = {
     const query = supabase
       .from('shiny_hunts')
       .select(
-        'id,pokemon_id,pokemon_name,method,region,area,location,rarity,phase_count,total_encounters,is_completed,is_phase,parent_hunt_id,start_date,found_at,created_at'
+        'id,pokemon_id,pokemon_name,method,region,area,location,rarity,phase_count,total_encounters,is_completed,is_phase,parent_hunt_id,start_date,found_at,created_at,is_secret_shiny,is_alpha,meta'
       )
       .order('created_at', { ascending: false });
 
@@ -55,24 +58,35 @@ export const shinyHuntService = {
     };
   },
 
-  async listActive(): Promise<ShinyHuntRow[]> {
-    const { data, error } = await supabase
-      .from('shiny_hunts')
-      .select(
-        'id,pokemon_id,pokemon_name,method,region,area,location,rarity,phase_count,total_encounters,is_completed,is_phase,parent_hunt_id,start_date,found_at,created_at'
+  subscribeUpdates(userId: string, onUpdate: (row: ShinyHuntRow) => void) {
+    const channel = supabase
+      .channel('shiny_hunts_updates')
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'shiny_hunts', filter: `user_id=eq.${userId}` },
+        (payload) => {
+          const updatedRow = payload.new as ShinyHuntRow;
+          onUpdate(updatedRow);
+        }
       )
-      .eq('is_completed', false)
-      .eq('is_phase', false)
-      .order('created_at', { ascending: false });
-    if (error) throw error;
-    return (data || []) as ShinyHuntRow[];
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  },
+
+  async listActive(): Promise<ShinyHuntRow[]> {
+    // Robust client-side filtering to tolerate missing/null columns in dev
+    const rows = await this.list();
+    return rows.filter((r: any) => r.is_completed !== true && r.is_phase !== true && r?.meta?.paused !== true);
   },
 
   async listCompleted(): Promise<ShinyHuntRow[]> {
     const { data, error } = await supabase
       .from('shiny_hunts')
       .select(
-        'id,pokemon_id,pokemon_name,method,region,area,location,rarity,phase_count,total_encounters,is_completed,is_phase,parent_hunt_id,start_date,created_at,found_at,completed_month,completed_year,meta'
+        'id,pokemon_id,pokemon_name,method,region,area,location,rarity,phase_count,total_encounters,is_completed,is_phase,parent_hunt_id,start_date,created_at,found_at,completed_month,completed_year,is_secret_shiny,is_alpha,meta'
       )
       .eq('is_completed', true)
       .order('found_at', { ascending: false });
@@ -97,12 +111,25 @@ export const shinyHuntService = {
   },
 
   async addPhase(parentId: number, payload: Partial<ShinyHuntRow> & { pokemon_id: number; pokemon_name: string; method: string; found_at?: string | null }): Promise<void> {
+    // ensure meta.ivs is saved under canonical keys
+    const meta = (payload as any).meta || {};
+    const ivs = meta.ivs
+      ? {
+          hp: Number(meta.ivs.hp ?? meta.ivs?.hp ?? 0),
+          attack: Number(meta.ivs.attack ?? meta.ivs?.atk ?? 0),
+          defense: Number(meta.ivs.defense ?? meta.ivs?.def ?? 0),
+          sp_attack: Number(meta.ivs.sp_attack ?? meta.ivs?.sp_atk ?? 0),
+          sp_defense: Number(meta.ivs.sp_defense ?? meta.ivs?.sp_def ?? 0),
+          speed: Number(meta.ivs.speed ?? meta.ivs?.spd ?? 0),
+        }
+      : undefined;
     const insert = {
       ...payload,
+      meta: { ...meta, ivs, secret_shiny: (payload as any)?.is_secret_shiny ?? meta?.secret_shiny ?? false, alpha: (payload as any)?.is_alpha ?? meta?.alpha ?? false },
       is_completed: true,
       is_phase: true,
       parent_hunt_id: Number(parentId),
-      found_at: payload.found_at || new Date().toISOString(),
+      found_at: (payload as any).found_at || new Date().toISOString(),
     } as any;
     const { error } = await supabase.from('shiny_hunts').insert([insert]);
     if (error) throw error;
@@ -135,6 +162,32 @@ export const shinyHuntService = {
     if (error) throw error;
   },
 
+  async pauseHunt(id: number): Promise<void> {
+    const { error } = await supabase
+      .from('shiny_hunts')
+      .update({ is_paused: true })
+      .eq('id', id);
+    if (error) {
+      await this.updateMeta(id, { paused: true });
+    }
+  },
+
+  async resumeHunt(id: number): Promise<void> {
+    const { error } = await supabase
+      .from('shiny_hunts')
+      .update({ is_paused: false })
+      .eq('id', id);
+    if (error) {
+      await this.updateMeta(id, { paused: false });
+    }
+  },
+
+  async listPaused(): Promise<ShinyHuntRow[]> {
+    // Robust client-side filtering
+    const rows = await this.list();
+    return rows.filter((r: any) => r.is_completed !== true && r.is_phase !== true && r?.meta?.paused === true);
+  },
+
   async updateCounters(id: number, data: { phase_count?: number; total_encounters?: number }): Promise<void> {
     const { error } = await supabase
       .from('shiny_hunts')
@@ -151,12 +204,41 @@ export const shinyHuntService = {
       .eq('id', id)
       .single();
     if (error) throw error;
-    const newMeta = { ...(data?.meta || {}), ...partialMeta };
+    // Normalize IV keys if present
+    const normalized = { ...partialMeta };
+    if (normalized.ivs) {
+      normalized.ivs = {
+        hp: Number(normalized.ivs.hp ?? normalized.ivs?.hp ?? 0),
+        attack: Number(normalized.ivs.attack ?? normalized.ivs?.atk ?? 0),
+        defense: Number(normalized.ivs.defense ?? normalized.ivs?.def ?? 0),
+        sp_attack: Number(normalized.ivs.sp_attack ?? normalized.ivs?.sp_atk ?? 0),
+        sp_defense: Number(normalized.ivs.sp_defense ?? normalized.ivs?.sp_def ?? 0),
+        speed: Number(normalized.ivs.speed ?? normalized.ivs?.spd ?? 0),
+      };
+    }
+    const newMeta = { ...(data?.meta || {}), ...normalized };
     const { error: upErr } = await supabase
       .from('shiny_hunts')
       .update({ meta: newMeta })
       .eq('id', id);
     if (upErr) throw upErr;
+  },
+
+  async updateFlags(id: number, flags: { is_secret_shiny?: boolean; is_alpha?: boolean }): Promise<void> {
+    // Try column update; fall back to meta merge if columns are missing
+    const { error } = await supabase
+      .from('shiny_hunts')
+      .update({
+        ...(typeof flags.is_secret_shiny === 'boolean' ? { is_secret_shiny: flags.is_secret_shiny } : {}),
+        ...(typeof flags.is_alpha === 'boolean' ? { is_alpha: flags.is_alpha } : {}),
+      } as any)
+      .eq('id', id);
+    if (error) {
+      const fallback: any = {};
+      if (typeof flags.is_secret_shiny === 'boolean') fallback.secret_shiny = flags.is_secret_shiny;
+      if (typeof flags.is_alpha === 'boolean') fallback.alpha = flags.is_alpha;
+      await this.updateMeta(id, fallback);
+    }
   },
 
   async deleteHunt(id: number): Promise<void> {
