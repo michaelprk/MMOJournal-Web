@@ -71,6 +71,22 @@ Personal data processed:
 
 - RLS must be enabled for `profiles`, `pokemon_builds`, `shiny_hunts` and any related tables. Client code assumes per-user scoping. Provide SQL separately to enforce `user_id = auth.uid()` policies. See `docs/rls_policies.sql` (to be added).
 
+Tables and expected ownership column:
+- `public.profiles` – owner: `user_id` (linked to `auth.uid()`).
+- `public.pokemon_builds` – owner: `user_id` (client reads/writes builds per user).
+- `public.shiny_hunts` – owner: `user_id` (hunts and phases live in same table; policies must scope by `user_id`).
+
+Believed RLS sufficiency (based on code):
+- `profiles`: Needed; insert/update/select scoped to `auth.uid()`. Status unknown in project; apply policies if missing.
+- `pokemon_builds`: Needed; CRUD from client; apply policies if missing.
+- `shiny_hunts`: Needed; CRUD + realtime; apply policies if missing.
+
+Instructions to apply:
+1) Open Supabase Dashboard → SQL Editor.
+2) Paste and run `docs/rls_policies.sql` (adjust table/column names if your schema differs).
+3) Use the top “Harmless” queries in that file to list current RLS status and policies.
+4) Re-test app CRUD to confirm no unauthorized access and that the client continues to work.
+
 ### 9) Sensitive config
 
 - Client uses only `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.
