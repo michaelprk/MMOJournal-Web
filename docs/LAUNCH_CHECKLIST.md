@@ -41,6 +41,10 @@ Version: 2025-08-14
   - Vercel: 2FA enabled for project owners
   - Supabase: 2FA enabled for project owners; rotate service keys if applicable
 
+- [ ] Run verification script
+  - From repo root: `bash scripts/verify.sh`
+  - Ensure security headers check shows OK and audit summary is acceptable
+
 - [ ] Retention note
   - Retention statement present in docs; no auto-deletes enabled yet
 
