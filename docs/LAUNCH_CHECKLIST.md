@@ -28,6 +28,9 @@ Version: 2025-08-14
 
 - [ ] User rights flows
   - Manual export/delete steps documented in `docs/DSAR_RUNBOOK.md`
+  - In the app, signed-in bar → Account:
+    - Test “Download My Data (JSON)” downloads a file containing profile/builds/hunts
+    - Test “Delete Account…” requires typing DELETE and removes the user’s rows; user is signed out
 
 - [ ] Retention note
   - Retention statement present in docs; no auto-deletes enabled yet
