@@ -1,0 +1,218 @@
+/* MMOJ Dark Theme - Color-only overrides */
+/* Scoped under .mmoj-dark, no layout/spacing changes */
+
+/* Base page colors */
+.mmoj-dark,
+.mmoj-dark body {
+  background-color: #0b0b0f;
+  color: #f5f7fa;
+}
+
+/* Form controls */
+.mmoj-dark input,
+.mmoj-dark select,
+.mmoj-dark textarea {
+  background-color: #0f1115;
+  color: #f5f7fa;
+  border-color: rgba(255,255,255,.12);
+}
+
+/* Buttons and interactive elements */
+.mmoj-dark button,
+.mmoj-dark .btn,
+.mmoj-dark .tab,
+.mmoj-dark .pill,
+.mmoj-dark label.btn {
+  background-color: #1b1d23;
+  color: #f5f7fa;
+  border-color: rgba(255,255,255,.12);
+}
+
+/* Panel surfaces */
+.mmoj-dark .panel,
+.mmoj-dark fieldset,
+.mmoj-dark .left,
+.mmoj-dark .middle,
+.mmoj-dark .right,
+.mmoj-dark .field,
+.mmoj-dark .info-group,
+.mmoj-dark .move-result-group,
+.mmoj-dark .main-result-group {
+  background-color: #14151a;
+  border-color: rgba(255,255,255,.12);
+}
+
+/* Secondary panel surfaces */
+.mmoj-dark .move-result-subgroup,
+.mmoj-dark th,
+.mmoj-dark .field td {
+  background-color: #1b1d23;
+}
+
+/* Table cells */
+.mmoj-dark td {
+  background-color: #14151a;
+  border-color: rgba(255,255,255,.12);
+}
+
+/* Links */
+.mmoj-dark a {
+  color: #f5f7fa;
+}
+
+/* Selected/highlighted states - use brand yellow */
+.mmoj-dark .btn.selected,
+.mmoj-dark button.selected,
+.mmoj-dark .active,
+.mmoj-dark .btn-on,
+.mmoj-dark input:checked + .btn,
+.mmoj-dark input:checked + label.btn,
+.mmoj-dark .visually-hidden:checked + .btn {
+  background-color: #ffcb05;
+  color: #000;
+  border-color: #ffcb05;
+}
+
+/* Result highlights - brand yellow */
+.mmoj-dark #resultHeader,
+.mmoj-dark #resultHeader *,
+.mmoj-dark .result-move-header,
+.mmoj-dark .result-move-header *,
+.mmoj-dark .big-text,
+.mmoj-dark #mainResult,
+.mmoj-dark [id^="resultDamage"] {
+  color: #ffcb05;
+}
+
+/* Focus states */
+.mmoj-dark input:focus,
+.mmoj-dark select:focus,
+.mmoj-dark textarea:focus,
+.mmoj-dark button:focus {
+  border-color: #ffcb05;
+}
+
+/* Hover states */
+.mmoj-dark button:hover,
+.mmoj-dark .btn:hover,
+.mmoj-dark label.btn:hover {
+  background-color: #1b1d23;
+  border-color: rgba(255,255,255,.2);
+}
+
+/* Muted text */
+.mmoj-dark .muted,
+.mmoj-dark small {
+  color: #c8cbd2;
+}
+
+/* HR dividers */
+.mmoj-dark hr {
+  border-color: rgba(255,255,255,.12);
+}
+
+/* Select options */
+.mmoj-dark select option {
+  background-color: #0f1115;
+  color: #f5f7fa;
+}
+
+/* Logo resizing and centering */
+.mmoj-dark .mmoj-logo img {
+  max-width: 200px;
+  width: 200px;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+/* Unify all backgrounds to solid black */
+.mmoj-dark body,
+.mmoj-dark .wrapper,
+.mmoj-dark .panel,
+.mmoj-dark .left,
+.mmoj-dark .middle,
+.mmoj-dark .right,
+.mmoj-dark .field,
+.mmoj-dark .info-group,
+.mmoj-dark .move-list,
+.mmoj-dark .damage-calc,
+.mmoj-dark .move-result-group,
+.mmoj-dark .main-result-group,
+.mmoj-dark .move-result-subgroup,
+.mmoj-dark .section,
+.mmoj-dark .card,
+.mmoj-dark table,
+.mmoj-dark th,
+.mmoj-dark td,
+.mmoj-dark fieldset {
+  background: #000 !important;
+}
+
+/* Explicitly preserve input/select backgrounds */
+.mmoj-dark input,
+.mmoj-dark select,
+.mmoj-dark textarea {
+  background-color: #0f1115 !important;
+}
+
+/* Additional table structures to force black */
+.mmoj-dark table,
+.mmoj-dark thead,
+.mmoj-dark tbody,
+.mmoj-dark tfoot,
+.mmoj-dark tr {
+  background: #000 !important;
+}
+
+/* Move result headers and wide bars */
+.mmoj-dark .result-move-header,
+.mmoj-dark .move-result-group,
+.mmoj-dark .move-result-subgroup {
+  background: #000 !important;
+}
+
+/* Pokemon panel legends and fieldsets */
+.mmoj-dark legend,
+.mmoj-dark .poke-info {
+  background: #000 !important;
+}
+
+/* Horizontal rules - subtle border instead of gray */
+.mmoj-dark hr {
+  border-color: rgba(255,255,255,.12) !important;
+  background: transparent !important;
+}
+
+/* Catch any remaining generic containers */
+.mmoj-dark .header,
+.mmoj-dark .subheader,
+.mmoj-dark .panel-heading,
+.mmoj-dark .section,
+.mmoj-dark .group,
+.mmoj-dark .container {
+  background: #000 !important;
+}
+
+/* === FINAL BLACK OVERRIDES (no layout changes) === */
+
+/* Many calc rules use CSS vars from dark-theme.css (e.g., --background). 
+   Override them at the root when .mmoj-dark is on <html>. */
+html.mmoj-dark {
+  --background: #000;        /* page & wide bars behind sections */
+  --fieldset-color: #000;    /* some fieldsets/panels */
+  --column1: #000;           /* table/column backgrounds in this skin */
+}
+
+/* Defensive fallback in case something bypasses the vars */
+html.mmoj-dark,
+.mmoj-dark body {
+  background-color: #000 !important;
+  background-image: none !important;
+}
+
+/* Keep the thin divider under the logo subtle, not gray */
+.mmoj-dark hr {
+  border-color: rgba(255,255,255,.12) !important;
+  background: transparent !important;
+}
