@@ -216,3 +216,28 @@ html.mmoj-dark,
   border-color: rgba(255,255,255,.12) !important;
   background: transparent !important;
 }
+
+/* Darken select controls to match the dev look */
+.mmoj-dark select {
+  background-color: #16181d !important;
+  color: #e8e8e8 !important;
+  border: 1px solid rgba(255,255,255,.2) !important;
+}
+
+.mmoj-dark select:hover {
+  background-color: #1a1c21 !important;
+  border-color: rgba(255,255,255,.3) !important;
+}
+
+.mmoj-dark select:focus {
+  background-color: #1a1c21 !important;
+  border-color: #ffd700 !important;
+  outline: 0 !important;
+  box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.3) !important;
+}
+
+/* Darken option elements where supported */
+.mmoj-dark select option {
+  background-color: #16181d !important;
+  color: #e8e8e8 !important;
+}

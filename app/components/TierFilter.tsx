@@ -97,7 +97,7 @@ export function TierFilter({ selectedTier, onTierChange, style = 'dropdown' }: T
           fontWeight: 'bold',
           cursor: 'pointer',
           transition: 'all 0.2s ease',
-          minWidth: '200px',
+          minWidth: '120px',
           textAlign: 'left',
           position: 'relative',
           display: 'flex',
@@ -113,7 +113,7 @@ export function TierFilter({ selectedTier, onTierChange, style = 'dropdown' }: T
           e.currentTarget.style.transform = 'translateY(0)';
         }}
       >
-        {selectedTier ? `${selectedTier} - ${TIER_FULL_NAMES[selectedTier]}` : 'Select Tier'}
+        {selectedTier ? selectedTier : 'Tier'}
         <span
           style={{
             marginLeft: 'auto',

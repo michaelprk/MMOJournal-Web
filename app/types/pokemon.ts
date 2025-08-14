@@ -141,12 +141,13 @@ export const MOVE_TYPE_COLORS: Record<string, { background: string; text: string
 // =============================================================================
 
 export type HuntingMethod = 
-  | 'Hordes 5x'
-  | 'Hordes 3x'
+  | '5x Horde'
+  | '3x Horde'
   | 'Singles / Lures'
-  | 'Safari'
-  | 'Egg (including Alphas)'
-  | 'Honey';
+  | 'Fishing'
+  | 'Egg Hunt'
+  | 'Alpha Egg Hunt'
+  | 'Fossil';
 
 export interface ShinyHunt {
   id: number;
@@ -191,22 +192,23 @@ export interface ShinyPortfolio {
 }
 
 export const HUNTING_METHODS: HuntingMethod[] = [
-  'Hordes 5x',
-  'Hordes 3x',
+  '5x Horde',
+  '3x Horde',
   'Singles / Lures',
-  'Safari',
-  'Egg (including Alphas)',
-  'Honey'
+  'Fishing',
+  'Egg Hunt',
+  'Alpha Egg Hunt',
+  'Fossil'
 ];
 
 export const HUNTING_METHOD_COLORS: Record<HuntingMethod, { background: string; text: string }> = {
-  'Hordes 5x': { background: 'linear-gradient(45deg, #ff6b35, #f7931e)', text: '#fff' },
-  'Hordes 3x': { background: 'linear-gradient(45deg, #ff9800, #ffb74d)', text: '#fff' },
-  // Shift Singles/Lures away from blue to a magenta/purple family to avoid similarity with Fishing
+  '5x Horde': { background: 'linear-gradient(45deg, #ff6b35, #f7931e)', text: '#fff' },
+  '3x Horde': { background: 'linear-gradient(45deg, #ff9800, #ffb74d)', text: '#fff' },
   'Singles / Lures': { background: 'linear-gradient(45deg, #ec4899, #a855f7)', text: '#fff' },
-  'Safari': { background: 'linear-gradient(45deg, #81c784, #66bb6a)', text: '#fff' },
-  'Egg (including Alphas)': { background: 'linear-gradient(45deg, #ba68c8, #ab47bc)', text: '#fff' },
-  'Honey': { background: 'linear-gradient(45deg, #ffd54f, #ffcc02)', text: '#000' }
+  'Fishing': { background: 'linear-gradient(45deg, #42a5f5, #2196f3)', text: '#fff' },
+  'Egg Hunt': { background: 'linear-gradient(45deg, #ba68c8, #ab47bc)', text: '#fff' },
+  'Alpha Egg Hunt': { background: 'linear-gradient(45deg, #9c27b0, #7b1fa2)', text: '#fff' },
+  'Fossil': { background: 'linear-gradient(45deg, #8d6e63, #5d4037)', text: '#fff' }
 };
 
 // Pokemon data for Gen 1-5 (IDs 1-649)

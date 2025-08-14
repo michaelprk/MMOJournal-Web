@@ -77,7 +77,7 @@ export default function CreateAccount() {
             backgroundColor: "#111",
             color: "#fff",
           }}
-          autoFocus
+
         />
         <input
           type="email"

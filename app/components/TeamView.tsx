@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import type { PokemonBuild } from '../types/pokemon';
 import { TIER_COLORS } from '../types/pokemon';
 import { ExportModal } from './ExportModal';
+import { ModalBase } from './ui/ModalBase';
 
 interface Team {
   id: string;
@@ -24,6 +25,7 @@ function TeamNameEditModal({ isOpen, onClose, team, onSave }: {
   onSave: (newName: string) => void; 
 }) {
   const [newName, setNewName] = useState(team.name);
+  const initialName = team.name;
 
   const handleSave = () => {
     if (newName.trim()) {
@@ -32,7 +34,7 @@ function TeamNameEditModal({ isOpen, onClose, team, onSave }: {
     }
   };
 
-  if (!isOpen) return null;
+  const isDirty = newName !== initialName;
 
   return (
     <div style={{
@@ -91,7 +93,7 @@ function TeamNameEditModal({ isOpen, onClose, team, onSave }: {
               color: '#fff',
               fontSize: '1rem',
             }}
-            autoFocus
+
           />
         </div>
 

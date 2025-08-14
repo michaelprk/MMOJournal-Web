@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { createPortal } from 'react-dom';
 import type { ShinyHunt, PokemonStats } from '../types/pokemon';
 import { POKEMON_NATURES } from '../types/pokemon';
+import { ModalBase } from './ui/ModalBase';
 
 interface CompletionModalProps {
   isOpen: boolean;
@@ -38,6 +38,22 @@ export default function CompletionModal({
     secret: false,
     alpha: false
   });
+
+  const initialData = {
+    gender: 'Genderless' as 'Male' | 'Female' | 'Genderless',
+    nature: '',
+    encounterCount: hunt?.totalEncounters || 0,
+    ivs: {
+      hp: 0,
+      attack: 0,
+      defense: 0,
+      sp_attack: 0,
+      sp_defense: 0,
+      speed: 0
+    },
+    secret: false,
+    alpha: false
+  };
 
   const handleInputChange = (field: string, value: string | number) => {
     setCompletionData(prev => ({
@@ -89,38 +105,22 @@ export default function CompletionModal({
     });
   };
 
-  if (!isOpen || !hunt) return null;
+  const isDirty = JSON.stringify(completionData) !== JSON.stringify(initialData);
 
-  const modal = (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: 'rgba(0, 0, 0, 0.95)',
-      zIndex: 10000,
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: 20,
-    }}>
-      <div style={{
-        background: 'rgba(0, 0, 0, 0.95)',
-        border: '2px solid #ffd700',
-        borderRadius: 12,
-        padding: 24,
-        maxWidth: 700,
-        width: '100%',
-        maxHeight: '90vh',
-        overflowY: 'auto',
-        color: '#fff'
-      }}>
-        <h3 style={{ color: '#ffd700', margin: '0 0 20px 0', fontSize: '1.5rem', textAlign: 'center' }}>
-          🎉 Shiny {hunt.pokemonName} Found!
-        </h3>
-        
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+  if (!hunt) return null;
+
+  return (
+    <ModalBase
+      open={isOpen}
+      onClose={onClose}
+      confirmOnDirty={true}
+      isDirty={isDirty}
+      className="completion-modal"
+    >
+      <h3 style={{ color: '#ffd700', margin: '0 0 20px 0', fontSize: '1.5rem', textAlign: 'center' }}>
+        🎉 Shiny {hunt.pokemonName} Found!
+      </h3>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <div>
             <label style={{ color: '#ffd700', display: 'block', marginBottom: '8px' }}>Gender:</label>
             <select 
@@ -243,44 +243,40 @@ export default function CompletionModal({
               ))}
             </div>
           </div>
-          
-        </div>
-        
-        <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', marginTop: 20 }}>
-          <button
-            onClick={onClose}
-            style={{
-              background: 'transparent',
-              border: '1px solid #ccc',
-              color: '#ccc',
-              padding: '10px 20px',
-              borderRadius: '6px',
-              cursor: 'pointer',
-              fontSize: '0.9rem',
-            }}
-          >
-            Cancel
-          </button>
-          <button
-            onClick={handleSubmit}
-            style={{
-              background: '#ffd700',
-              color: '#000',
-              border: 'none',
-              padding: '10px 20px',
-              borderRadius: '6px',
-              cursor: 'pointer',
-              fontWeight: 'bold',
-              fontSize: '0.9rem',
-            }}
-          >
-            Save to Portfolio
-          </button>
-        </div>
       </div>
-    </div>
+        
+      <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', marginTop: 20 }}>
+        <button
+          onClick={onClose}
+          style={{
+            background: 'transparent',
+            border: '1px solid #ccc',
+            color: '#ccc',
+            padding: '10px 20px',
+            borderRadius: '6px',
+            cursor: 'pointer',
+            fontSize: '0.9rem',
+          }}
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          onClick={handleSubmit}
+          style={{
+            background: '#ffd700',
+            color: '#000',
+            border: 'none',
+            padding: '10px 20px',
+            borderRadius: '6px',
+            cursor: 'pointer',
+            fontWeight: 'bold',
+            fontSize: '0.9rem',
+          }}
+        >
+          Save to Portfolio
+        </button>
+      </div>
+    </ModalBase>
   );
-
-  if (typeof document === 'undefined') return modal;
-  return createPortal(modal, document.body);
 } 

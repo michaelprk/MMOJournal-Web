@@ -21,9 +21,9 @@ export function SortFilter({ currentSort, onSortChange }: SortFilterProps) {
           fontSize: '0.875rem',
         }}
       >
-        <option value="tier">Tier (OU → UU → Doubles)</option>
+        <option value="tier">Tier</option>
         <option value="name">Name (A-Z)</option>
-        <option value="type">Type (Fire → Water → Electric...)</option>
+        <option value="type">Type</option>
         <option value="newest">Newest First</option>
         <option value="oldest">Oldest First</option>
       </select>

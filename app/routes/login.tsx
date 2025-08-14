@@ -121,7 +121,7 @@ export default function Login() {
             backgroundColor: "#111",
             color: "#fff",
           }}
-          autoFocus
+
         />
         <input
           type="password"

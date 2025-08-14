@@ -36,6 +36,36 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
   const [plainDamageCalcBg, setPlainDamageCalcBg] = useState(false);
 
+  // Scroll Management
+  useEffect(() => {
+    // Disable browser's native scroll restoration
+    if (typeof window !== 'undefined') {
+      window.history.scrollRestoration = 'manual';
+    }
+  }, []);
+
+  useEffect(() => {
+    // Handle scroll behavior on route changes
+    if (typeof window !== 'undefined') {
+      if (location.hash) {
+        // If there's a hash, let the browser handle anchor scrolling
+        return;
+      } else {
+        // Force scroll to absolute top - use multiple approaches to ensure it works
+        window.scrollTo(0, 0);
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+        
+        // Also do it after a micro-task to override any scroll restoration
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          document.documentElement.scrollTop = 0;
+          document.body.scrollTop = 0;
+        }, 0);
+      }
+    }
+  }, [location.pathname, location.search]); // Note: excluding location.hash intentionally
+
   useEffect(() => {
     if (location.pathname === "/damage-calc") {
       try {
@@ -115,7 +145,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             {location.pathname !== "/pvp" && location.pathname !== "/shiny-hunt" && <Footer />}
           </BackgroundProvider>
         </AuthProvider>
-        <ScrollRestoration />
+        <ScrollRestoration getKey={(location) => location.pathname} />
         <Scripts />
       </body>
     </html>
