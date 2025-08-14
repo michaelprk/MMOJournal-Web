@@ -1,7 +1,7 @@
 import { index, route } from "@react-router/dev/routes";
 
 const routes = [
-  index("./routes/home.tsx"),
+  index("./routes/index.tsx"),
   route("/home", "./routes/home.tsx"),
   route("/login", "./routes/login.tsx"),
   route("/create-account", "./routes/create-account.tsx"),

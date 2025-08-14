@@ -607,10 +607,12 @@ export function PokemonBuildCard({ build, onEdit, onDelete, onExport }: PokemonB
         padding: '16px',
         border: `3px solid ${tierColor.background}`,
         transition: 'all 0.3s ease',
-        minHeight: '200px',
+        minHeight: '220px',
         width: '100%',
         overflow: 'hidden',
         boxShadow: `0 4px 15px rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.3)`,
+        display: 'flex',
+        flexDirection: 'column',
       }}
       onMouseEnter={(e) => {
         e.currentTarget.style.boxShadow = `0 8px 25px rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.5)`;
@@ -621,171 +623,186 @@ export function PokemonBuildCard({ build, onEdit, onDelete, onExport }: PokemonB
         e.currentTarget.style.transform = 'translateY(0px)';
       }}
     >
-      {/* Main View */}
-      <div
-        style={{
-          opacity: currentView === 'main' ? 1 : 0,
-          transition: 'opacity 0.2s ease',
-          position: currentView === 'main' ? 'relative' : 'absolute',
-          width: '100%',
-          pointerEvents: currentView === 'main' ? 'auto' : 'none',
-        }}
-      >
-        <div>
-          {/* Tab Label and Navigation - Top Right */}
-          <div style={{ 
-            position: 'absolute', 
-            top: '2px', 
-            right: '8px', 
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: '4px',
-            zIndex: 10,
+      {/* Fixed Header Section - Always Visible */}
+      <div style={{ 
+        position: 'relative',
+        marginBottom: '16px',
+        flexShrink: 0,
+      }}>
+        {/* Tab Label and Navigation - Top Right */}
+        <div style={{ 
+          position: 'absolute', 
+          top: '2px', 
+          right: '8px', 
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '4px',
+          zIndex: 10,
+        }}>
+          <span style={{ 
+            color: '#ccc', 
+            fontSize: '0.65rem', 
+            fontStyle: 'italic',
+            textAlign: 'center'
           }}>
-            <span style={{ 
-              color: '#ccc', 
-              fontSize: '0.65rem', 
-              fontStyle: 'italic',
-              textAlign: 'center'
+            {getViewDisplayName(currentView)}
+          </span>
+          <div style={{ display: 'flex', gap: '4px' }}>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setCurrentView(getPreviousView());
+              }}
+              style={{
+                background: `rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.3)`,
+                border: `1px solid ${tierColor.background}`,
+                color: tierColor.background,
+                padding: '4px 8px',
+                borderRadius: '6px',
+                fontSize: '0.7rem',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                fontWeight: '600',
+              }}
+              title={`Go to ${getViewDisplayName(getPreviousView())}`}
+            >
+              ←
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setCurrentView(getNextView());
+              }}
+              style={{
+                background: `rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.3)`,
+                border: `1px solid ${tierColor.background}`,
+                color: tierColor.background,
+                padding: '4px 8px',
+                borderRadius: '6px',
+                fontSize: '0.7rem',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                fontWeight: '600',
+              }}
+              title={`Go to ${getViewDisplayName(getNextView())}`}
+            >
+              →
+            </button>
+          </div>
+        </div>
+
+        {/* Header with Sprite and Info */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{ flexShrink: 0 }}>
+            <img
+              src={imageError ? fallbackSpriteUrl : spriteUrl}
+              alt={build.species}
+              style={{
+                width: '64px',
+                height: '64px',
+                objectFit: 'contain',
+                filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.5))',
+              }}
+              onError={() => setImageError(true)}
+            />
+          </div>
+
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '8px', 
+              marginBottom: '4px', 
+              flexWrap: 'wrap',
+              minHeight: '30px'
             }}>
-              {getViewDisplayName(currentView)}
-            </span>
-            <div style={{ display: 'flex', gap: '4px' }}>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setCurrentView(getPreviousView());
-                }}
+              <h3
                 style={{
-                  background: `rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.3)`,
-                  border: `1px solid ${tierColor.background}`,
-                  color: tierColor.background,
-                  padding: '4px 8px',
-                  borderRadius: '6px',
-                  fontSize: '0.7rem',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                  fontWeight: '600',
+                  color: '#fff',
+                  margin: 0,
+                  fontSize: '1.25rem',
+                  fontWeight: 'bold',
+                  textShadow: '0 1px 2px rgba(0,0,0,0.8)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  flexShrink: 0,
                 }}
-                title={`Go to ${getViewDisplayName(getPreviousView())}`}
               >
-                ←
-              </button>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setCurrentView(getNextView());
-                }}
-                style={{
-                  background: `rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.3)`,
-                  border: `1px solid ${tierColor.background}`,
-                  color: tierColor.background,
-                  padding: '4px 8px',
-                  borderRadius: '6px',
-                  fontSize: '0.7rem',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                  fontWeight: '600',
-                }}
-                title={`Go to ${getViewDisplayName(getNextView())}`}
-              >
-                →
-              </button>
-            </div>
-          </div>
-
-          {/* Header with Sprite and Info */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
-            <div style={{ flexShrink: 0 }}>
-              <img
-                src={imageError ? fallbackSpriteUrl : spriteUrl}
-                alt={build.species}
-                style={{
-                  width: '64px',
-                  height: '64px',
-                  objectFit: 'contain',
-                  filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.5))',
-                }}
-                onError={() => setImageError(true)}
-              />
-            </div>
-
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: '8px', 
-                marginBottom: '4px', 
-                flexWrap: 'wrap',
-                minHeight: '30px'
-              }}>
-                <h3
-                  style={{
-                    color: '#fff',
-                    margin: 0,
-                    fontSize: '1.25rem',
-                    fontWeight: 'bold',
-                    textShadow: '0 1px 2px rgba(0,0,0,0.8)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    flexShrink: 0,
-                  }}
-                >
-                  {build.name}
-                  <GenderIcon gender={build.gender} />
-                </h3>
-                
-                {/* Type badges next to name */}
-                <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
-                  {pokemonTypes.map((type, index) => {
-                    const typeStyle = MOVE_TYPE_COLORS[type] || MOVE_TYPE_COLORS.normal;
-                    return (
-                      <span
-                        key={index}
-                        style={{
-                          background: typeStyle.background,
-                          color: typeStyle.text,
-                          padding: '2px 5px',
-                          borderRadius: '3px',
-                          fontSize: '0.65rem',
-                          fontWeight: 'bold',
-                          textTransform: 'uppercase',
-                          textShadow: '0 1px 2px rgba(0,0,0,0.7)',
-                          border: '1px solid rgba(255,255,255,0.2)',
-                        }}
-                        title={`${type.charAt(0).toUpperCase() + type.slice(1)} type`}
-                      >
-                        {type}
-                      </span>
-                    );
-                  })}
-                </div>
-              </div>
-              {build.name !== build.species && (
-                <p style={{ color: '#ddd', margin: '0 0 8px 0', fontSize: '0.9rem' }}>
-                  ({build.species})
-                </p>
-              )}
-              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                <span
-                  style={{
-                    backgroundColor: tierColor.background,
-                    color: tierColor.text,
-                    padding: '4px 8px',
-                    borderRadius: '6px',
-                    fontSize: '0.75rem',
-                    fontWeight: 'bold',
-                  }}
-                >
-                  {build.tier}
-                </span>
-                <span style={{ color: '#ddd', fontSize: '0.85rem' }}>
-                  Level {build.level}
-                </span>
+                {build.name}
+                <GenderIcon gender={build.gender || undefined} />
+              </h3>
+              
+              {/* Type badges next to name */}
+              <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+                {pokemonTypes.map((type, index) => {
+                  const typeStyle = MOVE_TYPE_COLORS[type] || MOVE_TYPE_COLORS.normal;
+                  return (
+                    <span
+                      key={index}
+                      style={{
+                        background: typeStyle.background,
+                        color: typeStyle.text,
+                        padding: '2px 5px',
+                        borderRadius: '3px',
+                        fontSize: '0.65rem',
+                        fontWeight: 'bold',
+                        textTransform: 'uppercase',
+                        textShadow: '0 1px 2px rgba(0,0,0,0.7)',
+                        border: '1px solid rgba(255,255,255,0.2)',
+                      }}
+                      title={`${type.charAt(0).toUpperCase() + type.slice(1)} type`}
+                    >
+                      {type}
+                    </span>
+                  );
+                })}
               </div>
             </div>
+            {build.name !== build.species && (
+              <p style={{ color: '#ddd', margin: '0 0 8px 0', fontSize: '0.9rem' }}>
+                ({build.species})
+              </p>
+            )}
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+              <span
+                style={{
+                  backgroundColor: tierColor.background,
+                  color: tierColor.text,
+                  padding: '4px 8px',
+                  borderRadius: '6px',
+                  fontSize: '0.75rem',
+                  fontWeight: 'bold',
+                }}
+              >
+                {build.tier}
+              </span>
+              <span style={{ color: '#ddd', fontSize: '0.85rem' }}>
+                Level {build.level}
+              </span>
+            </div>
           </div>
+        </div>
+      </div>
+
+      {/* Dynamic Content Area */}
+      <div style={{ 
+        flex: 1,
+        position: 'relative',
+        minHeight: '80px',
+      }}>
+        {/* Main View */}
+        <div
+          style={{
+            opacity: currentView === 'main' ? 1 : 0,
+            transition: 'opacity 0.2s ease',
+            position: currentView === 'main' ? 'relative' : 'absolute',
+            width: '100%',
+            height: '100%',
+            pointerEvents: currentView === 'main' ? 'auto' : 'none',
+          }}
+        >
+          <div>
 
           {/* Basic Info Grid */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '12px' }}>
@@ -826,27 +843,299 @@ export function PokemonBuildCard({ build, onEdit, onDelete, onExport }: PokemonB
             </div>
           )}
 
-          {/* Action Buttons - Bottom Right Corner */}
-          <div style={{ 
-            position: 'absolute',
-            bottom: '6px',
-            right: '6px',
-            display: 'flex',
-            gap: '6px',
-          }}>
+          </div>
+        </div>
+
+        {/* Stats View */}
+        <div
+          style={{
+            opacity: currentView === 'stats' ? 1 : 0,
+            transition: 'opacity 0.2s ease',
+            position: currentView === 'stats' ? 'relative' : 'absolute',
+            width: '100%',
+            height: '100%',
+            pointerEvents: currentView === 'stats' ? 'auto' : 'none',
+          }}
+        >
+          {/* Stats Layout - Side by Side */}
+          <div style={{ display: 'flex', gap: '16px', marginBottom: '12px', marginTop: '-27px' }}>
+            {/* IVs Section - Left Side */}
+            <div style={{ 
+              flex: '0 0 45%',
+              borderLeft: `1px solid rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.3)`,
+              borderRight: `1px solid rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.3)`,
+              borderBottom: `1px solid rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.3)`,
+              borderRadius: '6px',
+              padding: '8px 8px 6px 8px',
+              position: 'relative',
+              marginTop: '15px',
+            }}>
+              {/* Top Border Segments */}
+              <div style={{
+                position: 'absolute',
+                top: '0',
+                left: '0',
+                width: '8px',
+                height: '1px',
+                backgroundColor: `rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.3)`,
+              }} />
+              <div style={{
+                position: 'absolute',
+                top: '0',
+                left: '24px',
+                right: '0',
+                height: '1px',
+                backgroundColor: `rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.3)`,
+              }} />
+              
+              {/* IVs Label in Border */}
+              <div style={{
+                position: 'absolute',
+                top: '-6px',
+                left: '8px',
+                padding: '0 4px',
+                fontSize: '0.65rem',
+                color: tierColor.background,
+                fontWeight: 'bold',
+              }}>
+                IVs
+              </div>
+              
+              {/* IVs Grid - 2 rows of 3 */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '4px', fontSize: '0.75rem' }}>
+                {[
+                  { label: 'HP', value: build.ivs.hp },
+                  { label: 'ATK', value: build.ivs.attack },
+                  { label: 'DEF', value: build.ivs.defense },
+                  { label: 'SPA', value: build.ivs.sp_attack },
+                  { label: 'SPD', value: build.ivs.sp_defense },
+                  { label: 'SPE', value: build.ivs.speed },
+                ].map((stat, index) => (
+                  <div key={index} style={{ 
+                    display: 'flex', 
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: '2px',
+                  }}>
+                    <span style={{ color: tierColor.background, fontSize: '0.6rem', fontWeight: '600' }}>{stat.label}</span>
+                    <span style={{ color: '#fff', fontWeight: 'bold', fontSize: '0.75rem' }}>{stat.value}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* EVs Section - Right Side */}
+            <div style={{ flex: 1 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3px' }}>
+                <h4 style={{ color: tierColor.background, margin: '0', fontSize: '0.8rem', fontWeight: 'bold' }}>EVs</h4>
+                <span style={{ fontSize: '0.65rem', color: '#fff', fontWeight: '600' }}>
+                  Total: {Object.values(build.evs).reduce((sum, val) => sum + val, 0)}/510
+                </span>
+              </div>
+              
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '4px', fontSize: '0.7rem' }}>
+                {[
+                  { label: 'HP', value: build.evs.hp, icon: '❤️' },
+                  { label: 'ATK', value: build.evs.attack, icon: '⚔️' },
+                  { label: 'DEF', value: build.evs.defense, icon: '🛡️' },
+                  { label: 'SPA', value: build.evs.sp_attack, icon: '🔮' },
+                  { label: 'SPD', value: build.evs.sp_defense, icon: '🔰' },
+                  { label: 'SPE', value: build.evs.speed, icon: '⚡' },
+                ].map((stat, index) => {
+                  const percentage = (stat.value / 252) * 100;
+                  return (
+                    <div key={index} style={{ 
+                      position: 'relative',
+                      display: 'flex', 
+                      alignItems: 'center',
+                      gap: '3px',
+                      padding: '3px 6px', 
+                      backgroundColor: `rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.2)`, 
+                      borderRadius: '4px',
+                      border: `1px solid rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.3)`,
+                      minHeight: '16px',
+                      overflow: 'hidden',
+                    }}>
+                      {/* Progress bar background */}
+                      <div style={{
+                        position: 'absolute',
+                        left: 0,
+                        top: 0,
+                        height: '100%',
+                        width: `${percentage}%`,
+                        background: `linear-gradient(90deg, rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.4) 0%, rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.1) 100%)`,
+                        borderRadius: '4px',
+                        transition: 'width 0.5s ease',
+                      }} />
+                      {/* Stat icon */}
+                      <span style={{ 
+                        fontSize: '0.6rem', 
+                        zIndex: 1,
+                        color: stat.label === 'HP' ? '#ff4444' : 'inherit'
+                      }}>{stat.icon}</span>
+                      <span style={{ color: tierColor.background, fontSize: '0.55rem', fontWeight: '600', zIndex: 1 }}>{stat.label}</span>
+                      <span style={{ color: '#fff', fontWeight: 'bold', fontSize: '0.7rem', zIndex: 1 }}>{stat.value}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Moves View */}
+        <div
+          style={{
+            opacity: currentView === 'moves' ? 1 : 0,
+            transition: 'opacity 0.2s ease',
+            position: currentView === 'moves' ? 'relative' : 'absolute',
+            width: '100%',
+            height: '100%',
+            pointerEvents: currentView === 'moves' ? 'auto' : 'none',
+          }}
+        >
+          {/* Moves Section */}
+          <div style={{ marginBottom: '16px', marginTop: '-20px' }}>
+            <h4 style={{ color: tierColor.background, margin: '0 0 8px 0', fontSize: '0.9rem', fontWeight: 'bold', textAlign: 'center' }}>Moveset</h4>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '6px' }}>
+              {build.moves.slice(0, 4).map((move, index) => {
+                const moveType = moveTypes[move] || 'normal';
+                const typeColor = MOVE_TYPE_COLORS[moveType] || MOVE_TYPE_COLORS.normal;
+                
+                // Get animation class based on type
+                const getAnimationClass = (type: string) => {
+                  switch (type) {
+                    case 'electric': return 'move-electric';
+                    case 'water': return 'move-water';
+                    case 'fire': return 'move-fire';
+                    case 'grass': return 'move-grass';
+                    case 'psychic': return 'move-psychic';
+                    case 'ice': return 'move-ice';
+                    default: return 'move-default';
+                  }
+                };
+
+                // Create animated background pattern
+                const getBackgroundPattern = (type: string) => {
+                  const baseGradient = typeColor.background;
+                  switch (type) {
+                    case 'electric':
+                      return `${baseGradient}`;
+                    case 'water':
+                      return `${baseGradient}`;
+                    case 'fire':
+                      return `${baseGradient}`;
+                    case 'grass':
+                      return `${baseGradient}`;
+                    case 'psychic':
+                      return `${baseGradient}`;
+                    case 'ice':
+                      return `${baseGradient}`;
+                    case 'fighting':
+                      return `${baseGradient}`;
+                    case 'poison':
+                      return `${baseGradient}`;
+                    case 'ground':
+                      return `${baseGradient}`;
+                    case 'flying':
+                      return `${baseGradient}`;
+                    case 'bug':
+                      return `${baseGradient}`;
+                    case 'rock':
+                      return `${baseGradient}`;
+                    case 'ghost':
+                      return `${baseGradient}`;
+                    case 'dragon':
+                      return `${baseGradient}`;
+                    case 'dark':
+                      return `${baseGradient}`;
+                    case 'steel':
+                      return `${baseGradient}`;
+                    case 'fairy':
+                      return `${baseGradient}`;
+                    default:
+                      return `linear-gradient(135deg, #C8C8C8 0%, #E8E8E8 25%, #C8C8C8 50%, #E8E8E8 75%, #C8C8C8 100%)`;
+                  }
+                };
+                
+                return (
+                  <div
+                    key={index}
+                    className={getAnimationClass(moveType)}
+                    style={{
+                      background: getBackgroundPattern(moveType),
+                      backgroundSize: '100% 100%',
+                      color: typeColor.text,
+                      fontSize: '0.7rem',
+                      padding: '6px 8px',
+                      borderRadius: '6px',
+                      textAlign: 'center',
+                      fontWeight: '600',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                      minHeight: '32px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      position: 'relative',
+                      border: `2px solid ${typeColor.background.includes('linear-gradient') ? '#666' : typeColor.background}`,
+                      transition: 'all 0.3s ease',
+                    }}
+                    title={`${move} (${moveType.charAt(0).toUpperCase() + moveType.slice(1)} type)`}
+                  >
+                    <span style={{ 
+                      position: 'relative', 
+                      zIndex: 1,
+                      textShadow: '0 1px 2px rgba(0,0,0,0.7)'
+                    }}>
+                      {move}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Description Section - Only if description exists */}
+          {build.description && (
+            <div style={{ 
+              padding: '8px', 
+              backgroundColor: `rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.2)`, 
+              borderRadius: '6px', 
+              border: `1px solid rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.3)` 
+            }}>
+              <h4 style={{ color: tierColor.background, margin: '0 0 4px 0', fontSize: '0.8rem', fontWeight: 'bold' }}>Description</h4>
+              <div style={{ color: '#ddd', fontSize: '0.7rem', lineHeight: 1.3 }}>
+                {build.description}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Action Buttons - Fixed at Bottom */}
+      <div style={{ 
+        position: 'absolute',
+        bottom: '12px',
+        right: '12px',
+        display: 'flex',
+        gap: '4px',
+        zIndex: 10,
+      }}>
             <button
               onClick={handleExportToShowdown}
               style={{
                 backgroundColor: 'transparent',
                 border: '1px solid #28a745',
                 color: '#28a745',
-                padding: '4px 8px',
+                padding: '3px 6px',
                 borderRadius: '4px',
-                fontSize: '0.75rem',
+                fontSize: '0.7rem',
                 cursor: 'pointer',
                 transition: 'all 0.2s ease',
                 fontWeight: '600',
-                minWidth: '50px',
+                minWidth: '45px',
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.backgroundColor = 'rgba(40, 167, 69, 0.2)';
@@ -870,13 +1159,13 @@ export function PokemonBuildCard({ build, onEdit, onDelete, onExport }: PokemonB
                   backgroundColor: 'transparent',
                   border: `1px solid ${tierColor.background}`,
                   color: tierColor.background,
-                  padding: '4px 8px',
+                  padding: '3px 6px',
                   borderRadius: '4px',
-                  fontSize: '0.75rem',
+                  fontSize: '0.7rem',
                   cursor: 'pointer',
                   transition: 'all 0.2s ease',
                   fontWeight: '600',
-                  minWidth: '40px',
+                  minWidth: '35px',
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.backgroundColor = `rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.2)`;
@@ -900,13 +1189,13 @@ export function PokemonBuildCard({ build, onEdit, onDelete, onExport }: PokemonB
                   backgroundColor: 'transparent',
                   border: '1px solid #dc3545',
                   color: '#dc3545',
-                  padding: '4px 8px',
+                  padding: '3px 6px',
                   borderRadius: '4px',
-                  fontSize: '0.75rem',
+                  fontSize: '0.7rem',
                   cursor: 'pointer',
                   transition: 'all 0.2s ease',
                   fontWeight: '600',
-                  minWidth: '45px',
+                  minWidth: '40px',
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.backgroundColor = 'rgba(220, 53, 69, 0.2)';
@@ -920,465 +1209,6 @@ export function PokemonBuildCard({ build, onEdit, onDelete, onExport }: PokemonB
                 Delete
               </button>
             )}
-          </div>
-        </div>
-      </div>
-
-      {/* Stats View */}
-      <div
-        style={{
-          opacity: currentView === 'stats' ? 1 : 0,
-          transition: 'opacity 0.2s ease',
-          position: currentView === 'stats' ? 'relative' : 'absolute',
-          width: '100%',
-          pointerEvents: currentView === 'stats' ? 'auto' : 'none',
-          height: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-        }}
-      >
-        {/* Tab Label and Navigation - Top Right */}
-        <div style={{ 
-          position: 'absolute', 
-          top: '2px', 
-          right: '8px', 
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: '4px',
-          zIndex: 10,
-        }}>
-          <span style={{ 
-            color: '#ccc', 
-            fontSize: '0.65rem', 
-            fontStyle: 'italic',
-            textAlign: 'center'
-          }}>
-            {getViewDisplayName(currentView)}
-          </span>
-          <div style={{ display: 'flex', gap: '4px' }}>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setCurrentView(getPreviousView());
-              }}
-              style={{
-                background: `rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.3)`,
-                border: `1px solid ${tierColor.background}`,
-                color: tierColor.background,
-                padding: '4px 8px',
-                borderRadius: '6px',
-                fontSize: '0.7rem',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                fontWeight: '600',
-              }}
-              title={`Go to ${getViewDisplayName(getPreviousView())}`}
-            >
-              ←
-            </button>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setCurrentView(getNextView());
-              }}
-              style={{
-                background: `rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.3)`,
-                border: `1px solid ${tierColor.background}`,
-                color: tierColor.background,
-                padding: '4px 8px',
-                borderRadius: '6px',
-                fontSize: '0.7rem',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                fontWeight: '600',
-              }}
-              title={`Go to ${getViewDisplayName(getNextView())}`}
-            >
-              →
-            </button>
-          </div>
-        </div>
-
-        {/* Single Line Header */}
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'center', 
-          alignItems: 'center', 
-          marginBottom: '20px', 
-          paddingBottom: '8px'
-        }}>
-          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-            <h3 style={{ color: '#fff', margin: '0', fontSize: '1.1rem', fontWeight: 'bold', display: 'flex', alignItems: 'center' }}>
-              {build.name}
-              <GenderIcon gender={build.gender} />
-            </h3>
-            <span style={{
-              backgroundColor: tierColor.background,
-              color: tierColor.text,
-              padding: '2px 6px',
-              borderRadius: '4px',
-              fontSize: '0.7rem',
-              fontWeight: 'bold',
-            }}>
-              {build.tier}
-            </span>
-            <span style={{ color: '#ddd', fontSize: '0.8rem' }}>
-              Level {build.level}
-            </span>
-          </div>
-        </div>
-
-        {/* Stats Layout - Compact and Consistent */}
-        <div style={{ marginBottom: '12px' }}>
-          {/* IVs Section - Single Line */}
-          <div style={{ marginBottom: '12px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-              <h4 style={{ color: tierColor.background, margin: '0', fontSize: '0.9rem', fontWeight: 'bold' }}>Individual Values</h4>
-              <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                {[
-                  { label: 'HP', value: build.ivs.hp },
-                  { label: 'ATK', value: build.ivs.attack },
-                  { label: 'DEF', value: build.ivs.defense },
-                  { label: 'SPA', value: build.ivs.sp_attack },
-                  { label: 'SPD', value: build.ivs.sp_defense },
-                  { label: 'SPE', value: build.ivs.speed },
-                ].map((stat, index) => (
-                  <div key={index} style={{ 
-                    display: 'flex', 
-                    alignItems: 'center',
-                    gap: '4px',
-                  }}>
-                    <span style={{ color: tierColor.background, fontSize: '0.65rem', fontWeight: '600' }}>{stat.label}</span>
-                    <span style={{ color: '#fff', fontWeight: 'bold', fontSize: '0.8rem' }}>{stat.value}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* EVs Section - Simplified 1x3 Layout */}
-          <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-              <h4 style={{ color: tierColor.background, margin: '0', fontSize: '0.9rem', fontWeight: 'bold' }}>Effort Values</h4>
-              <span style={{ fontSize: '0.75rem', color: '#fff', fontWeight: '600' }}>
-                Total: {Object.values(build.evs).reduce((sum, val) => sum + val, 0)}/510
-              </span>
-            </div>
-            
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', fontSize: '0.8rem' }}>
-              {[
-                { label: 'HP', value: build.evs.hp, icon: '❤️' },
-                { label: 'ATK', value: build.evs.attack, icon: '⚔️' },
-                { label: 'DEF', value: build.evs.defense, icon: '🛡️' },
-              ].map((stat, index) => {
-                const percentage = (stat.value / 252) * 100;
-                return (
-                  <div key={index} style={{ 
-                    position: 'relative',
-                    display: 'flex', 
-                    alignItems: 'center',
-                    gap: '4px',
-                    padding: '4px 8px', 
-                    backgroundColor: `rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.2)`, 
-                    borderRadius: '6px',
-                    border: `1px solid rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.3)`,
-                    minHeight: '18px',
-                    overflow: 'hidden',
-                  }}>
-                    {/* Progress bar background */}
-                    <div style={{
-                      position: 'absolute',
-                      left: 0,
-                      top: 0,
-                      height: '100%',
-                      width: `${percentage}%`,
-                      background: `linear-gradient(90deg, rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.4) 0%, rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.1) 100%)`,
-                      borderRadius: '6px',
-                      transition: 'width 0.5s ease',
-                    }} />
-                    {/* Stat icon */}
-                    <span style={{ 
-                      fontSize: '0.7rem', 
-                      zIndex: 1,
-                      color: stat.label === 'HP' ? '#ff4444' : 'inherit'
-                    }}>{stat.icon}</span>
-                    <span style={{ color: tierColor.background, fontSize: '0.65rem', fontWeight: '600', zIndex: 1 }}>{stat.label}</span>
-                    <span style={{ color: '#fff', fontWeight: 'bold', fontSize: '0.85rem', zIndex: 1 }}>{stat.value}</span>
-                  </div>
-                );
-              })}
-            </div>
-            
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', fontSize: '0.8rem', marginTop: '8px' }}>
-              {[
-                { label: 'SPA', value: build.evs.sp_attack, icon: '🔮' },
-                { label: 'SPD', value: build.evs.sp_defense, icon: '🔰' },
-                { label: 'SPE', value: build.evs.speed, icon: '⚡' },
-              ].map((stat, index) => {
-                const percentage = (stat.value / 252) * 100;
-                return (
-                  <div key={index + 3} style={{ 
-                    position: 'relative',
-                    display: 'flex', 
-                    alignItems: 'center',
-                    gap: '4px',
-                    padding: '4px 8px', 
-                    backgroundColor: `rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.2)`, 
-                    borderRadius: '6px',
-                    border: `1px solid rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.3)`,
-                    minHeight: '18px',
-                    overflow: 'hidden',
-                  }}>
-                    {/* Progress bar background */}
-                    <div style={{
-                      position: 'absolute',
-                      left: 0,
-                      top: 0,
-                      height: '100%',
-                      width: `${percentage}%`,
-                      background: `linear-gradient(90deg, rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.4) 0%, rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.1) 100%)`,
-                      borderRadius: '6px',
-                      transition: 'width 0.5s ease',
-                    }} />
-                    {/* Stat icon */}
-                    <span style={{ 
-                      fontSize: '0.7rem', 
-                      zIndex: 1
-                    }}>{stat.icon}</span>
-                    <span style={{ color: tierColor.background, fontSize: '0.65rem', fontWeight: '600', zIndex: 1 }}>{stat.label}</span>
-                    <span style={{ color: '#fff', fontWeight: 'bold', fontSize: '0.85rem', zIndex: 1 }}>{stat.value}</span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Moves View */}
-      <div
-        style={{
-          opacity: currentView === 'moves' ? 1 : 0,
-          transition: 'opacity 0.2s ease',
-          position: currentView === 'moves' ? 'relative' : 'absolute',
-          width: '100%',
-          pointerEvents: currentView === 'moves' ? 'auto' : 'none',
-          height: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-        }}
-      >
-        {/* Tab Label and Navigation - Top Right */}
-        <div style={{ 
-          position: 'absolute', 
-          top: '2px', 
-          right: '8px', 
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: '4px',
-          zIndex: 10,
-        }}>
-          <span style={{ 
-            color: '#ccc', 
-            fontSize: '0.65rem', 
-            fontStyle: 'italic',
-            textAlign: 'center'
-          }}>
-            {getViewDisplayName(currentView)}
-          </span>
-          <div style={{ display: 'flex', gap: '4px' }}>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setCurrentView(getPreviousView());
-              }}
-              style={{
-                background: `rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.3)`,
-                border: `1px solid ${tierColor.background}`,
-                color: tierColor.background,
-                padding: '4px 8px',
-                borderRadius: '6px',
-                fontSize: '0.7rem',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                fontWeight: '600',
-              }}
-              title={`Go to ${getViewDisplayName(getPreviousView())}`}
-            >
-              ←
-            </button>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setCurrentView(getNextView());
-              }}
-              style={{
-                background: `rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.3)`,
-                border: `1px solid ${tierColor.background}`,
-                color: tierColor.background,
-                padding: '4px 8px',
-                borderRadius: '6px',
-                fontSize: '0.7rem',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                fontWeight: '600',
-              }}
-              title={`Go to ${getViewDisplayName(getNextView())}`}
-            >
-              →
-            </button>
-          </div>
-        </div>
-
-        {/* Single Line Header */}
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'center', 
-          alignItems: 'center', 
-          marginBottom: '20px', 
-          paddingBottom: '8px'
-        }}>
-          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-            <h3 style={{ color: '#fff', margin: '0', fontSize: '1.1rem', fontWeight: 'bold', display: 'flex', alignItems: 'center' }}>
-              {build.name}
-              <GenderIcon gender={build.gender} />
-            </h3>
-            <span style={{
-              backgroundColor: tierColor.background,
-              color: tierColor.text,
-              padding: '2px 6px',
-              borderRadius: '4px',
-              fontSize: '0.7rem',
-              fontWeight: 'bold',
-            }}>
-              {build.tier}
-            </span>
-            <span style={{ color: '#ddd', fontSize: '0.8rem' }}>
-              Level {build.level}
-            </span>
-          </div>
-        </div>
-
-        {/* Moves Section */}
-        <div style={{ marginBottom: '20px' }}>
-          <h4 style={{ color: tierColor.background, margin: '0 0 12px 0', fontSize: '1rem', fontWeight: 'bold' }}>Moveset</h4>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px' }}>
-            {build.moves.slice(0, 4).map((move, index) => {
-              const moveType = moveTypes[move] || 'normal';
-              const typeColor = MOVE_TYPE_COLORS[moveType] || MOVE_TYPE_COLORS.normal;
-              
-              // Get animation class based on type
-              const getAnimationClass = (type: string) => {
-                switch (type) {
-                  case 'electric': return 'move-electric';
-                  case 'water': return 'move-water';
-                  case 'fire': return 'move-fire';
-                  case 'grass': return 'move-grass';
-                  case 'psychic': return 'move-psychic';
-                  case 'ice': return 'move-ice';
-                  default: return 'move-default';
-                }
-              };
-
-              // Create animated background pattern
-              const getBackgroundPattern = (type: string) => {
-                const baseGradient = typeColor.background;
-                switch (type) {
-                  case 'electric':
-                    return `${baseGradient}`;
-                  case 'water':
-                    return `${baseGradient}`;
-                  case 'fire':
-                    return `${baseGradient}`;
-                  case 'grass':
-                    return `${baseGradient}`;
-                  case 'psychic':
-                    return `${baseGradient}`;
-                  case 'ice':
-                    return `${baseGradient}`;
-                  case 'fighting':
-                    return `${baseGradient}`;
-                  case 'poison':
-                    return `${baseGradient}`;
-                  case 'ground':
-                    return `${baseGradient}`;
-                  case 'flying':
-                    return `${baseGradient}`;
-                  case 'bug':
-                    return `${baseGradient}`;
-                  case 'rock':
-                    return `${baseGradient}`;
-                  case 'ghost':
-                    return `${baseGradient}`;
-                  case 'dragon':
-                    return `${baseGradient}`;
-                  case 'dark':
-                    return `${baseGradient}`;
-                  case 'steel':
-                    return `${baseGradient}`;
-                  case 'fairy':
-                    return `${baseGradient}`;
-                  default:
-                    return `linear-gradient(135deg, #C8C8C8 0%, #E8E8E8 25%, #C8C8C8 50%, #E8E8E8 75%, #C8C8C8 100%)`;
-                }
-              };
-              
-              return (
-                <div
-                  key={index}
-                  className={getAnimationClass(moveType)}
-                  style={{
-                    background: getBackgroundPattern(moveType),
-                    backgroundSize: '100% 100%',
-                    color: typeColor.text,
-                    fontSize: '0.8rem',
-                    padding: '10px 12px',
-                    borderRadius: '8px',
-                    textAlign: 'center',
-                    fontWeight: '600',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                    minHeight: '45px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    position: 'relative',
-                    border: `2px solid ${typeColor.background.includes('linear-gradient') ? '#666' : typeColor.background}`,
-                    transition: 'all 0.3s ease',
-                  }}
-                  title={`${move} (${moveType.charAt(0).toUpperCase() + moveType.slice(1)} type)`}
-                >
-                  <span style={{ 
-                    position: 'relative', 
-                    zIndex: 1,
-                    textShadow: '0 1px 2px rgba(0,0,0,0.7)'
-                  }}>
-                    {move}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Description Section - Only if description exists */}
-        {build.description && (
-          <div style={{ 
-            padding: '12px', 
-            backgroundColor: `rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.2)`, 
-            borderRadius: '8px', 
-            border: `1px solid rgba(${tierColor.background.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16)).join(', ')}, 0.3)` 
-          }}>
-            <h4 style={{ color: tierColor.background, margin: '0 0 8px 0', fontSize: '0.9rem', fontWeight: 'bold' }}>Description</h4>
-            <div style={{ color: '#ddd', fontSize: '0.8rem', lineHeight: 1.4 }}>
-              {build.description}
-            </div>
-          </div>
-        )}
-
       </div>
     </div>
   );

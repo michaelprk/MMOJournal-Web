@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { shinyHuntService } from '../services/shinyHuntService';
 import type { ShinyHuntRow } from '../services/shinyHuntService';
+import { PokemonBuildService } from '../services/supabase';
+import { getShinySpritePath } from '../types/pokemon';
 
 export default function Home() {
   const navigate = useNavigate();
@@ -21,12 +23,14 @@ export default function Home() {
     }
     (async () => {
       try {
-        const [active, complete] = await Promise.all([
+        const [active, complete, pvp] = await Promise.all([
           shinyHuntService.listActive(),
           shinyHuntService.listCompleted(),
+          PokemonBuildService.getBuilds().catch(() => []),
         ]);
         setHunts(active);
         setCompleted(complete as any);
+        setBuilds(pvp as any);
       } finally {
         setLoading(false);
       }
@@ -36,20 +40,33 @@ export default function Home() {
   const y = new Date().getFullYear();
   const ytdCompleted = useMemo(() => completed.filter((r: any) => {
     const d = new Date(r.found_at || r.created_at);
-    return d.getFullYear() === y;
+    return d.getFullYear() === y && (r as any).is_phase !== true;
   }), [completed, y]);
-  const ytdSecret = useMemo(() => ytdCompleted.filter((r: any) => (r as any).is_secret_shiny || (r as any)?.meta?.secret_shiny).length, [ytdCompleted]);
-  const ytdAlpha = useMemo(() => ytdCompleted.filter((r: any) => (r as any).is_alpha || (r as any)?.meta?.alpha).length, [ytdCompleted]);
+  const totalShinies = useMemo(() => (completed as any[]).filter((r: any) => (r as any).is_phase !== true).length, [completed]);
+
+  // The dashboard must fit in one screen: height = 100vh - navbar(200px) - footer(38px)
+  const DASHBOARD_HEIGHT = 'calc(100vh - 200px - 38px)';
 
   return (
-    <div style={{ maxWidth: 1200, margin: '0 auto', padding: 16, color: '#fff' }}>
-      {/* Header strip */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(255,215,0,0.12)', borderRadius: 10, marginBottom: 12 }}>
+    <div style={{
+      maxWidth: 1400,
+      margin: '0 auto',
+      padding: '0 16px',
+      color: '#fff',
+      height: DASHBOARD_HEIGHT,
+      display: 'grid',
+      gridTemplateRows: '56px 72px 1fr',
+      gap: 10,
+      overflow: 'hidden',
+      paddingTop: 200,
+    }}>
+      {/* Row A — Header & Actions */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div>
           <div style={{ fontSize: 22, fontWeight: 900, color: '#ffd700' }}>Home</div>
-          <div style={{ fontSize: 12, color: '#ccc' }}>Welcome{user?.email ? `, ${user.email}` : ''}</div>
+          <div style={{ fontSize: 12, color: '#ccc' }}>Welcome{user?.id ? `, ${getUsername(user.id)}` : ''}</div>
         </div>
-        <div style={{ display: 'flex', gap: 8 }}>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'nowrap' }}>
           <button onClick={() => navigate('/shiny-hunt?open=start')} style={btn()}>Start New Hunt</button>
           <button onClick={() => navigate('/shiny-hunt?open=phase')} style={btn()}>Add Phase</button>
           <button onClick={() => navigate('/pvp?open=new')} style={btn()}>New PvP Build</button>
@@ -57,111 +74,145 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Overview cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 8, marginBottom: 12 }}>
-        {card('Current Hunts', hunts.length, () => navigate('/shiny-hunt'))}
-        {card(`Shinies ${y}`, ytdCompleted.length, () => navigate(`/shiny-hunt`))}
-        {card('Secret (YTD)', ytdSecret, () => navigate('/shiny-hunt'))}
-        {card('Alpha (YTD)', ytdAlpha, () => navigate('/shiny-hunt'))}
-        {card('PvP Builds', builds.length, () => navigate('/pvp'))}
+      {/* Row B — Overview metrics */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 8 }}>
+        <OverviewCard label="Current Hunts" value={hunts.length} onClick={() => navigate('/shiny-hunt?view=current')} />
+        <OverviewCard label={`Shinies (YTD)`} value={ytdCompleted.length} onClick={() => navigate(`/shiny-hunt?view=showcase&year=${y}`)} />
+        <OverviewCard label="Total Shinies" value={totalShinies} onClick={() => navigate('/shiny-hunt?view=showcase')} />
+        <OverviewCard label="PvP Builds" value={builds.length} onClick={() => navigate('/pvp')} />
       </div>
 
-      {/* Two-column body */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-        <div>
-          <Section title="Continuing Hunts">
-            <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4 }}>
-              {hunts.slice(0, 12).map((h) => (
-                <div key={h.id} style={{ minWidth: 140, background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(255,215,0,0.12)', borderRadius: 10, padding: 8 }}>
-                  <div style={{ fontWeight: 800 }}>{h.pokemon_name}</div>
-                  <div style={{ color: '#bbb', fontSize: 12 }}>{(h as any).region}{(h as any).area ? ` — ${(h as any).area}` : ''}</div>
+      {/* Row C — Three equal panels */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, overflow: 'hidden' }}>
+        {/* Panel 1: Continuing Hunts (max 4) */}
+        <Panel title="Continuing Hunts" rightLinkLabel={hunts.length > 4 ? 'View all' : undefined} onRightLink={() => navigate('/shiny-hunt?view=current')}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
+            {loading && Array.from({ length: 4 }).map((_, i) => (
+              <Skeleton key={i} height={100} />
+            ))}
+            {!loading && hunts.slice(0, 4).map((h) => (
+              <button key={h.id} onClick={() => navigate('/shiny-hunt?view=current')} style={cardStyle()}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <img
+                    src={getShinySpritePath(h.pokemon_id as any, h.pokemon_name as any)}
+                    alt={h.pokemon_name as any}
+                    style={{ width: 64, height: 64 }}
+                    onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/images/shiny-sprites/001_Bulbasaur.gif'; }}
+                  />
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ fontWeight: 800, whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{h.pokemon_name}</div>
+                    <div style={{ color: '#bbb', fontSize: 12, whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{(h as any).region}{(h as any).area ? ` — ${(h as any).area}` : ''}</div>
+                  </div>
                 </div>
-              ))}
-              {hunts.length === 0 && <Empty text={loading ? 'Loading…' : 'No active hunts'} />}
-            </div>
-          </Section>
+              </button>
+            ))}
+            {!loading && hunts.length === 0 && <Empty text={'No active hunts'} />}
+          </div>
+        </Panel>
 
-          <Section title="Recent Finds">
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-              {ytdCompleted.slice(0, 5).map((r: any) => (
-                <div key={r.id} style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(255,215,0,0.12)', borderRadius: 10, padding: 8 }}>
-                  <div style={{ width: 32, height: 32, borderRadius: 6, outline: (r.is_alpha || r?.meta?.alpha) ? '2px solid #ffd700' : undefined, outlineOffset: (r.is_alpha || r?.meta?.alpha) ? -2 : undefined, background: 'rgba(255,255,255,0.06)' }} />
-                  <div style={{ fontWeight: 800 }}>{r.pokemon_name}</div>
-                  <div style={{ color: '#bbb', fontSize: 12 }}>{new Date(r.found_at || r.created_at).toLocaleDateString()} — {r.method}</div>
+        {/* Panel 2: Recent Finds (max 6, 3x2) */}
+        <Panel title="Recent Finds" rightLinkLabel={ytdCompleted.length > 6 ? 'View all' : undefined} onRightLink={() => navigate(`/shiny-hunt?view=showcase&year=${y}`)}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
+            {loading && Array.from({ length: 6 }).map((_, i) => (
+              <Skeleton key={i} height={84} />
+            ))}
+            {!loading && completed.filter((r: any) => (r as any).is_phase !== true).slice(0, 6).map((r: any) => (
+              <button key={r.id} onClick={() => navigate('/shiny-hunt?view=showcase')} style={cardStyle()}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <img
+                    src={getShinySpritePath(r.pokemon_id as any, r.pokemon_name as any)}
+                    alt={r.pokemon_name as any}
+                    style={{ width: 56, height: 56, outline: (r.is_alpha || r?.meta?.alpha) ? '2px solid #ffd700' : undefined, outlineOffset: (r.is_alpha || r?.meta?.alpha) ? -2 : undefined }}
+                    onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/images/shiny-sprites/001_Bulbasaur.gif'; }}
+                  />
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ fontWeight: 800, whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{r.pokemon_name}</div>
+                    <div style={{ color: '#bbb', fontSize: 12, whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{new Date(r.found_at || r.created_at).toLocaleDateString()} — {r.method}</div>
+                  </div>
                   {(r.is_secret_shiny || r?.meta?.secret_shiny) && <span style={{ marginLeft: 'auto', fontSize: 10, fontWeight: 800, color: '#000', background: '#ffd700', borderRadius: 999, padding: '2px 6px' }}>SECRET</span>}
                 </div>
-              ))}
-              {ytdCompleted.length === 0 && <Empty text={loading ? 'Loading…' : 'No finds yet this year'} />}
-            </div>
-          </Section>
+              </button>
+            ))}
+            {!loading && ytdCompleted.length === 0 && <Empty text={'No finds yet this year'} />}
+          </div>
+        </Panel>
 
-          <Section title="This Month">
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 4 }}>
-              {renderMiniMonth(ytdCompleted)}
-            </div>
-          </Section>
-        </div>
-
-        <div>
-          <Section title="Recent Builds">
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-              {builds.slice(0, 5).map((b) => (
-                <div key={b.id} style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(255,215,0,0.12)', borderRadius: 10, padding: 8 }}>
-                  <div style={{ fontWeight: 800 }}>{b.name}</div>
-                  <div style={{ color: '#bbb', fontSize: 12, marginLeft: 'auto' }}>{new Date(b.updated_at).toLocaleString()}</div>
+        {/* Panel 3: PvP — Recent Builds (max 5) */}
+        <Panel title="PvP — Recent Builds" rightLinkLabel={'New Build'} onRightLink={() => navigate('/pvp?open=new')}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            {loading && Array.from({ length: 5 }).map((_, i) => (
+              <Skeleton key={i} height={42} />
+            ))}
+            {!loading && builds.slice(0, 5).map((b) => (
+              <button key={b.id} onClick={() => navigate(`/pvp`)} style={cardStyle()}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%' }}>
+                  {/* Mini sprites row - fallback to tier chip if no team exposed */}
+                  {Array.isArray(b.team_sprites) && b.team_sprites.length > 0 ? (
+                    <div style={{ display: 'flex', gap: 4 }}>
+                      {b.team_sprites.slice(0, 6).map((sid: number, idx: number) => (
+                        <img key={idx} src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${sid}.png`} alt="" width={24} height={24} style={{ imageRendering: 'pixelated' }} />
+                      ))}
+                    </div>
+                  ) : (
+                    <span style={{ fontSize: 10, color: '#bbb', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 6, padding: '2px 6px' }}>{b.tier || '—'}</span>
+                  )}
+                  <div style={{ fontWeight: 800, whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{b.name}</div>
+                  <div style={{ color: '#bbb', fontSize: 12, marginLeft: 'auto' }}>{new Date(b.updated_at).toLocaleDateString()}</div>
                 </div>
-              ))}
-              {builds.length === 0 && <Empty text={loading ? 'Loading…' : 'No recent builds'} />}
-            </div>
-          </Section>
-        </div>
+              </button>
+            ))}
+            {!loading && builds.length === 0 && <Empty text={'No recent builds'} />}
+          </div>
+        </Panel>
       </div>
     </div>
   );
 }
 
-function btn() {
-  return { background: '#ffd700', color: '#000', border: 'none', padding: '6px 10px', borderRadius: 6, fontWeight: 800, cursor: 'pointer' } as React.CSSProperties;
+function getUsername(userId: string): string {
+  try {
+    const cached = window.localStorage.getItem(`profile:username:${userId}`);
+    if (cached) return cached;
+  } catch {}
+  // Fallback placeholder until profile hydrated elsewhere
+  return `Trainer`;
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function OverviewCard({ label, value, onClick }: { label: string; value: number; onClick?: () => void }) {
   return (
-    <section style={{ background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(255,215,0,0.12)', borderRadius: 10, padding: 10, marginBottom: 12 }}>
-      <div style={{ fontWeight: 800, color: '#ffd700', marginBottom: 8 }}>{title}</div>
-      {children}
+    <button onClick={onClick} style={{ textAlign: 'left', background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(255,215,0,0.12)', borderRadius: 10, padding: 10, cursor: 'pointer' }}>
+      <div style={{ fontSize: 20, fontWeight: 900, color: '#ffd700' }}>{value}</div>
+      <div style={{ fontSize: 11, color: '#ccc' }}>{label}</div>
+    </button>
+  );
+}
+
+function btn() {
+  return { background: '#ffd700', color: '#000', border: 'none', padding: '6px 10px', borderRadius: 6, fontWeight: 800, cursor: 'pointer', whiteSpace: 'nowrap' } as React.CSSProperties;
+}
+
+function Panel({ title, rightLinkLabel, onRightLink, children }: { title: string; rightLinkLabel?: string; onRightLink?: () => void; children: React.ReactNode }) {
+  return (
+    <section style={{ background: 'rgba(0,0,0,0.20)', border: '1px solid rgba(255,215,0,0.12)', borderRadius: 10, padding: 10, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+      <div style={{ display: 'flex', alignItems: 'center', marginBottom: 8 }}>
+        <div style={{ fontWeight: 800, color: '#ffd700' }}>{title}</div>
+        {rightLinkLabel && (
+          <button onClick={onRightLink} style={{ marginLeft: 'auto', background: 'transparent', border: 'none', color: '#ffd700', fontSize: 12, cursor: 'pointer' }}> {rightLinkLabel} </button>
+        )}
+      </div>
+      <div style={{ flex: 1, minHeight: 0 }}>{children}</div>
     </section>
   );
 }
 
-function Empty({ text }: { text: string }) {
-  return <div style={{ color: '#888', fontStyle: 'italic', padding: 8 }}>{text}</div>;
+function cardStyle() {
+  return { background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(255,215,0,0.12)', borderRadius: 10, padding: 8, textAlign: 'left', cursor: 'pointer', width: '100%' } as React.CSSProperties;
 }
 
-function renderMiniMonth(items: any[]) {
-  const now = new Date();
-  const first = new Date(now.getFullYear(), now.getMonth(), 1);
-  const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-  const mondayFirstOffset = (first.getDay() + 6) % 7;
-  const totalCells = mondayFirstOffset + daysInMonth;
-  const rows = totalCells <= 35 ? 5 : 6;
-  const cells = rows * 7;
-  const counts: Record<number, number> = {};
-  items.forEach((r) => {
-    const d = new Date(r.found_at || r.created_at);
-    if (d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()) {
-      const day = d.getDate();
-      counts[day] = (counts[day] || 0) + 1;
-    }
-  });
-  return Array.from({ length: cells }).map((_, i) => {
-    const dayNum = i - mondayFirstOffset + 1;
-    const inMonth = dayNum >= 1 && dayNum <= daysInMonth;
-    const count = inMonth ? counts[dayNum] || 0 : 0;
-    return (
-      <div key={i} style={{ aspectRatio: '1/1', background: inMonth ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8, position: 'relative' }}>
-        <div style={{ fontSize: 10, padding: 4, opacity: inMonth ? 0.9 : 0.4 }}>{inMonth ? dayNum : ''}</div>
-        {count > 0 && <span style={{ position: 'absolute', right: 6, bottom: 6, width: 6, height: 6, borderRadius: 999, background: '#ffd700' }} />}
-      </div>
-    );
-  });
+function Skeleton({ height }: { height: number }) {
+  return <div style={{ height, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,215,0,0.08)', borderRadius: 10 }} />;
+}
+
+function Empty({ text }: { text: string }) {
+  return <div style={{ color: '#888', fontStyle: 'italic', padding: 8, textAlign: 'center' }}>{text}</div>;
 }

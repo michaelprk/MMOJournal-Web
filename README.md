@@ -73,24 +73,45 @@ MMOJournal-Web is the web-based evolution of the MMOJournal CLI app — a person
 
 > Note for Shiny Hunts FK: After merging changes that include `app/db/sql/shiny_hunts_fk_cascade.sql`, run that SQL file in the Supabase SQL Editor to switch `parent_hunt_id` foreign key to `ON DELETE CASCADE` so deleting a parent hunt removes its phases.
 
-### **Shiny Hunt Calendar & Showcase** (New)
+### **Latest UI/UX Overhaul (December 2024)** ⭐
+- **Fixed Scroll Container System**: Completely redesigned `/pvp` and `/shiny-hunt` pages with fixed scroll containers that prevent content from scrolling behind the navbar and utility bars
+- **Constrained Scroll Areas**: Implemented proper scroll panes that start below fixed UI elements (at 375px) for clean, non-overlapping content flow
+- **Footer Repositioning**: Footer now displays at the bottom of each scroll pane rather than fixed to viewport, providing natural page endings
+- **Enhanced Background System**: New background context with video backgrounds and improved asset management for immersive visual experience
+
+### **Pokemon Card Redesign (December 2024)** ⭐
+- **Consistent Fixed Headers**: Redesigned Pokemon cards with persistent header sections showing sprite, name, types, tier, and level across all three views (Overview, Stats, Moves)
+- **Compact Layout**: Reduced card height from 280px to 220px for better space efficiency while maintaining all functionality
+- **Side-by-Side Stats**: Reorganized Stats view with IVs in bordered box (left) and EVs in compact grid (right) for better information density
+- **Optimized Move Display**: Smaller move boxes with centered "Moveset" title and improved spacing for cleaner presentation
+- **Fixed Action Buttons**: Export/Edit/Delete buttons consistently positioned at bottom-right across all card views with compact styling
+- **Clean Border Design**: IVs section features gapped border design without background for professional appearance
+
+### **Sort & Filter Improvements (December 2024)**
+- **Unified Dropdown Styling**: Consistent dropdown design across PVP page matching shiny hunt page aesthetics
+- **Simplified Interface**: Removed emoji icons and improved text-only labels for cleaner professional appearance
+- **Enhanced Visual Consistency**: Matching border colors, backgrounds, and sizing across all filter components
+
+### **Shiny Hunt Calendar & Showcase**
 - Calendar month grid now shows actual shiny sprites + species names, with a PHASE badge for phase entries.
 - Hover details use a shared anchored popover that stays interactive and positions within the viewport.
 - Clicking a tile opens the edit modal.
 
-### **Showcase Hover Stability** (New)
+### **Showcase Hover Stability**
 - Hover popup is anchored to each tile and no longer jumps off-screen; remains interactive without losing hover.
 
-### **Validation & Data Canonicalization** (New)
+### **Validation & Data Canonicalization**
 - Added canonicalization for encounter methods (e.g., Single/Lures, Fishing, Horde) and improved validator logic for cave/grass/surf/water labeling mismatches.
 - Scripted audit to verify all method/location combos and DB rows with `npm run audit:hunts`.
 - Specific fixes verified: Beldum/Hoenn/Meteor Falls, Larvesta/Unova/Relic Castle, Bagon Single/Lures.
 
-### **Export Modal (Teams)** (New)
+### **Export Modal (Teams)**
 - Export modal portals to `document.body`, locks background scroll, and renders above utility bars and headers for clean presentation.
 
-### **Background Visuals** (New)
-- App-wide animated background video (`public/images/Snowpoint.mp4`) with muted audio and darkened/blurred styling to preserve the dark+yellow aesthetic.
+### **Enhanced Background System**
+- Dynamic background videos with proper fallbacks and optimized asset management
+- Multiple themed backgrounds (Celestial Tower, Distortion World, Dragons Den, Route 3 Unova, Whirl Islands)
+- Background context system for centralized management and smooth transitions
 
 ### **Team Management & Organization** (Latest)
 - **Team Creation**: Create and manage teams with unique identifiers and names

@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 
 export default function JournalComingSoon() {
-  const navbarApproxHeightPx = 0; // approximate space taken by fixed navbar/logo cluster
+  const navbarApproxHeightPx = 180; // approximate space taken by fixed navbar/logo cluster
 
   return (
     <div
@@ -9,7 +9,7 @@ export default function JournalComingSoon() {
       style={{ height: "100vh", paddingTop: `${navbarApproxHeightPx}px` }}
     >
       <div
-        className="flex items-center justify-center px-6"
+        className="flex items-start justify-center px-6"
         style={{ minHeight: `calc(100vh - ${navbarApproxHeightPx}px)` }}
       >
         <div className="text-center animate-fadeIn">
@@ -29,10 +29,10 @@ export default function JournalComingSoon() {
 
           <div className="mt-8">
             <Link
-              to="/pvp"
+              to="/home"
               className="inline-flex items-center gap-2 rounded-full bg-[#ffcb05] px-6 py-2.5 text-black font-semibold shadow-md transition-transform transition-colors duration-200 hover:scale-105 hover:bg-[#e6b800] focus:outline-none focus:ring-2 focus:ring-[#ffcb05]/40"
             >
-              Back to PvP
+              Back to Home
             </Link>
           </div>
         </div>

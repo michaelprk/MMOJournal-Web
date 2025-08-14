@@ -11,6 +11,7 @@ import ShinyUtilityBar from '../../components/ShinyUtilityBar';
 import ShinyHuntCard from '../../components/ShinyHuntCard';
 
 import ShinyCalendar from '../../components/ShinyPlayArea';
+// FixedUtilityBar not used in this layout revert
 import ShinyTile, { type ShinyHoverDetails } from '../../components/shiny/ShinyTile';
 import { supabase } from '../../services/supabase';
 import { shinyHuntService, type ShinyHuntRow } from '../../services/shinyHuntService';
@@ -20,6 +21,7 @@ import { StartHuntModal } from '../../components/shiny/StartHuntModal';
 import { AddPhaseModal } from '../../components/shiny/AddPhaseModal';
 import { EditShinyModal } from '../../components/shiny/EditShinyModal';
 import CompletionModal from '../../components/CompletionModal';
+import { Footer } from '../../components/layout/Footer';
 
 export default function ShinyShowcase() {
   const { user, initializing } = useAuth();
@@ -398,23 +400,23 @@ export default function ShinyShowcase() {
       <div
         style={{
           position: 'sticky',
-          top: '280px', // Below navbar (200px navbar + 80px spacing)
+          top: '280px',
           left: 0,
           right: 0,
           zIndex: 30,
           padding: '16px',
           display: 'flex',
           justifyContent: 'space-between',
-          alignItems: 'center', // vertically center contents inside the bar
-          backgroundColor: 'rgba(0, 0, 0, 0.1)',
+          alignItems: 'center',
+          backgroundColor: 'rgba(0, 0, 0, 0)',
           borderRadius: '8px',
-          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0)',
           margin: '0 auto',
-          marginBottom: '13px', // slightly reduced gap below the bar
+          marginBottom: '13px',
           maxWidth: '1400px',
         }}
       >
-        <div style={{ marginLeft: '16px' }}> {/* Bring inward from edge */}
+          <div style={{ marginLeft: '16px' }}> {/* Bring inward from edge */}
           {/* Left side stats */}
           <div style={{ display: 'flex', gap: '2rem' }}>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem' }}>
@@ -482,26 +484,28 @@ export default function ShinyShowcase() {
         </div>
       </div>
 
-      {/* Main Content Container - Scrollable */}
-      <div
+      {/* Scrollable content area that starts below utility bar */}
+      <div 
         style={{
           position: 'fixed',
-          top: '350px', // Reduced by ~30px to tighten gap below utility bar
+          top: '375px', // Start just below utility bar (280px navbar + ~95px utility bar)
           left: 0,
           right: 0,
-          height: 'calc(100vh - 350px)', // Match reduced top offset
-          backgroundColor: 'transparent',
-          overflowY: 'auto', // Allow scrolling within this container
+          bottom: 0,
+          overflowY: 'auto',
           overflowX: 'hidden',
+          zIndex: 1,
         }}
       >
-        
-        <main style={{ 
-          maxWidth: '1400px',
-          margin: '0 auto',
-          padding: "2rem", 
-          minHeight: "100%" 
-        }}>
+        <main 
+          style={{ 
+            maxWidth: '1400px',
+            margin: '0 auto',
+            padding: "2rem",
+            paddingTop: '5px', // Small breathing room at top of scroll area
+            minHeight: '100%', // Ensure content fills the scroll area
+          }}
+        >
 
         {/* Filter and Sort Controls - moved from fixed bar to content area */}
         <div style={{
@@ -718,6 +722,10 @@ export default function ShinyShowcase() {
           <ShinyCalendar portfolio={portfolio} onEdit={(row) => setEditingShiny(row)} />
         </section>
       </main>
+      
+      {/* Footer at bottom of scroll area */}
+      <Footer />
+      </div> {/* Close scroll container */}
 
       {/* Start Hunt Modal (Supabase-backed, PVP modal pattern) */}
       {showPausedModal && createPortal(
@@ -945,7 +953,6 @@ export default function ShinyShowcase() {
           })) as any);
         }}
       />
-      </div>
     </>
   );
 }

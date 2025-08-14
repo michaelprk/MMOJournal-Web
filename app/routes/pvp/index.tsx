@@ -10,9 +10,11 @@ import { PokemonBuildListView } from '../../components/PokemonBuildListView';
 import { ViewToggle } from '../../components/ViewToggle';
 import { SortFilter } from '../../components/SortFilter';
 import { TeamManager } from '../../components/TeamManager';
+// FixedUtilityBar not used in this layout revert
 
 import { AddPokemonModal } from '../../components/AddPokemonModal';
 import { ExportModal } from '../../components/ExportModal';
+import { Footer } from '../../components/layout/Footer';
 
 export default function PVPPage() {
   const { user, initializing } = useAuth();
@@ -367,21 +369,21 @@ export default function PVPPage() {
     <>
       {/* Sticky Utility Bar - simplified */}
       <div
-        className="sticky top-[64px] z-30 px-4 py-2 flex justify-between items-center bg-black/10 rounded-md shadow-sm"
+        className="sticky z-30 px-4 py-2 flex justify-between items-center bg-black/10 rounded-md shadow-sm"
         style={{
           position: 'sticky',
-          top: '280px', // Below navbar (200px navbar + 80px spacing)
+          top: '280px', // below navbar
           left: 0,
           right: 0,
           zIndex: 30,
           padding: '16px',
           display: 'flex',
           alignItems: 'center',
-          backgroundColor: 'rgba(0, 0, 0, 0.1)',
+          backgroundColor: 'rgba(0, 0, 0, 0)',
           borderRadius: '8px',
-          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0)',
           margin: '0 auto',
-          marginBottom: '16px',
+          marginBottom: '24px', // Increased margin for better separation
           maxWidth: '1400px',
         }}
       >
@@ -526,26 +528,29 @@ export default function PVPPage() {
         </div>
       </div>
 
-      {/* Main Content Container - Scrollable */}
-      <div
+      {/* Scrollable content area that starts below utility bar */}
+      <div 
         style={{
           position: 'fixed',
-          top: '350px', // Start below navbar + utility bar (280px + 70px)
+          top: '375px', // Start just below utility bar (280px navbar + ~95px utility bar)
           left: 0,
           right: 0,
-          height: 'calc(100vh - 350px)', // Take remaining viewport height
-          backgroundColor: 'transparent',
-          overflowY: 'auto', // Allow scrolling within this container
+          bottom: 0,
+          overflowY: 'auto',
           overflowX: 'hidden',
+          zIndex: 1,
         }}
       >
-        <div style={{ 
-          maxWidth: '1400px', 
-          margin: '0 auto',
-          padding: '1.5rem',
-          minHeight: '100%',
-          width: '100%',
-        }}>
+        <div 
+          style={{ 
+            maxWidth: '1400px', 
+            margin: '0 auto',
+            padding: '1.5rem',
+            paddingTop: '5px', // Small breathing room at top of scroll area
+            width: '100%',
+            minHeight: '100%', // Ensure content fills the scroll area
+          }}
+        >
           {/* Main Content Area */}
           <div style={{ width: '100%' }}>
             {/* Top Control Row - ViewToggle, Team Showcase, Sort Filter */}
@@ -746,7 +751,10 @@ export default function PVPPage() {
           )}
           </div>
         </div>
-      </div>
+        
+        {/* Footer at bottom of scroll area */}
+        <Footer />
+      </div> {/* Close scroll container */}
 
       {/* Add/Edit Modal */}
       <AddPokemonModal
