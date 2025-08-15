@@ -1,0 +1,550 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 17.4
+-- Dumped by pg_dump version 17.4
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET transaction_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- Name: public; Type: SCHEMA; Schema: -; Owner: -
+--
+
+CREATE SCHEMA IF NOT EXISTS public;
+
+
+--
+-- Name: SCHEMA public; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON SCHEMA public IS 'standard public schema';
+
+
+--
+-- Name: lookup_email_for_username(text); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.lookup_email_for_username(p_username text) RETURNS text
+    LANGUAGE plpgsql SECURITY DEFINER
+    AS $$
+declare v_email text;
+begin
+  select email into v_email
+  from public.profiles
+  where lower(username) = lower(p_username);
+  return v_email; -- null if not found
+end;
+$$;
+
+
+--
+-- Name: shiny_hunts_set_completed_cache(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.shiny_hunts_set_completed_cache() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+begin
+  if new.is_completed = true and new.found_at is null then
+    new.found_at := now();
+  end if;
+  if new.found_at is not null then
+    new.completed_month := extract(month from new.found_at)::int;
+    new.completed_year  := extract(year  from new.found_at)::int;
+  end if;
+  return new;
+end $$;
+
+
+--
+-- Name: update_updated_at_column(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.update_updated_at_column() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+begin
+  new.updated_at = now();
+  return new;
+end;
+$$;
+
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- Name: pokemon_builds; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.pokemon_builds (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    name text NOT NULL,
+    species text NOT NULL,
+    gender text,
+    tier text NOT NULL,
+    level integer DEFAULT 50 NOT NULL,
+    nature text NOT NULL,
+    ability text NOT NULL,
+    item text,
+    moves text[] DEFAULT '{}'::text[] NOT NULL,
+    ivs jsonb DEFAULT '{"hp": 31, "speed": 31, "attack": 31, "defense": 31, "sp_attack": 31, "sp_defense": 31}'::jsonb NOT NULL,
+    evs jsonb DEFAULT '{"hp": 0, "speed": 0, "attack": 0, "defense": 0, "sp_attack": 0, "sp_defense": 0}'::jsonb NOT NULL,
+    description text,
+    showdown_import text,
+    team_id text,
+    team_name text,
+    user_id uuid DEFAULT auth.uid() NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL,
+    CONSTRAINT pokemon_builds_gender_check CHECK ((gender = ANY (ARRAY['M'::text, 'F'::text, 'U'::text]))),
+    CONSTRAINT pokemon_builds_level_check CHECK (((level >= 1) AND (level <= 100))),
+    CONSTRAINT pokemon_builds_tier_check CHECK ((tier = ANY (ARRAY['OU'::text, 'UU'::text, 'NU'::text, 'Doubles'::text, 'UT'::text, 'LC'::text])))
+);
+
+
+--
+-- Name: profiles; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.profiles (
+    user_id uuid NOT NULL,
+    username text NOT NULL,
+    email text NOT NULL,
+    created_at timestamp with time zone DEFAULT now(),
+    CONSTRAINT profiles_email_not_blank CHECK ((length(TRIM(BOTH FROM email)) > 0)),
+    CONSTRAINT profiles_username_not_blank CHECK ((length(TRIM(BOTH FROM username)) > 0))
+);
+
+
+--
+-- Name: shiny_hunts; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.shiny_hunts (
+    id bigint NOT NULL,
+    pokemon_id integer NOT NULL,
+    pokemon_name text NOT NULL,
+    method text NOT NULL,
+    start_date timestamp with time zone DEFAULT now(),
+    phase_count integer DEFAULT 1 NOT NULL,
+    total_encounters integer DEFAULT 0 NOT NULL,
+    is_completed boolean DEFAULT false NOT NULL,
+    notes text,
+    phase_pokemon jsonb,
+    user_id uuid DEFAULT auth.uid() NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL,
+    location text,
+    region text,
+    area text,
+    rarity text,
+    species_id integer,
+    meta jsonb DEFAULT '{}'::jsonb NOT NULL,
+    found_at timestamp with time zone,
+    completed_month integer,
+    completed_year integer,
+    is_phase boolean DEFAULT false NOT NULL,
+    parent_hunt_id bigint,
+    is_secret_shiny boolean DEFAULT false NOT NULL,
+    is_alpha boolean DEFAULT false NOT NULL,
+    CONSTRAINT shiny_hunts_secret_not_horde_chk CHECK (((is_secret_shiny = false) OR (method <> ALL (ARRAY['Hordes 3x'::text, 'Hordes 5x'::text]))))
+);
+
+
+--
+-- Name: shiny_hunts_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+ALTER TABLE public.shiny_hunts ALTER COLUMN id ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME public.shiny_hunts_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: shiny_portfolio; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.shiny_portfolio (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    species text NOT NULL,
+    date_caught date,
+    location text,
+    nature text,
+    ivs jsonb,
+    proof_url text,
+    user_id uuid DEFAULT auth.uid() NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: pokemon_builds pokemon_builds_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.pokemon_builds
+    ADD CONSTRAINT pokemon_builds_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: profiles profiles_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.profiles
+    ADD CONSTRAINT profiles_pkey PRIMARY KEY (user_id);
+
+
+--
+-- Name: shiny_hunts shiny_hunts_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.shiny_hunts
+    ADD CONSTRAINT shiny_hunts_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: shiny_portfolio shiny_portfolio_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.shiny_portfolio
+    ADD CONSTRAINT shiny_portfolio_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: idx_pokemon_builds_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_pokemon_builds_created_at ON public.pokemon_builds USING btree (created_at);
+
+
+--
+-- Name: idx_pokemon_builds_team_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_pokemon_builds_team_id ON public.pokemon_builds USING btree (team_id);
+
+
+--
+-- Name: idx_pokemon_builds_tier; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_pokemon_builds_tier ON public.pokemon_builds USING btree (tier);
+
+
+--
+-- Name: idx_pokemon_builds_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_pokemon_builds_user_id ON public.pokemon_builds USING btree (user_id);
+
+
+--
+-- Name: idx_shiny_hunts_is_phase; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_shiny_hunts_is_phase ON public.shiny_hunts USING btree (is_phase);
+
+
+--
+-- Name: idx_shiny_hunts_method; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_shiny_hunts_method ON public.shiny_hunts USING btree (method);
+
+
+--
+-- Name: idx_shiny_hunts_parent; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_shiny_hunts_parent ON public.shiny_hunts USING btree (parent_hunt_id);
+
+
+--
+-- Name: idx_shiny_hunts_species; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_shiny_hunts_species ON public.shiny_hunts USING btree (species_id);
+
+
+--
+-- Name: idx_shiny_hunts_startdate; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_shiny_hunts_startdate ON public.shiny_hunts USING btree (start_date);
+
+
+--
+-- Name: idx_shiny_hunts_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_shiny_hunts_user_id ON public.shiny_hunts USING btree (user_id);
+
+
+--
+-- Name: uq_profiles_email_ci; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX uq_profiles_email_ci ON public.profiles USING btree (lower(email));
+
+
+--
+-- Name: uq_profiles_username_ci; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX uq_profiles_username_ci ON public.profiles USING btree (lower(username));
+
+
+--
+-- Name: pokemon_builds trg_pokemon_builds_updated_at; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER trg_pokemon_builds_updated_at BEFORE UPDATE ON public.pokemon_builds FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+
+
+--
+-- Name: shiny_hunts trg_shiny_hunts_cache; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER trg_shiny_hunts_cache BEFORE INSERT OR UPDATE ON public.shiny_hunts FOR EACH ROW EXECUTE FUNCTION public.shiny_hunts_set_completed_cache();
+
+
+--
+-- Name: shiny_hunts trg_shiny_hunts_updated_at; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER trg_shiny_hunts_updated_at BEFORE UPDATE ON public.shiny_hunts FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+
+
+--
+-- Name: shiny_portfolio trg_shiny_portfolio_updated_at; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER trg_shiny_portfolio_updated_at BEFORE UPDATE ON public.shiny_portfolio FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+
+
+--
+-- Name: pokemon_builds pokemon_builds_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.pokemon_builds
+    ADD CONSTRAINT pokemon_builds_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE;
+
+
+--
+-- Name: profiles profiles_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.profiles
+    ADD CONSTRAINT profiles_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE;
+
+
+--
+-- Name: shiny_hunts shiny_hunts_parent_hunt_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.shiny_hunts
+    ADD CONSTRAINT shiny_hunts_parent_hunt_id_fkey FOREIGN KEY (parent_hunt_id) REFERENCES public.shiny_hunts(id) ON DELETE SET NULL;
+
+
+--
+-- Name: shiny_hunts shiny_hunts_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.shiny_hunts
+    ADD CONSTRAINT shiny_hunts_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE;
+
+
+--
+-- Name: shiny_portfolio shiny_portfolio_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.shiny_portfolio
+    ADD CONSTRAINT shiny_portfolio_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE;
+
+
+--
+-- Name: pokemon_builds pb_delete_own; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY pb_delete_own ON public.pokemon_builds FOR DELETE USING ((auth.uid() = user_id));
+
+
+--
+-- Name: pokemon_builds pb_insert_own; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY pb_insert_own ON public.pokemon_builds FOR INSERT WITH CHECK ((auth.uid() = user_id));
+
+
+--
+-- Name: pokemon_builds pb_select_own; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY pb_select_own ON public.pokemon_builds FOR SELECT USING ((auth.uid() = user_id));
+
+
+--
+-- Name: pokemon_builds pb_update_own; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY pb_update_own ON public.pokemon_builds FOR UPDATE USING ((auth.uid() = user_id)) WITH CHECK ((auth.uid() = user_id));
+
+
+--
+-- Name: pokemon_builds; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.pokemon_builds ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: profiles; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: profiles profiles_delete_own; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY profiles_delete_own ON public.profiles FOR DELETE USING ((auth.uid() = user_id));
+
+
+--
+-- Name: profiles profiles_insert_own; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY profiles_insert_own ON public.profiles FOR INSERT WITH CHECK ((auth.uid() = user_id));
+
+
+--
+-- Name: profiles profiles_select_own; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY profiles_select_own ON public.profiles FOR SELECT USING ((auth.uid() = user_id));
+
+
+--
+-- Name: profiles profiles_update_own; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY profiles_update_own ON public.profiles FOR UPDATE USING ((auth.uid() = user_id)) WITH CHECK ((auth.uid() = user_id));
+
+
+--
+-- Name: shiny_hunts sh_delete_own; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY sh_delete_own ON public.shiny_hunts FOR DELETE USING ((auth.uid() = user_id));
+
+
+--
+-- Name: shiny_hunts sh_insert_own; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY sh_insert_own ON public.shiny_hunts FOR INSERT WITH CHECK ((auth.uid() = user_id));
+
+
+--
+-- Name: shiny_hunts sh_select_own; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY sh_select_own ON public.shiny_hunts FOR SELECT USING ((auth.uid() = user_id));
+
+
+--
+-- Name: shiny_hunts sh_update_own; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY sh_update_own ON public.shiny_hunts FOR UPDATE USING ((auth.uid() = user_id)) WITH CHECK ((auth.uid() = user_id));
+
+
+--
+-- Name: shiny_hunts shiny_delete_own; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY shiny_delete_own ON public.shiny_hunts FOR DELETE USING ((auth.uid() = user_id));
+
+
+--
+-- Name: shiny_hunts; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.shiny_hunts ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: shiny_hunts shiny_insert_own; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY shiny_insert_own ON public.shiny_hunts FOR INSERT WITH CHECK ((auth.uid() = user_id));
+
+
+--
+-- Name: shiny_portfolio; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.shiny_portfolio ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: shiny_hunts shiny_select_own; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY shiny_select_own ON public.shiny_hunts FOR SELECT USING ((auth.uid() = user_id));
+
+
+--
+-- Name: shiny_hunts shiny_update_own; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY shiny_update_own ON public.shiny_hunts FOR UPDATE USING ((auth.uid() = user_id));
+
+
+--
+-- Name: shiny_portfolio sp_delete_own; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY sp_delete_own ON public.shiny_portfolio FOR DELETE USING ((auth.uid() = user_id));
+
+
+--
+-- Name: shiny_portfolio sp_insert_own; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY sp_insert_own ON public.shiny_portfolio FOR INSERT WITH CHECK ((auth.uid() = user_id));
+
+
+--
+-- Name: shiny_portfolio sp_select_own; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY sp_select_own ON public.shiny_portfolio FOR SELECT USING ((auth.uid() = user_id));
+
+
+--
+-- Name: shiny_portfolio sp_update_own; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY sp_update_own ON public.shiny_portfolio FOR UPDATE USING ((auth.uid() = user_id)) WITH CHECK ((auth.uid() = user_id));
+
+
+--
+-- PostgreSQL database dump complete
+--
+

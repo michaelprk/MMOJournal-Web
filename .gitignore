@@ -13,3 +13,7 @@ backend/dist/
 third_party/pokemmo-damage-calc/
 
 .vercel
+
+# Local database backups and dumps
+mmojournal_backups/
+*.dump

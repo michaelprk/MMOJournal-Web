@@ -276,3 +276,13 @@ Notes:
 - Legacy `/damage-calc` in-app UI has been removed in favor of the standalone embed.
 - All calculator logic remains upstream; our changes are CSS-only for branding and readability.
 - Attribution: Engine/UI by upstream project `c4vv/pokemmo-damage-calc`.
+
+---
+
+## Compliance & Security
+
+- Audit: see `docs/COMPLIANCE_AUDIT.md` (data inventory, risks, sub‑processors).
+- Policies (drafts): `docs/PRIVACY_POLICY_DRAFT.md`, `docs/TERMS_OF_USE_DRAFT.md`, `docs/COOKIES_DRAFT.md`.
+- RLS policies: `docs/rls_policies.sql` (enable RLS, per‑user policies; run in Supabase SQL Editor).
+- DSAR runbook: `docs/DSAR_RUNBOOK.md` (export/delete steps with screenshots placeholders).
+- Launch checklist: `docs/LAUNCH_CHECKLIST.md` (headers, RLS, DSAR, cookies, backups, MFA).

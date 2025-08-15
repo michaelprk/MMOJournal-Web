@@ -18,7 +18,10 @@
     "backend:db:studio": "cd backend && npx prisma studio",
     "sb:ping": "tsx scripts/sb-ping.ts",
     "audit:hunts": "tsx scripts/audit-hunts.ts",
-    "audit:cases": "tsx scripts/check-cases.ts"
+    "audit:cases": "tsx scripts/check-cases.ts",
+    "db:docker:start": "bash ./scripts/db_start_docker.sh",
+    "db:docker:stop": "bash ./scripts/db_stop_docker.sh",
+    "db:rebuild": "bash ./scripts/db_rebuild_local.sh"
   },
   "dependencies": {
     "@react-router/node": "^7.5.3",

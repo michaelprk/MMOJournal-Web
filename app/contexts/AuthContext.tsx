@@ -65,7 +65,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const { error } = await supabase.auth.signUp({ email, password });
       if (error) throw error;
       const { data } = await supabase.auth.getUser();
-      if (!data.user) throw new Error('Could not get authenticated user after sign up');
+      if (!data.user) throw new Error('Please verify your account via email to continue');
       const { error: pErr } = await supabase
         .from('profiles')
         .insert({ user_id: data.user.id, username, email });
