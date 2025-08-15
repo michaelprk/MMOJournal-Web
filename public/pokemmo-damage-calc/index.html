@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-    <script>document.documentElement.classList.add('mmoj-dark');</script>
+    <script src="js/inline-init.js"></script>
     <meta charset="UTF-8" />
     <title>Pok&eacute;mon Damage Calculator</title>
     <link type="text/css" rel="stylesheet" href="js/vendor/select2/select2.css" />
@@ -12,30 +12,6 @@
     <link rel="stylesheet" href="/pokemmo-damage-calc/mmoj-dark.css?v=4">
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-26211653-3"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-
-        gtag('config', 'UA-26211653-3');
-
-        window.onerror = function(err, uri, line) {
-            gtag('event', 'exception', {'description': uri + ':' + line + ': ' + err});
-            return false;
-        };
-    </script>
-    <!-- Immediately loads the dark theme in order to reduce FOIT -->
-    <script>
-        /*
-        * localStorage will only store strings
-        * This means that if it has the value 'false',
-        * It will be truey and incorrectly cause the
-        * dark theme to load.
-        */
-        if (localStorage.getItem('darkTheme') !== 'true') {
-            document.getElementById('dark-theme-styles').disabled = true;
-        }
-    </script>
 </head>
 
 <body class="dark-theme">
@@ -1588,21 +1564,13 @@
             </div>
         </fieldset>
     </div>
-    <script type="text/javascript">
-        var linkExtension = '.html';
-    </script>
+    <script type="text/javascript" src="js/link-extension.js"></script>
     <script type="text/javascript" src="js/vendor/jquery-1.9.1.min.js"></script>
     <script type="text/javascript" src="js/vendor/select2/select2.min.js"></script>
     <script type="text/javascript" src="js/vendor/url-search-params-0.1.2.min.js"></script>
     <!-- MMOJ embedded theme/height loader (kept separate from upstream files) -->
     <script src="theme/loader.js"></script>
-    <script type="text/javascript">
-        this.__createBinding = function(o, m, k) {
-            o[k] = m[k];
-        };
-        var calc = exports = {};
-        function require() { return exports };
-    </script>
+    <script type="text/javascript" src="js/calc-bindings.js"></script>
     <script type="text/javascript" src="calc/util.js?8fa0c7ff"></script>
     <script type="text/javascript" src="calc/stats.js?9220179f"></script>
     <script type="text/javascript" src="calc/data/species.js?0cd957b7"></script>
