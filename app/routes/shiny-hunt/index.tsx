@@ -24,6 +24,7 @@ import CompletionModal from '../../components/CompletionModal';
 import { Footer } from '../../components/layout/Footer';
 
 
+
 export default function ShinyShowcase() {
   const { user, initializing } = useAuth();
   // Mock data for demonstration - in a real app, this would come from an API

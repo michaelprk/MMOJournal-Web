@@ -41,45 +41,47 @@ export function MainLayout() {
   return (
     <AuthProvider>
       <BackgroundProvider>
-        <ScrollToTop />
-        <div style={{ display: hideBackground ? "none" : "block" }}>
-          <BackgroundLayer />
+        <div style={{ margin: 0, minHeight: "100vh", position: "relative", display: "flex", flexDirection: "column" }}>
+          <ScrollToTop />
+          <div style={{ display: hideBackground ? "none" : "block" }}>
+            <BackgroundLayer />
+          </div>
+
+          <Navbar />
+          <AuthBar />
+
+          {/* Main content */}
+          <main
+            style={{
+              position: "relative",
+              zIndex: 1,
+              flex: 1,
+              minHeight: 0,
+              backgroundColor:
+                location.pathname === "/" ||
+                location.pathname === "/home" ||
+                location.pathname === "/pvp" ||
+                location.pathname === "/shiny-hunt" ||
+                location.pathname === "/journal" ||
+                location.pathname === "/damage-calc"
+                  ? "transparent"
+                  : "rgba(0,0,0,0.7)",
+              // No padding needed - using fixed scroll containers for /pvp and /shiny-hunt
+              paddingTop: 
+                location.pathname !== "/pvp" && 
+                location.pathname !== "/shiny-hunt" 
+                  ? "200px" 
+                  : "0",
+              paddingBottom: 0,
+              backdropFilter: "none",
+            }}
+          >
+            <Outlet />
+          </main>
+
+          {/* Footer only shows on pages that don't have scroll containers */}
+          {location.pathname !== "/pvp" && location.pathname !== "/shiny-hunt" && <Footer />}
         </div>
-
-        <Navbar />
-        <AuthBar />
-
-        {/* Main content */}
-        <main
-          style={{
-            position: "relative",
-            zIndex: 1,
-            flex: 1,
-            minHeight: 0,
-            backgroundColor:
-              location.pathname === "/" ||
-              location.pathname === "/home" ||
-              location.pathname === "/pvp" ||
-              location.pathname === "/shiny-hunt" ||
-              location.pathname === "/journal" ||
-              location.pathname === "/damage-calc"
-                ? "transparent"
-                : "rgba(0,0,0,0.7)",
-            // No padding needed - using fixed scroll containers for /pvp and /shiny-hunt
-            paddingTop: 
-              location.pathname !== "/pvp" && 
-              location.pathname !== "/shiny-hunt" 
-                ? "200px" 
-                : "0",
-            paddingBottom: 0,
-            backdropFilter: "none",
-          }}
-        >
-          <Outlet />
-        </main>
-
-        {/* Footer only shows on pages that don't have scroll containers */}
-        {location.pathname !== "/pvp" && location.pathname !== "/shiny-hunt" && <Footer />}
       </BackgroundProvider>
     </AuthProvider>
   );
