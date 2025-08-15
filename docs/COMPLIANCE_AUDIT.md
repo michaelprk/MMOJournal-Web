@@ -60,6 +60,7 @@ Personal data processed:
 
 - No explicit automated retention. Supabase tables retain data indefinitely unless deleted by users.
 - Add a configurable retention policy placeholder (docs-only), e.g., remove inactive accounts after X months, subject to DSAR and legal requirements.
+- See Privacy Policy → Data Retention for current stance; no automated inactive-account deletion yet.
 
 ### 7) Sub-processors
 

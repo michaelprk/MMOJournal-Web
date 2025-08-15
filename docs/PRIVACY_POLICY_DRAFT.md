@@ -29,11 +29,9 @@ We do not rely on consent for analytics or advertising, because we do not run th
   - Vercel (static hosting and delivery)
   These providers process data only to provide the service to us.
 
-### Retention
+### Data Retention
 
-- We keep your account and content while your account is active.
-- You can delete your data in the app (Account → Delete Account). We may keep minimal records if required by law or for security.
-- We may add an inactive‑account retention policy before launch and will update this page.
+We store account data and user-generated content (e.g., PvP builds, shiny hunts) for as long as your MMOJournal account remains active. You may delete your account at any time from the settings page; this permanently deletes your content from our databases, subject to backup retention. Backups are kept for a limited period solely for disaster recovery and are automatically purged on rotation. We currently do not implement automatic deletion for inactive accounts; we may introduce a policy in the future and will update this notice accordingly.
 
 ### Your rights
 
