@@ -8,8 +8,11 @@ import {
 
 import type { Route } from "./+types/root";
 import "./app.css";
+import React, { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { BackgroundProvider } from "./contexts/BackgroundContext";
+import { BackgroundLayer } from "./components/layout/BackgroundLayer";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -42,9 +45,41 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
+  const location = useLocation();
+  const [plainDamageCalcBg, setPlainDamageCalcBg] = useState(false);
+
+  useEffect(() => {
+    if (location.pathname === "/damage-calc") {
+      try {
+        const flag = window.localStorage.getItem("damageCalcPlainBg");
+        setPlainDamageCalcBg(flag === "true");
+      } catch {}
+    }
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === "damageCalcPlainBg" && location.pathname === "/damage-calc") {
+        setPlainDamageCalcBg(e.newValue === "true");
+      }
+    };
+    const onCustom = (e: Event) => {
+      const ce = e as CustomEvent<{ plain: boolean }>;
+      if (location.pathname === "/damage-calc") setPlainDamageCalcBg(!!ce.detail?.plain);
+    };
+    window.addEventListener("storage", onStorage);
+    window.addEventListener("damageCalc:bg", onCustom as EventListener);
+    return () => {
+      window.removeEventListener("storage", onStorage);
+      window.removeEventListener("damageCalc:bg", onCustom as EventListener);
+    };
+  }, [location.pathname]);
+
+  const hideBackground = location.pathname === "/damage-calc" && plainDamageCalcBg;
+
   return (
     <AuthProvider>
       <BackgroundProvider>
+        <div style={{ display: hideBackground ? "none" : "block" }}>
+          <BackgroundLayer />
+        </div>
         <Outlet />
       </BackgroundProvider>
     </AuthProvider>

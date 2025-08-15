@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { Outlet, useLocation } from "react-router";
 import { Navbar } from "../components/Navbar";
 import { AuthBar } from "../components/AuthBar";
-import { BackgroundLayer } from "../components/layout/BackgroundLayer";
 import { Footer } from "../components/layout/Footer";
 import { ScrollToTop } from "../components/ScrollToTop";
 
@@ -34,14 +33,9 @@ export function MainLayout() {
     };
   }, [location.pathname]);
 
-  const hideBackground = location.pathname === "/damage-calc" && plainDamageCalcBg;
-  
   return (
     <div style={{ margin: 0, minHeight: "100vh", position: "relative", display: "flex", flexDirection: "column" }}>
       <ScrollToTop />
-      <div style={{ display: hideBackground ? "none" : "block" }}>
-        <BackgroundLayer />
-      </div>
 
       <Navbar />
       <AuthBar />
