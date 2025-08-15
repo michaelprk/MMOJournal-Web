@@ -48,6 +48,9 @@ export default function App() {
   const location = useLocation();
   const [plainDamageCalcBg, setPlainDamageCalcBg] = useState(false);
 
+  // TEMP DIAGNOSTIC (to be removed after verification)
+  // useEffect(() => { console.log('[ROOT] mounted'); }, []);
+
   useEffect(() => {
     if (location.pathname === "/damage-calc") {
       try {

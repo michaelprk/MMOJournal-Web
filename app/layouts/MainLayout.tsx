@@ -9,6 +9,9 @@ export function MainLayout() {
   const location = useLocation();
   const [plainDamageCalcBg, setPlainDamageCalcBg] = useState(false);
 
+  // TEMP DIAGNOSTIC (to be removed after verification)
+  // useEffect(() => { console.log('[MAIN_LAYOUT] mounted'); }, []);
+
   useEffect(() => {
     if (location.pathname === "/damage-calc") {
       try {

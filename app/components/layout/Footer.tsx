@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useState } from "react";
 import { useBackground } from "../../contexts/BackgroundContext";
 
 export function Footer() {
+  // TEMP DIAGNOSTIC (to be removed after verification)
+  // console.log('[FOOTER] mounted');
   const { random, setById, setSolid, manifest } = useBackground();
   const [openLegal, setOpenLegal] = useState(false);
   const [openMenu, setOpenMenu] = useState(false);

@@ -6,6 +6,8 @@ export function BackgroundLayer() {
   const { state, manifest } = useBackground();
   const entry = manifest.find((m) => m.id === state.id) || null;
   const location = useLocation();
+  // TEMP DIAGNOSTIC (to be removed after verification)
+  // console.log('[BG] mounted');
 
   const commonStyle: React.CSSProperties = {
     position: "fixed",

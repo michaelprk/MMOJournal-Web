@@ -2,6 +2,8 @@ import { NavLink, useNavigate } from "react-router-dom";
 
 export function Navbar() {
   const navigate = useNavigate();
+  // TEMP DIAGNOSTIC (to be removed after verification)
+  // console.log('[NAVBAR] mounted');
 
   return (
     <nav
