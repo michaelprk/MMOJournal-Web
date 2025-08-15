@@ -6,18 +6,8 @@ import {
   Scripts,
 } from "react-router";
 
-import React, { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
 import type { Route } from "./+types/root";
 import "./app.css";
-
-import { Navbar } from "./components/Navbar";
-import { AuthBar } from "./components/AuthBar";
-import { AuthProvider } from "./contexts/AuthContext";
-import { BackgroundProvider } from "./contexts/BackgroundContext";
-import { BackgroundLayer } from "./components/layout/BackgroundLayer";
-import { Footer } from "./components/layout/Footer";
-import { ScrollToTop } from "./components/ScrollToTop";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -33,37 +23,6 @@ export const links: Route.LinksFunction = () => [
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
-  const location = useLocation();
-  const [plainDamageCalcBg, setPlainDamageCalcBg] = useState(false);
-
-
-
-  useEffect(() => {
-    if (location.pathname === "/damage-calc") {
-      try {
-        const flag = window.localStorage.getItem("damageCalcPlainBg");
-        setPlainDamageCalcBg(flag === "true");
-      } catch {}
-    }
-    const onStorage = (e: StorageEvent) => {
-      if (e.key === "damageCalcPlainBg" && location.pathname === "/damage-calc") {
-        setPlainDamageCalcBg(e.newValue === "true");
-      }
-    };
-    const onCustom = (e: Event) => {
-      const ce = e as CustomEvent<{ plain: boolean }>;
-      if (location.pathname === "/damage-calc") setPlainDamageCalcBg(!!ce.detail?.plain);
-    };
-    window.addEventListener("storage", onStorage);
-    window.addEventListener("damageCalc:bg", onCustom as EventListener);
-    return () => {
-      window.removeEventListener("storage", onStorage);
-      window.removeEventListener("damageCalc:bg", onCustom as EventListener);
-    };
-  }, [location.pathname]);
-  const showNavbar = location.pathname !== "/login" && location.pathname !== "/create-account";
-  const hideBackground = location.pathname === "/damage-calc" && plainDamageCalcBg;
-
   return (
     <html lang="en">
       <head>
@@ -73,52 +32,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body style={{ margin: 0, minHeight: "100vh", position: "relative", display: "flex", flexDirection: "column" }}>
-        <AuthProvider>
-          <BackgroundProvider>
-            <ScrollToTop />
-            <div style={{ display: hideBackground ? "none" : "block" }}>
-              <BackgroundLayer />
-            </div>
-
-            {showNavbar && <Navbar />}
-            <AuthBar />
-
-            {/* Main content */}
-            <main
-              style={{
-                position: "relative",
-                zIndex: 1,
-                flex: 1,
-                minHeight: 0,
-                backgroundColor:
-                  location.pathname === "/login" ||
-                  location.pathname === "/create-account" ||
-                  location.pathname === "/" ||
-                  location.pathname === "/home" ||
-                  location.pathname === "/pvp" ||
-                  location.pathname === "/shiny-hunt" ||
-                  location.pathname === "/journal" ||
-                  location.pathname === "/damage-calc"
-                    ? "transparent"
-                    : "rgba(0,0,0,0.7)",
-                // No padding needed - using fixed scroll containers for /pvp and /shiny-hunt
-                paddingTop: showNavbar && 
-                  location.pathname !== "/pvp" && 
-                  location.pathname !== "/shiny-hunt" 
-                    ? "200px" 
-                    : "0",
-                paddingBottom: 0,
-                backdropFilter: "none",
-              }}
-            >
-              {children}
-            </main>
-
-            {/* Footer only shows on pages that don't have scroll containers */}
-            {location.pathname !== "/pvp" && location.pathname !== "/shiny-hunt" && <Footer />}
-          </BackgroundProvider>
-        </AuthProvider>
-
+        {children}
         <Scripts />
       </body>
     </html>
