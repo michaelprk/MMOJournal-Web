@@ -307,3 +307,62 @@ html.mmoj-dark select:disabled {
   background: #0b0d10 !important;
   color: #9aa0a6 !important;
 }
+
+/* ===== Select2 v3 (as used by the calc) ===== */
+.mmoj-dark .select2-drop,
+.mmoj-dark .select2-drop-active,
+.mmoj-dark .select2-results,
+.mmoj-dark .select2-results li,
+.mmoj-dark .select2-search,
+.mmoj-dark .select2-search input,
+.mmoj-dark .select2-choice,
+.mmoj-dark .select2-choice > .select2-chosen,
+.mmoj-dark .select2-choice .select2-arrow {
+  background: #000 !important;
+  color: #f5f7fa !important;
+  border-color: #333 !important;
+  box-shadow: none !important;
+}
+/* highlighted row */
+.mmoj-dark .select2-results .select2-highlighted {
+  background: #ffcb05 !important;
+  color: #000 !important;
+}
+/* the page-wide mask that shows behind the dropdown */
+.mmoj-dark .select2-drop-mask {
+  background: rgba(0,0,0,0) !important; /* fully transparent */
+}
+
+/* ===== Select2 v4 (future-proof if any control uses it) ===== */
+.mmoj-dark .select2-dropdown,
+.mmoj-dark .select2-results__options,
+.mmoj-dark .select2-results__option,
+.mmoj-dark .select2-search--dropdown,
+.mmoj-dark .select2-search__field,
+.mmoj-dark .select2-selection,
+.mmoj-dark .select2-selection__rendered,
+.mmoj-dark .select2-selection__arrow {
+  background: #000 !important;
+  color: #f5f7fa !important;
+  border-color: #333 !important;
+}
+.mmoj-dark .select2-results__option--highlighted {
+  background: #ffcb05 !important;
+  color: #000 !important;
+}
+
+/* ===== jQuery UI Autocomplete (some move lists) ===== */
+.mmoj-dark .ui-autocomplete,
+.mmoj-dark .ui-menu,
+.mmoj-dark .ui-menu-item,
+.mmoj-dark .ui-widget-content {
+  background: #000 !important;
+  color: #f5f7fa !important;
+  border-color: #333 !important;
+}
+.mmoj-dark .ui-state-hover,
+.mmoj-dark .ui-menu-item-wrapper.ui-state-active {
+  background: #ffcb05 !important;
+  color: #000 !important;
+  border-color: #ffcb05 !important;
+}

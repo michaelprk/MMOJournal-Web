@@ -25,12 +25,12 @@ contains() {
 
 # Content-Security-Policy (required directives)
 contains '"key"\s*:\s*"Content-Security-Policy"' "CSP header key missing"
-contains 'default-src \'self\'' "CSP: default-src 'self' missing"
-contains 'script-src \'self\'' "CSP: script-src 'self' missing"
-contains 'style-src \'self\' \'unsafe-inline\'' "CSP: style-src 'self' 'unsafe-inline' missing"
-contains 'img-src \'self\' data: https:' "CSP: img-src 'self' data: https: missing"
-contains 'connect-src \'self\' https: wss:' "CSP: connect-src 'self' https: wss: missing"
-contains 'object-src none|object-src \'none\'' "CSP: object-src 'none' missing"
+contains "default-src ',self'" "CSP: default-src 'self' missing"
+contains "script-src 'self'" "CSP: script-src 'self' missing"
+contains "style-src 'self' 'unsafe-inline'" "CSP: style-src 'self' 'unsafe-inline' missing"
+contains "img-src 'self' data: https:" "CSP: img-src 'self' data: https: missing"
+contains "connect-src 'self' https: wss:" "CSP: connect-src 'self' https: wss: missing"
+contains "object-src none|object-src 'none'" "CSP: object-src 'none' missing"
 
 # HSTS
 contains '"key"\s*:\s*"Strict-Transport-Security"' "HSTS header key missing"
@@ -47,7 +47,7 @@ contains 'strict-origin-when-cross-origin' "Referrer-Policy: strict-origin-when-
 
 # Permissions-Policy
 contains '"key"\s*:\s*"Permissions-Policy"' "Permissions-Policy header key missing"
-contains 'geolocation=\(\), camera=\(\), microphone=\(\)' "Permissions-Policy: geolocation/camera/microphone disabled missing"
+contains "geolocation=\(\), camera=\(\), microphone=\()" "Permissions-Policy: geolocation/camera/microphone disabled missing"
 
 if (( ${#missing[@]} > 0 )); then
   echo "Security headers check: MISSING items detected:" >&2
