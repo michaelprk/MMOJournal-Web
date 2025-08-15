@@ -21,7 +21,6 @@ import { StartHuntModal } from '../../components/shiny/StartHuntModal';
 import { AddPhaseModal } from '../../components/shiny/AddPhaseModal';
 import { EditShinyModal } from '../../components/shiny/EditShinyModal';
 import CompletionModal from '../../components/CompletionModal';
-import { Footer } from '../../components/layout/Footer';
 
 
 
@@ -725,8 +724,6 @@ export default function ShinyShowcase() {
         </section>
       </main>
       
-      {/* Footer at bottom of scroll area */}
-      <Footer />
       </div> {/* Close scroll container */}
 
       {/* Start Hunt Modal (Supabase-backed, PVP modal pattern) */}

@@ -69,8 +69,8 @@ export function MainLayout() {
         <Outlet />
       </main>
 
-      {/* Footer only shows on pages that don't have scroll containers */}
-      {location.pathname !== "/pvp" && location.pathname !== "/shiny-hunt" && <Footer />}
+      {/* Footer rendered once by layout */}
+      <Footer />
     </div>
   );
 }

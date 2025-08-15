@@ -14,7 +14,6 @@ import { TeamManager } from '../../components/TeamManager';
 
 import { AddPokemonModal } from '../../components/AddPokemonModal';
 import { ExportModal } from '../../components/ExportModal';
-import { Footer } from '../../components/layout/Footer';
 
 
 
@@ -754,8 +753,6 @@ export default function PVPPage() {
           </div>
         </div>
         
-        {/* Footer at bottom of scroll area */}
-        <Footer />
       </div> {/* Close scroll container */}
 
       {/* Add/Edit Modal */}
