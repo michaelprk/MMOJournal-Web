@@ -1,7 +1,7 @@
 import { Outlet } from "react-router";
 import { ScrollToTop } from "../components/ScrollToTop";
 
-export function AuthLayout() {
+export default function AuthLayout() {
   return (
     <>
       <ScrollToTop />

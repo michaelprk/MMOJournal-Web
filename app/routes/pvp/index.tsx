@@ -529,6 +529,7 @@ export default function PVPPage() {
         </div>
       </div>
 
+
       {/* Scrollable content area that starts below utility bar */}
       <div 
         style={{

@@ -77,6 +77,13 @@ export default function App() {
 
   const hideBackground = location.pathname === "/damage-calc" && plainDamageCalcBg;
 
+  // Ensure any modal-open state is cleared on route changes so navbar/footer remain interactive
+  useEffect(() => {
+    try {
+      document.body.classList.remove('modal-open');
+    } catch {}
+  }, [location.pathname]);
+
   return (
     <AuthProvider>
       <BackgroundProvider>

@@ -5,7 +5,7 @@ import { AuthBar } from "../components/AuthBar";
 import { Footer } from "../components/layout/Footer";
 import { ScrollToTop } from "../components/ScrollToTop";
 
-export function MainLayout() {
+export default function MainLayout() {
   const location = useLocation();
   const [plainDamageCalcBg, setPlainDamageCalcBg] = useState(false);
 

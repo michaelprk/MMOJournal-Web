@@ -726,6 +726,7 @@ export default function ShinyShowcase() {
       
       </div> {/* Close scroll container */}
 
+
       {/* Start Hunt Modal (Supabase-backed, PVP modal pattern) */}
       {showPausedModal && createPortal(
         <div
