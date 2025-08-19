@@ -113,6 +113,7 @@ export default function MainLayout() {
           paddingTop: 'var(--nav-h)',
           paddingBottom: 0,
           backdropFilter: "none",
+          overflowAnchor: 'none',
         }}
       >
         <Outlet />

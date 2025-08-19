@@ -59,9 +59,13 @@ export default function ShinyShowcase() {
   // Start at the very top of the scroll pane on mount
   useLayoutEffect(() => {
     const el = scrollPaneRef.current;
-    if (el) {
-      try { el.scrollTo({ top: 0 }); } catch { el.scrollTop = 0; }
-    }
+    if (!el) return;
+    const reset = () => { try { el.scrollTo({ top: 0, left: 0 }); } catch { el.scrollTop = 0; } };
+    reset();
+    // Run again after next frame and shortly after mount to defeat scroll anchoring
+    requestAnimationFrame(reset);
+    const t = setTimeout(reset, 60);
+    return () => clearTimeout(t);
   }, []);
   
   // View mode state  
@@ -515,7 +519,7 @@ export default function ShinyShowcase() {
           zIndex: 1,
         }}
       >
-        <div ref={scrollPaneRef} data-route-scrollpane="true" style={{ height: '100%', overflowY: 'auto' }}>
+        <div ref={scrollPaneRef} data-route-scrollpane="true" style={{ height: '100%', overflowY: 'auto', overflowAnchor: 'none' }}>
           <main 
             style={{ 
               maxWidth: '1400px',
