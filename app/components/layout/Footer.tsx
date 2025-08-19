@@ -1,8 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { useBackground } from "../../contexts/BackgroundContext";
 
 export function Footer() {
   const { random, setById, setSolid, manifest } = useBackground();
+  const location = useLocation();
   const [openMenu, setOpenMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
   const menuButtonRef = useRef<HTMLButtonElement | null>(null);
@@ -70,10 +72,12 @@ export function Footer() {
     return () => document.removeEventListener("keydown", onKey, true);
   }, [openMenu]);
 
+  const isLegal = location.pathname === "/privacy" || location.pathname === "/tos";
+
   const footerStyle: React.CSSProperties = {
     position: "relative",
     padding: "12px 16px",
-    background: "transparent",
+    background: isLegal ? "rgba(0,0,0,0.7)" : "transparent",
     color: "white",
   };
 
@@ -101,22 +105,7 @@ export function Footer() {
     <div style={{ position: "relative", zIndex: 2 }}>
       <footer style={footerStyle}>
         <div style={containerStyle}>
-          {/* Left: Logo + Tagline */}
-          <div style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 0 }}>
-            <img src="/images/MMOJournal_logo.svg" alt="MMOJournal" style={{ height: 40 }} />
-            <div style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", color: "#ccc", fontSize: 12 }}>
-              MMOJournal — Competitive builds, shiny tracking, and more.
-            </div>
-          </div>
-
-          {/* Center: Links */}
-          <nav aria-label="Legal" style={{ display: "flex", alignItems: "center", gap: 16, fontSize: 12 }}>
-            <a href="/privacy" style={{ color: "#ffcb05", textDecoration: "none" }}>Privacy Policy</a>
-            <a href="/tos" style={{ color: "#ffcb05", textDecoration: "none" }}>Terms of Service</a>
-            <a href="mailto:support@mmojournal.app" style={{ color: "#ffcb05", textDecoration: "none" }}>Contact</a>
-          </nav>
-
-          {/* Right: Change Background button */}
+          {/* Left: Change Background */}
           <div>
             <button
               ref={menuButtonRef}
@@ -132,6 +121,18 @@ export function Footer() {
             >
               Change background
             </button>
+          </div>
+
+          {/* Center: Links */}
+          <nav aria-label="Legal" style={{ display: "flex", alignItems: "center", gap: 16, fontSize: 12 }}>
+            <a href="/privacy" style={{ color: "#ffcb05", textDecoration: "none" }}>Privacy Policy</a>
+            <a href="/tos" style={{ color: "#ffcb05", textDecoration: "none" }}>Terms of Service</a>
+            <a href="mailto:support@mmojournal.app" style={{ color: "#ffcb05", textDecoration: "none" }}>Contact</a>
+          </nav>
+
+          {/* Right: Tagline */}
+          <div style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", color: "#ccc", fontSize: 12 }}>
+            MMOJournal — Competitive builds, shiny tracking, and more.
           </div>
         </div>
       </footer>
