@@ -4,7 +4,7 @@ export default function Privacy() {
   return (
     <div style={{ position: 'fixed', inset: 0, display: 'flex', flexDirection: 'column' }}>
       {/* Spacer to keep content below navbar */}
-      <div style={{ height: '200px', flex: '0 0 auto' }} />
+      <div style={{ height: '300px', flex: '0 0 auto' }} />
       {/* Scroll pane */}
       <div style={{ flex: 1, overflowY: 'auto' }}>
         <div style={{ maxWidth: '900px', margin: '0 auto 80px', padding: '0 16px' }}>
