@@ -119,7 +119,7 @@ export function Navbar() {
               }
             }}
           >
-            competitive compendium
+            PvP Builds
           </NavLink>
 
           <div style={{ 
