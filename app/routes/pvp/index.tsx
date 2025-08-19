@@ -34,25 +34,6 @@ export default function PVPPage() {
   const [currentSort, setCurrentSort] = useState<'tier' | 'name' | 'type' | 'newest' | 'oldest'>('tier');
   const [showExportModal, setShowExportModal] = useState(false);
   const [exportingPokemon, setExportingPokemon] = useState<PokemonBuild | undefined>();
-  
-  // Set page sticky height variable for layout offset
-  useEffect(() => {
-    const root = document.documentElement;
-    const sticky = document.getElementById('pvp-sticky') as HTMLElement | null;
-    const apply = () => {
-      const h = sticky?.offsetHeight;
-      try { root.style.setProperty('--page-sticky-h', h ? `${h}px` : '250px'); } catch {}
-    };
-    apply();
-    const ro = sticky ? new ResizeObserver(apply) : null;
-    if (sticky && ro) ro.observe(sticky);
-    window.addEventListener('resize', apply);
-    return () => {
-      try { root.style.removeProperty('--page-sticky-h'); } catch {}
-      if (ro && sticky) try { ro.disconnect(); } catch {}
-      window.removeEventListener('resize', apply);
-    };
-  }, []);
 
   // Sort builds by different criteria
   const sortBuilds = (builds: PokemonBuild[], sortBy: 'tier' | 'name' | 'type' | 'newest' | 'oldest') => {
@@ -551,11 +532,7 @@ export default function PVPPage() {
 
 
       {/* Content area (document scrolls; no page-level fixed scroller) */}
-      <div
-        style={{
-          paddingTop: 'calc(var(--nav-h) + var(--page-sticky-h, 250px))',
-        }}
-      >
+      <div>
         <div 
           style={{ 
             maxWidth: '1400px', 
