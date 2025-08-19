@@ -41,7 +41,7 @@ export default function PVPPage() {
     const sticky = document.getElementById('pvp-sticky') as HTMLElement | null;
     const apply = () => {
       const h = sticky?.offsetHeight;
-      try { root.style.setProperty('--page-sticky-h', h ? `${h}px` : '280px'); } catch {}
+      try { root.style.setProperty('--page-sticky-h', h ? `${h}px` : '250px'); } catch {}
     };
     apply();
     const ro = sticky ? new ResizeObserver(apply) : null;
@@ -553,7 +553,7 @@ export default function PVPPage() {
       {/* Content area (document scrolls; no page-level fixed scroller) */}
       <div
         style={{
-          paddingTop: 'calc(var(--nav-h) + var(--page-sticky-h, 280px))',
+          paddingTop: 'calc(var(--nav-h) + var(--page-sticky-h, 250px))',
         }}
       >
         <div 

@@ -146,7 +146,7 @@ export default function ShinyShowcase() {
     const sticky = document.getElementById('shiny-sticky') as HTMLElement | null;
     const apply = () => {
       const h = sticky?.offsetHeight;
-      try { root.style.setProperty('--page-sticky-h', h ? `${h}px` : '280px'); } catch {}
+      try { root.style.setProperty('--page-sticky-h', h ? `${h}px` : '250px'); } catch {}
     };
     apply();
     const ro = sticky ? new ResizeObserver(apply) : null;
@@ -506,7 +506,7 @@ export default function ShinyShowcase() {
       </div>
 
       {/* Content area (document scrolls; no page-level fixed scroller) */}
-      <div style={{ paddingTop: 'calc(var(--nav-h) + var(--page-sticky-h, 280px))' }}>
+      <div style={{ paddingTop: 'calc(var(--nav-h) + var(--page-sticky-h, 250px))' }}>
         <main 
           style={{ 
             maxWidth: '1400px',

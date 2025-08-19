@@ -81,12 +81,8 @@ export default function MainLayout() {
             location.pathname === "/damage-calc"
               ? "transparent"
               : "rgba(0,0,0,0.7)",
-          // No padding needed - using fixed scroll containers for /pvp and /shiny-hunt
-          paddingTop: 
-            location.pathname !== "/pvp" && 
-            location.pathname !== "/shiny-hunt" 
-              ? "200px" 
-              : "0",
+          // Reserve space for the navbar globally so content never underlaps
+          paddingTop: 'var(--nav-h)',
           paddingBottom: 0,
           backdropFilter: "none",
         }}
