@@ -487,7 +487,7 @@ export default function ShinyShowcase() {
       </div>
 
       {/* Content area (document scrolls; no page-level fixed scroller) */}
-      <div>
+      <div style={{ marginTop: 'var(--page-sticky-h, 250px)' }}>
         <main 
           style={{ 
             maxWidth: '1400px',
