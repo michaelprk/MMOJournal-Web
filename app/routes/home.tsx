@@ -63,8 +63,8 @@ export default function Home() {
       {/* Row A — Header & Actions */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div>
-          <div style={{ fontSize: 22, fontWeight: 900, color: '#ffd700' }}>Home</div>
-          <div style={{ fontSize: 12, color: '#ccc' }}>Welcome{user?.id ? `, ${getUsername(user.id)}` : ''}</div>
+          <div style={{ fontSize: 22, fontWeight: 900, color: '#ffd700' }}>Welcome back{user?.id ? `, ${getUsername(user.id)}!` : '!'}
+          </div>
         </div>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'nowrap' }}>
           <button onClick={() => navigate('/shiny-hunt?open=start')} style={btn()}>Start New Hunt</button>
@@ -83,10 +83,10 @@ export default function Home() {
       </div>
 
       {/* Row C — Three equal panels */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, overflow: 'hidden' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, overflow: 'hidden', alignItems: 'start' }}>
         {/* Panel 1: Continuing Hunts (max 4) */}
         <Panel title="Continuing Hunts" rightLinkLabel={hunts.length > 4 ? 'View all' : undefined} onRightLink={() => navigate('/shiny-hunt?view=current')}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8, justifyItems: 'center' }}>
             {loading && Array.from({ length: 4 }).map((_, i) => (
               <Skeleton key={i} height={100} />
             ))}
@@ -112,7 +112,7 @@ export default function Home() {
 
         {/* Panel 2: Recent Finds (max 6, 3x2) */}
         <Panel title="Recent Finds" rightLinkLabel={ytdCompleted.length > 6 ? 'View all' : undefined} onRightLink={() => navigate(`/shiny-hunt?view=showcase&year=${y}`)}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, justifyItems: 'center' }}>
             {loading && Array.from({ length: 6 }).map((_, i) => (
               <Skeleton key={i} height={84} />
             ))}
@@ -138,8 +138,8 @@ export default function Home() {
         </Panel>
 
         {/* Panel 3: PvP — Recent Builds (max 5) */}
-        <Panel title="PvP — Recent Builds" rightLinkLabel={'New Build'} onRightLink={() => navigate('/pvp?open=new')}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <Panel title="PvP — Recent Builds">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'center' }}>
             {loading && Array.from({ length: 5 }).map((_, i) => (
               <Skeleton key={i} height={42} />
             ))}

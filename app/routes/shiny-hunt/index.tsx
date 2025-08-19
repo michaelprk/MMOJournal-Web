@@ -140,6 +140,21 @@ export default function ShinyShowcase() {
     setCompletingHunt(hunt);
     setShowCompletionModal(true);
   };
+  // Auto-open modals via query params from /home
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const open = params.get('open');
+    if (open === 'start') {
+      setShowStartHunt(true);
+      params.delete('open');
+      window.history.replaceState(null, '', `${window.location.pathname}`);
+    } else if (open === 'phase') {
+      // Open AddPhase by selecting a placeholder; show modal without parent if needed
+      setHuntForPhase({ id: 0, pokemonId: 0, pokemonName: '', method: '' } as any);
+      params.delete('open');
+      window.history.replaceState(null, '', `${window.location.pathname}`);
+    }
+  }, []);
 
   const handleCompleteHunt = async (huntId: number, data: {
     nature?: string;

@@ -278,6 +278,23 @@ export default function PVPPage() {
     setShowAddModal(true);
     setShowAddOptions(false);
   };
+  // Auto-open modals via query params from /home
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const open = params.get('open');
+    if (open === 'new') {
+      handleAddNew();
+      params.delete('open');
+      window.history.replaceState(null, '', `${window.location.pathname}`);
+    } else if (open === 'import') {
+      setEditingBuild(undefined);
+      setModalDefaultTab('showdown');
+      setShowAddModal(true);
+      setShowAddOptions(false);
+      params.delete('open');
+      window.history.replaceState(null, '', `${window.location.pathname}`);
+    }
+  }, []);
 
   const handleShowdownImport = () => {
     setEditingBuild(undefined);
