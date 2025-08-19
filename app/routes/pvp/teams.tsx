@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import type { PokemonBuild } from '../../types/pokemon';
 import { PokemonBuildService } from '../../services/supabase';
 import { useAuth } from '../../contexts/AuthContext';
@@ -15,6 +15,7 @@ export default function TeamsPage() {
   const [builds, setBuilds] = useState<PokemonBuild[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [editingTeamId, setEditingTeamId] = useState<string | null>(null);
 
   // Load Pokemon builds
   useEffect(() => {
@@ -78,6 +79,63 @@ export default function TeamsPage() {
   };
 
   const teams = organizeIntoTeams();
+
+  const teamIds = useMemo(() => new Set(teams.map(t => t.id)), [teams]);
+
+  // Sync with URL param (?edit=<teamId>) after data loads
+  useEffect(() => {
+    if (isLoading) return;
+    try {
+      const url = new URL(window.location.href);
+      const editParam = url.searchParams.get('edit');
+      if (editParam) {
+        if (teamIds.has(editParam)) {
+          setEditingTeamId(editParam);
+        } else {
+          // Invalid team id, clear param/state
+          url.searchParams.delete('edit');
+          window.history.replaceState(null, '', url.toString());
+          setEditingTeamId(null);
+        }
+      } else {
+        setEditingTeamId(null);
+      }
+    } catch {}
+  }, [isLoading, teamIds]);
+
+  const openEditTeamName = (teamId: string) => {
+    setEditingTeamId(teamId);
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.set('edit', teamId);
+      window.history.replaceState(null, '', url.toString());
+    } catch {}
+  };
+
+  const closeEditTeamName = () => {
+    setEditingTeamId(null);
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.delete('edit');
+      window.history.replaceState(null, '', url.toString());
+    } catch {}
+  };
+
+  const handleEditTeamName = async (teamId: string, newName: string) => {
+    try {
+      const pokemonInTeam = builds.filter(build => build.team_id === teamId);
+      for (const pokemon of pokemonInTeam) {
+        await PokemonBuildService.updateBuild(pokemon.id, {
+          team_name: newName
+        });
+      }
+      setBuilds(prev => prev.map(b => (b.team_id === teamId ? { ...b, team_name: newName } : b)));
+    } catch (err) {
+      console.error('Failed to update team name:', err);
+    } finally {
+      closeEditTeamName();
+    }
+  };
 
   return (
     <>
@@ -329,6 +387,10 @@ export default function TeamsPage() {
                 teams={teams}
                 onEdit={handleEditBuild}
                 onDelete={handleDeleteBuild}
+                onEditTeamName={handleEditTeamName}
+                editingTeamId={editingTeamId}
+                onRequestEditTeamName={openEditTeamName}
+                onCancelEditTeamName={closeEditTeamName}
               />
             </>
           )}
