@@ -389,11 +389,10 @@ export default function PVPPage() {
     <>
       {/* Sticky Utility Bar - simplified */}
       <div
-        id="pvp-sticky"
         className="sticky z-30 px-4 py-2 flex justify-between items-center bg-black/10 rounded-md shadow-sm"
         style={{
           position: 'sticky',
-          top: 'var(--nav-h)', // below navbar
+          top: '280px', // below navbar
           left: 0,
           right: 0,
           zIndex: 30,
@@ -550,13 +549,19 @@ export default function PVPPage() {
       </div>
 
 
-      {/* Content area (document scrolls; no page-level fixed scroller) */}
-      {/* Scrollable pane starts below sticky utility bar; reserve footer space to avoid last-row overlap */}
-      <div style={{ 
-        position: 'relative',
-        paddingTop: 'var(--page-sticky-h, 250px)',
-        paddingBottom: 'var(--footer-h, 0px)'
-      }}>
+      {/* Scrollable content area that starts below utility bar */}
+      <div
+        style={{
+          position: 'fixed',
+          top: '375px', // Start just below utility bar (280px navbar + ~95px utility bar)
+          left: 0,
+          right: 0,
+          bottom: 0,
+          overflowY: 'auto',
+          overflowX: 'hidden',
+          zIndex: 1,
+        }}
+      >
         <div 
           style={{ 
             maxWidth: '1400px', 
@@ -564,6 +569,7 @@ export default function PVPPage() {
             padding: '1.5rem',
             paddingTop: '5px', // Small breathing room at top of scroll area
             width: '100%',
+            minHeight: '100%', // Ensure content fills the scroll area
           }}
         >
           {/* Main Content Area */}
@@ -766,7 +772,7 @@ export default function PVPPage() {
           )}
           </div>
         </div>
-      </div>
+      </div> {/* Close scroll container */}
 
       {/* Add/Edit Modal */}
       <AddPokemonModal
