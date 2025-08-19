@@ -3,6 +3,7 @@ import type { PokemonBuild } from '../../types/pokemon';
 import { PokemonBuildService } from '../../services/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import { TeamView } from '../../components/TeamView';
+import { PageFooter } from '../../components/layout/PageFooter';
 
 interface Team {
   id: string;
@@ -220,26 +221,27 @@ export default function TeamsPage() {
         </a>
       </div>
 
-      {/* Main Content Container */}
+      {/* Main Content Container with in-pane footer (single instance) */}
       <div
         style={{
           position: 'fixed',
-          top: '380px', // Below header with adjusted spacing
+          top: '380px',
           left: 0,
           right: 0,
-          height: 'calc(100vh - 380px)',
-          backgroundColor: 'transparent',
-          overflowY: 'auto',
-          overflowX: 'hidden',
+          bottom: 0,
+          overflow: 'hidden',
         }}
       >
-        <div style={{ 
-          maxWidth: '1400px', 
-          margin: '0 auto',
-          padding: '1.5rem',
-          minHeight: '100%',
-          width: '100%',
-        }}>
+        <div style={{ height: '100%', overflowY: 'auto' }}>
+          <div style={{ 
+            maxWidth: '1400px', 
+            margin: '0 auto',
+            padding: '1.5rem',
+            width: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            minHeight: '100%'
+          }}>
           {isLoading ? (
             <div style={{ textAlign: 'center', padding: '4rem' }}>
               <div
@@ -392,8 +394,11 @@ export default function TeamsPage() {
                 onRequestEditTeamName={openEditTeamName}
                 onCancelEditTeamName={closeEditTeamName}
               />
+            {/* In-pane footer rendered once, at bottom of content */}
+            <PageFooter />
             </>
           )}
+          </div>
         </div>
       </div>
     </>

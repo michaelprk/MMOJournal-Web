@@ -113,7 +113,7 @@ export default function MainLayout() {
       </main>
 
       {/* Footer rendered once by layout except on routes with in-pane footer */}
-      {!(location.pathname === "/pvp" || location.pathname === "/shiny-hunt") && <Footer />}
+      {!(location.pathname === "/pvp" || location.pathname === "/shiny-hunt" || location.pathname === "/pvp/teams") && <Footer />}
     </div>
   );
 }
