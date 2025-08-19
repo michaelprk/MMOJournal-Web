@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import type { 
   ShinyHunt, 
@@ -44,6 +44,8 @@ export default function ShinyShowcase() {
   const [showPausedModal, setShowPausedModal] = useState(false);
   const [pausedHunts, setPausedHunts] = useState<ShinyHunt[]>([]);
 
+  const scrollPaneRef = useRef<HTMLDivElement | null>(null);
+
   // Ensure paused modal sits above navbar/utility bar and disables navbar interactions
   useEffect(() => {
     if (showPausedModal) {
@@ -54,6 +56,13 @@ export default function ShinyShowcase() {
     return () => { try { document.body.classList.remove('modal-open'); } catch {} };
   }, [showPausedModal]);
 
+  // Start at the very top of the scroll pane on mount
+  useLayoutEffect(() => {
+    const el = scrollPaneRef.current;
+    if (el) {
+      try { el.scrollTo({ top: 0 }); } catch { el.scrollTop = 0; }
+    }
+  }, []);
   
   // View mode state  
   const [huntsViewMode, setHuntsViewMode] = useState<'grid' | 'compact'>('grid');
@@ -341,19 +350,17 @@ export default function ShinyShowcase() {
               paused: true,
             }] as any).concat(prev));
           } else {
-            setCurrentHunts((prev) => ([{
-              id: row.id,
-              pokemonId: row.pokemon_id,
-              pokemonName: row.pokemon_name,
-              method: row.method as any,
-              startDate: (row.start_date || row.created_at) as string,
-              phaseCount: row.phase_count,
-              totalEncounters: row.total_encounters,
-              isCompleted: row.is_completed,
-              phasePokemon: [],
-              createdAt: row.created_at,
-              updatedAt: row.created_at,
-            }] as any).concat(prev));
+            // Update counters live
+            setCurrentHunts((prev) => prev.map((h) => (
+              h.id === row.id
+                ? {
+                    ...h,
+                    phaseCount: row.phase_count,
+                    totalEncounters: row.total_encounters,
+                    updatedAt: row.created_at,
+                  }
+                : h
+            )));
           }
         }
       });
@@ -412,7 +419,7 @@ export default function ShinyShowcase() {
       <div
         style={{
           position: 'sticky',
-          top: '280px',
+          top: 'var(--nav-h)',
           left: 0,
           right: 0,
           zIndex: 30,
@@ -508,13 +515,12 @@ export default function ShinyShowcase() {
           zIndex: 1,
         }}
       >
-        <div style={{ height: '100%', overflowY: 'auto' }}>
+        <div ref={scrollPaneRef} style={{ height: '100%', overflowY: 'auto' }}>
           <main 
             style={{ 
               maxWidth: '1400px',
               margin: '0 auto',
               padding: "2rem",
-              paddingTop: '5px', // Small breathing room at top of scroll area
               minHeight: '100%', // Ensure content fills the scroll area
               display: 'flex',
               flexDirection: 'column',
@@ -799,175 +805,49 @@ export default function ShinyShowcase() {
       <StartHuntModal
         isOpen={showStartHunt}
         onClose={() => setShowStartHunt(false)}
-        onCreated={async () => {
-          try {
-            const fetched = await shinyHuntService.listActive();
-            setCurrentHunts((prev) => {
-              const map = new Map(prev.map((r) => [r.id, r]));
-              for (const r of fetched) {
-                const existing = map.get(r.id);
-                const merged = {
-                  id: r.id,
-                  pokemonId: r.pokemon_id,
-                  pokemonName: r.pokemon_name,
-                  method: r.method as any,
-                  startDate: (r.start_date || r.created_at) as string,
-                  phaseCount: r.phase_count,
-                  totalEncounters: r.total_encounters,
-                  isCompleted: r.is_completed,
-                  region: (r as any).region,
-                  area: (r as any).area,
-                  location: (r as any).location,
-                  rarity: (r as any).rarity,
-                  phasePokemon: existing?.phasePokemon || [],
-                  createdAt: r.created_at,
-                  updatedAt: r.created_at,
-                } as ShinyHunt;
-                map.set(r.id, merged);
-              }
-              const mergedArr = Array.from(map.values()).sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt));
-              if (import.meta?.env?.DEV) console.debug('[merge] active count', mergedArr.length, 'first ids', mergedArr.slice(0, 5).map(x => x.id));
-              return mergedArr;
-            });
-          } catch (e) {
-            console.error('[shiny:list] error after create', e);
-          }
-        }}
-      />
-
-      {/* Edit Hunt Modal (reuse StartHuntModal in edit mode) */}
-      <StartHuntModal
-        isOpen={!!editHunt}
-        onClose={() => setEditHunt(null)}
-        mode="edit"
-        initial={editHunt ? {
-          id: editHunt.id,
-          species: { id: editHunt.pokemonId, name: editHunt.pokemonName },
-          method: editHunt.method as any,
-          location: editHunt.region || editHunt.area ? {
-            label: `${(editHunt.region || 'Unknown Region')} — ${editHunt.area ? String(editHunt.area).toUpperCase() : 'UNKNOWN AREA'}`,
-            value: JSON.stringify({ region: editHunt.region ?? null, area: editHunt.area ?? null }),
-            region: editHunt.region ?? null,
-            area: editHunt.area ?? null,
-            method: editHunt.method as any,
-            rarity: editHunt.rarity ?? null,
-          } : null,
-          startDate: editHunt.startDate,
-          notes: editHunt.notes,
-        } : undefined}
-        onUpdated={async () => {
-          const active = await shinyHuntService.listActive();
-          setCurrentHunts(active.map((r) => ({
-            id: r.id,
-            pokemonId: r.pokemon_id,
-            pokemonName: r.pokemon_name,
-            method: r.method as any,
-            startDate: (r.start_date || r.created_at) as string,
-            phaseCount: r.phase_count,
-            totalEncounters: r.total_encounters,
-            isCompleted: r.is_completed,
-            region: (r as any).region,
-            area: (r as any).area,
-            location: (r as any).location,
-            rarity: (r as any).rarity,
-            phasePokemon: [],
-            createdAt: r.created_at,
-            updatedAt: r.created_at,
-          })));
-          const paused = await shinyHuntService.listPaused();
-          setPausedHunts(paused.map((r) => ({
-            id: r.id,
-            pokemonId: r.pokemon_id,
-            pokemonName: r.pokemon_name,
-            method: r.method as any,
-            startDate: (r.start_date || r.created_at) as string,
-            phaseCount: r.phase_count,
-            totalEncounters: r.total_encounters,
-            isCompleted: r.is_completed,
-            region: (r as any).region,
-            area: (r as any).area,
-            location: (r as any).location,
-            rarity: (r as any).rarity,
-            phasePokemon: [],
-            createdAt: r.created_at,
-            updatedAt: r.created_at,
-            paused: true,
-          })));
-        }}
-      />
-
-      {/* Add Phase Modal (Supabase-backed) */}
-      <AddPhaseModal
-        isOpen={!!huntForPhase}
-        onClose={() => setHuntForPhase(null)}
-        parentHunt={huntForPhase as any || { id: 0, pokemonId: 0, pokemonName: '', method: '', region: null, area: null }}
-        onAdded={async ({ parentId, addedEncounters }) => {
-          // Optimistic update for current hunts list
-          setCurrentHunts((prev) => prev.map((h) => (
-            h.id === parentId
-              ? { ...h, totalEncounters: h.totalEncounters + addedEncounters, phaseCount: h.phaseCount + 1 }
-              : h
-          )));
-
-          // Refresh completed list to include the new phase in portfolio
-          const completed = await shinyHuntService.listCompleted();
-          setPortfolio(completed.map((r: any) => ({
-            id: r.id,
-            pokemonId: r.pokemon_id,
-            pokemonName: r.pokemon_name,
-            method: r.method as any,
-            dateFound: (r.found_at || r.start_date || r.created_at) as string,
-            nature: r.meta?.nature,
-            gender: r.meta?.gender,
-            encounterCount: r.total_encounters,
-            ivs: r.meta?.ivs,
-            is_secret_shiny: r.is_secret_shiny ?? r.meta?.secret_shiny ?? false,
-            is_alpha: r.is_alpha ?? r.meta?.alpha ?? false,
-            createdAt: r.created_at,
-            updatedAt: r.created_at,
-          })) as any);
+        onStart={(data) => {
+          handleCreateHunt({ pokemonId: data.pokemonId, pokemonName: data.pokemonName, method: data.method });
+          setShowStartHunt(false);
         }}
       />
 
       {/* Completion Modal */}
-      <CompletionModal
-        isOpen={showCompletionModal}
-        onClose={() => setShowCompletionModal(false)}
-        hunt={completingHunt}
-        onCompleteHunt={handleCompleteHunt}
-      />
+      {showCompletionModal && (
+        <CompletionModal
+          hunt={completingHunt}
+          onClose={() => { setShowCompletionModal(false); setCompletingHunt(null); }}
+          onComplete={(huntId, data) => handleCompleteHunt(huntId, data)}
+        />
+      )}
 
       {/* Edit Shiny Modal */}
-      <EditShinyModal
-        isOpen={!!editingShiny}
-        onClose={() => setEditingShiny(null)}
-        initial={{
-          id: editingShiny?.id || 0,
-          phase_count: 0,
-          total_encounters: editingShiny?.encounterCount || 0,
-          meta: { ivs: editingShiny?.ivs || (editingShiny as any)?.meta?.ivs, nature: (editingShiny as any)?.nature || (editingShiny as any)?.meta?.nature },
-          pokemonName: editingShiny?.pokemonName || '',
-          pokemonId: editingShiny?.pokemonId
-        }}
-        onSave={async ({ id, phase_count, total_encounters, meta }) => {
-          await shinyHuntService.updateCounters(id, { phase_count, total_encounters });
-          await shinyHuntService.updateMeta(id, meta);
-          // Refresh completed list
-          const completed = await shinyHuntService.listCompleted();
-          setPortfolio(completed.map((r: any) => ({
-            id: r.id,
-            pokemonId: r.pokemon_id,
-            pokemonName: r.pokemon_name,
-            method: r.method as any,
-            dateFound: (r.found_at || r.start_date || r.created_at) as string,
-            nature: r.meta?.nature,
-            encounterCount: r.total_encounters,
-            ivs: r.meta?.ivs,
-            createdAt: r.created_at,
-            updatedAt: r.created_at,
-          })) as any);
-        }}
-      />
+      {editingShiny && (
+        <EditShinyModal
+          shiny={editingShiny}
+          onClose={() => setEditingShiny(null)}
+          onSave={(updated) => {
+            setPortfolio((prev) => prev.map((s) => s.id === updated.id ? updated : s));
+            setEditingShiny(null);
+          }}
+        />
+      )}
+
+      {/* Add Phase Modal */}
+      {huntForPhase && (
+        <AddPhaseModal
+          hunt={huntForPhase}
+          onClose={() => setHuntForPhase(null)}
+          onAddPhase={(encounters) => {
+            handleAddPhaseData({
+              huntId: huntForPhase.id,
+              pokemonId: huntForPhase.pokemonId,
+              pokemonName: huntForPhase.pokemonName,
+              encounters,
+            });
+            setHuntForPhase(null);
+          }}
+        />
+      )}
     </>
   );
 }
