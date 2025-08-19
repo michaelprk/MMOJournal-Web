@@ -10,14 +10,26 @@ export function BackgroundModal({ onClose }: { onClose: () => void }) {
   const dialogRef = useRef<HTMLDivElement | null>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
 
-  const entry = manifest[index] || null;
+  const solidSlide = { id: '__solid__', label: 'Solid Colors' } as const;
+  const slides = [solidSlide, ...manifest];
+  const entry = slides[index] && slides[index] !== solidSlide ? (slides[index] as any) : null;
 
   const go = (delta: number) => setIndex((i) => (manifest.length ? (i + delta + manifest.length) % manifest.length : 0));
   const apply = () => {
     if (entry) {
       setById(entry.id);
-      onClose();
+    } else {
+      // Solid color selection
+      // Map to BackgroundContext solid mode
+      // We only support 'black' and curated names; unknowns map to black
+      const name = solidSelected.name.toLowerCase() as any;
+      if (name === 'black') {
+        (useBackground() as any).setSolid?.('black');
+      } else {
+        (useBackground() as any).setSolid?.(name);
+      }
     }
+    onClose();
   };
 
   useEffect(() => {
@@ -67,6 +79,28 @@ export function BackgroundModal({ onClose }: { onClose: () => void }) {
     );
   }, [entry]);
 
+  const solidPalette: Array<{ name: string; hex: string }> = [
+    { name: 'Black', hex: '#000000' },
+    { name: 'Crimson', hex: '#4a0d17' },
+    { name: 'Red', hex: '#3e0b0b' },
+    { name: 'Orange', hex: '#3b1f08' },
+    { name: 'Amber', hex: '#3a2a0a' },
+    { name: 'Gold', hex: '#3a300a' },
+    { name: 'Olive', hex: '#202a12' },
+    { name: 'Green', hex: '#0f2a18' },
+    { name: 'Teal', hex: '#0e2624' },
+    { name: 'Cyan', hex: '#0b2630' },
+    { name: 'Azure', hex: '#0b2238' },
+    { name: 'Blue', hex: '#0b1e3e' },
+    { name: 'Indigo', hex: '#161a3f' },
+    { name: 'Violet', hex: '#22183e' },
+    { name: 'Purple', hex: '#2a1638' },
+    { name: 'Magenta', hex: '#351431' },
+    { name: 'Fuchsia', hex: '#3a1330' },
+    { name: 'Pink', hex: '#3a1120' },
+  ];
+  const [solidSelected, setSolidSelected] = useState<{ name: string; hex: string }>(solidPalette[0]);
+
   return createPortal(
     <div
       role="dialog"
@@ -83,22 +117,56 @@ export function BackgroundModal({ onClose }: { onClose: () => void }) {
           <div style={{ fontWeight: 800, color: '#ffcb05', textAlign: 'center' }}>Change Background</div>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, justifyContent: 'center' }}>
-          <button onClick={() => go(-1)} aria-label="Previous" style={{ background: 'transparent', color: '#ffcb05', border: '1px solid #ffcb05', borderRadius: 8, padding: '6px 10px', cursor: 'pointer' }}>←</button>
+        <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          {/* Left arrow */}
+          <button
+            onClick={() => go(-1)}
+            aria-label="Previous"
+            style={{
+              position: 'absolute', left: 8, top: '50%', transform: 'translateY(-50%)',
+              width: 36, height: 36, borderRadius: 999,
+              background: 'rgba(0,0,0,0.5)', color: '#ffcb05', border: '1px solid #ffcb05',
+              boxShadow: '0 0 10px rgba(255,203,5,0.25)', cursor: 'pointer',
+              display: 'grid', placeItems: 'center', transition: 'all 120ms ease'
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = '#ffcb05'; e.currentTarget.style.color = '#000'; e.currentTarget.style.transform = 'translateY(-50%) scale(1.08)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(0,0,0,0.5)'; e.currentTarget.style.color = '#ffcb05'; e.currentTarget.style.transform = 'translateY(-50%) scale(1)'; }}
+          >
+            ‹
+          </button>
+
           <div style={{ flex: '0 1 auto', display: 'flex', justifyContent: 'center' }}>
-            {preview}
+            {entry ? preview : (
+              <div style={{ width: '100%', maxWidth: 720, height: 400, borderRadius: 12, border: '2px solid #ffcb05', background: solidSelected.hex }} />
+            )}
           </div>
-          <button onClick={() => go(1)} aria-label="Next" style={{ background: 'transparent', color: '#ffcb05', border: '1px solid #ffcb05', borderRadius: 8, padding: '6px 10px', cursor: 'pointer' }}>→</button>
+
+          {/* Right arrow */}
+          <button
+            onClick={() => go(1)}
+            aria-label="Next"
+            style={{
+              position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)',
+              width: 36, height: 36, borderRadius: 999,
+              background: 'rgba(0,0,0,0.5)', color: '#ffcb05', border: '1px solid #ffcb05',
+              boxShadow: '0 0 10px rgba(255,203,5,0.25)', cursor: 'pointer',
+              display: 'grid', placeItems: 'center', transition: 'all 120ms ease'
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = '#ffcb05'; e.currentTarget.style.color = '#000'; e.currentTarget.style.transform = 'translateY(-50%) scale(1.08)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(0,0,0,0.5)'; e.currentTarget.style.color = '#ffcb05'; e.currentTarget.style.transform = 'translateY(-50%) scale(1)'; }}
+          >
+            ›
+          </button>
         </div>
 
-        <div style={{ textAlign: 'center', marginTop: 10, color: '#ccc' }}>{entry?.label}</div>
+        <div style={{ textAlign: 'center', marginTop: 10, color: '#ccc' }}>{entry ? entry.label : `${solidSelected.name} ${solidSelected.hex}`}</div>
 
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 6, marginTop: 12 }}>
-          {manifest.map((m, i) => (
+          {slides.map((m, i) => (
             <button
-              key={m.id}
+              key={(m as any).id}
               onClick={() => setIndex(i)}
-              title={m.label}
+              title={(m as any).label || 'Solid Colors'}
               style={{
                 width: 10,
                 height: 10,
@@ -110,6 +178,24 @@ export function BackgroundModal({ onClose }: { onClose: () => void }) {
             />
           ))}
         </div>
+
+        {/* Solid color swatches when Solid Colors is selected */}
+        {!entry && (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(56px, 1fr))', gap: 8, marginTop: 12 }}>
+            {solidPalette.map(c => (
+              <button
+                key={c.hex}
+                onClick={() => setSolidSelected(c)}
+                title={`${c.name} ${c.hex}`}
+                style={{
+                  height: 42, borderRadius: 8, border: '1px solid rgba(255,203,5,0.3)', cursor: 'pointer',
+                  outline: c.hex === solidSelected.hex ? '2px solid #ffcb05' : 'none',
+                  background: c.hex
+                }}
+              />
+            ))}
+          </div>
+        )}
 
         <div style={{ display: 'flex', justifyContent: 'center', marginTop: 14 }}>
           <button onClick={apply} style={{ background: '#ffcb05', color: '#000', border: 'none', padding: '8px 14px', borderRadius: 8, fontWeight: 800, cursor: 'pointer' }}>Apply</button>

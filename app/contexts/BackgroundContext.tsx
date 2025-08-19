@@ -3,7 +3,26 @@ import type { BackgroundManifestEntry } from "../assets/backgrounds";
 import { BACKGROUND_MANIFEST } from "../assets/backgrounds";
 
 type BackgroundKind = "image" | "video" | "solid";
-type SolidColor = "black" | "white";
+type SolidColor =
+  | "black"
+  | "white"
+  | "crimson"
+  | "red"
+  | "orange"
+  | "amber"
+  | "gold"
+  | "olive"
+  | "green"
+  | "teal"
+  | "cyan"
+  | "azure"
+  | "blue"
+  | "indigo"
+  | "violet"
+  | "purple"
+  | "magenta"
+  | "fuchsia"
+  | "pink";
 
 export type BackgroundState = {
   kind: BackgroundKind;
@@ -78,7 +97,7 @@ export function BackgroundProvider({ children }: { children: React.ReactNode }) 
   };
 
   const setSolid = (color: SolidColor) => {
-    // Only allow black; map white -> black for backward compatibility
+    // Preserve backward compatibility for deprecated white (map to black)
     const resolved: SolidColor = color === "white" ? "black" : color;
     setState((s) => ({ ...s, kind: "solid", solidColor: resolved }));
   };
