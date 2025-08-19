@@ -485,26 +485,14 @@ export default function ShinyShowcase() {
         </div>
       </div>
 
-      {/* Scrollable content area that starts below utility bar */}
-      <div 
-        style={{
-          position: 'fixed',
-          top: '375px', // Start just below utility bar (280px navbar + ~95px utility bar)
-          left: 0,
-          right: 0,
-          bottom: 0,
-          overflowY: 'auto',
-          overflowX: 'hidden',
-          zIndex: 1,
-        }}
-      >
+      {/* Content area (document scrolls; no page-level fixed scroller) */}
+      <div>
         <main 
           style={{ 
             maxWidth: '1400px',
             margin: '0 auto',
             padding: "2rem",
-            paddingTop: '5px', // Small breathing room at top of scroll area
-            minHeight: '100%', // Ensure content fills the scroll area
+            paddingTop: '5px', // Small breathing room at top
           }}
         >
 
@@ -723,8 +711,7 @@ export default function ShinyShowcase() {
           <ShinyCalendar portfolio={portfolio} onEdit={(row) => setEditingShiny(row)} />
         </section>
       </main>
-      
-      </div> {/* Close scroll container */}
+      </div>
 
 
       {/* Start Hunt Modal (Supabase-backed, PVP modal pattern) */}

@@ -530,19 +530,8 @@ export default function PVPPage() {
       </div>
 
 
-      {/* Scrollable content area that starts below utility bar */}
-      <div 
-        style={{
-          position: 'fixed',
-          top: '375px', // Start just below utility bar (280px navbar + ~95px utility bar)
-          left: 0,
-          right: 0,
-          bottom: 0,
-          overflowY: 'auto',
-          overflowX: 'hidden',
-          zIndex: 1,
-        }}
-      >
+      {/* Content area (document scrolls; no page-level fixed scroller) */}
+      <div>
         <div 
           style={{ 
             maxWidth: '1400px', 
@@ -550,7 +539,6 @@ export default function PVPPage() {
             padding: '1.5rem',
             paddingTop: '5px', // Small breathing room at top of scroll area
             width: '100%',
-            minHeight: '100%', // Ensure content fills the scroll area
           }}
         >
           {/* Main Content Area */}
@@ -753,8 +741,7 @@ export default function PVPPage() {
           )}
           </div>
         </div>
-        
-      </div> {/* Close scroll container */}
+      </div>
 
       {/* Add/Edit Modal */}
       <AddPokemonModal
