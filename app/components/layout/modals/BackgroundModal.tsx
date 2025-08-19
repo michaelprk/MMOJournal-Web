@@ -1,9 +1,11 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { useLocation } from "react-router-dom";
 import { useBackground } from "../../../contexts/BackgroundContext";
 
 export function BackgroundModal({ onClose }: { onClose: () => void }) {
   const { manifest, state, setById } = useBackground();
+  const location = useLocation();
   const [index, setIndex] = useState(() => Math.max(0, manifest.findIndex(m => m.id === state.id)));
   const dialogRef = useRef<HTMLDivElement | null>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
@@ -36,6 +38,10 @@ export function BackgroundModal({ onClose }: { onClose: () => void }) {
 
   const preview = useMemo(() => {
     if (!entry) return null;
+    const videoFilter =
+      location.pathname === "/login" || location.pathname === "/create-account"
+        ? "grayscale(50%) brightness(80%) contrast(95%) blur(4px)"
+        : "grayscale(70%) brightness(40%) contrast(90%) blur(1px)";
     if (entry.type === 'video') {
       return (
         <video
@@ -45,7 +51,7 @@ export function BackgroundModal({ onClose }: { onClose: () => void }) {
           loop
           playsInline
           poster={entry.poster}
-          style={{ width: '100%', maxWidth: 720, borderRadius: 12, border: '2px solid #ffcb05' }}
+          style={{ width: '100%', maxWidth: 720, borderRadius: 12, border: '2px solid #ffcb05', filter: videoFilter }}
         >
           <source src={entry.src} />
         </video>
