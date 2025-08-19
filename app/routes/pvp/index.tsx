@@ -36,24 +36,7 @@ export default function PVPPage() {
   const [showExportModal, setShowExportModal] = useState(false);
   const [exportingPokemon, setExportingPokemon] = useState<PokemonBuild | undefined>();
   
-  // Measure sticky bar height for initial content offset (prevents underlap at top)
-  useEffect(() => {
-    const root = document.documentElement;
-    const sticky = document.getElementById('pvp-sticky') as HTMLElement | null;
-    const apply = () => {
-      const h = sticky?.offsetHeight;
-      try { root.style.setProperty('--page-sticky-h', h ? `${h}px` : '250px'); } catch {}
-    };
-    apply();
-    const ro = sticky ? new ResizeObserver(apply) : null;
-    if (sticky && ro) ro.observe(sticky);
-    window.addEventListener('resize', apply);
-    return () => {
-      try { root.style.removeProperty('--page-sticky-h'); } catch {}
-      if (ro && sticky) try { ro.disconnect(); } catch {}
-      window.removeEventListener('resize', apply);
-    };
-  }, []);
+  // No document-level page-specific CSS variables; any offsets are local to this page's own wrappers
 
   // Sort builds by different criteria
   const sortBuilds = (builds: PokemonBuild[], sortBy: 'tier' | 'name' | 'type' | 'newest' | 'oldest') => {

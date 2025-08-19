@@ -56,6 +56,12 @@ export default function MainLayout() {
   // useEffect(() => { console.log('[MAIN_LAYOUT] mounted'); }, []);
 
   useEffect(() => {
+    // Clear any page-scoped variables that might have been mistakenly applied to root
+    try {
+      const root = document.documentElement;
+      root.style.removeProperty('--page-sticky-h');
+      root.style.removeProperty('--content-offset');
+    } catch {}
     if (location.pathname === "/damage-calc") {
       try {
         const flag = window.localStorage.getItem("damageCalcPlainBg");
