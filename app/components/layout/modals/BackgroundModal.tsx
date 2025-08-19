@@ -9,6 +9,7 @@ export function BackgroundModal({ onClose }: { onClose: () => void }) {
   const [index, setIndex] = useState(() => Math.max(0, manifest.findIndex(m => m.id === state.id)));
   const dialogRef = useRef<HTMLDivElement | null>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
+  const overlayRef = useRef<HTMLDivElement | null>(null);
 
   const solidSlide = { id: '__solid__', label: 'Solid Colors' } as const;
   const slides = [solidSlide, ...manifest];
@@ -21,6 +22,8 @@ export function BackgroundModal({ onClose }: { onClose: () => void }) {
     } else {
       setSolidHex(solidSelected.hex);
     }
+    // Remove temp overlay before closing
+    removeLiveOverlay();
     onClose();
   };
 
@@ -37,6 +40,8 @@ export function BackgroundModal({ onClose }: { onClose: () => void }) {
       document.removeEventListener('keydown', onKey);
       previousFocusRef.current?.focus();
       try { document.body.classList.remove('modal-open'); } catch {}
+      // Cleanup any live overlay on unmount
+      removeLiveOverlay();
     };
   }, [onClose]);
 
@@ -77,26 +82,48 @@ export function BackgroundModal({ onClose }: { onClose: () => void }) {
   }, [entry]);
 
   const solidPalette: Array<{ name: string; hex: string }> = [
-    { name: 'Black', hex: '#000000' },
-    { name: 'Crimson', hex: '#4a0d17' },
-    { name: 'Red', hex: '#3e0b0b' },
-    { name: 'Orange', hex: '#3b1f08' },
-    { name: 'Amber', hex: '#3a2a0a' },
-    { name: 'Gold', hex: '#3a300a' },
-    { name: 'Olive', hex: '#202a12' },
-    { name: 'Green', hex: '#0f2a18' },
-    { name: 'Teal', hex: '#0e2624' },
-    { name: 'Cyan', hex: '#0b2630' },
-    { name: 'Azure', hex: '#0b2238' },
-    { name: 'Blue', hex: '#0b1e3e' },
-    { name: 'Indigo', hex: '#161a3f' },
-    { name: 'Violet', hex: '#22183e' },
-    { name: 'Purple', hex: '#2a1638' },
-    { name: 'Magenta', hex: '#351431' },
-    { name: 'Fuchsia', hex: '#3a1330' },
-    { name: 'Pink', hex: '#3a1120' },
+    { name: 'Black', hex: '#000000' }, { name: 'Crimson', hex: '#4a0d17' }, { name: 'Red', hex: '#3e0b0b' },
+    { name: 'Orange', hex: '#3b1f08' }, { name: 'Amber', hex: '#3a2a0a' }, { name: 'Gold', hex: '#3a300a' },
+    { name: 'Olive', hex: '#202a12' }, { name: 'Green', hex: '#0f2a18' }, { name: 'Teal', hex: '#0e2624' },
+    { name: 'Cyan', hex: '#0b2630' }, { name: 'Azure', hex: '#0b2238' }, { name: 'Blue', hex: '#0b1e3e' },
+    { name: 'Indigo', hex: '#161a3f' }, { name: 'Violet', hex: '#22183e' }, { name: 'Purple', hex: '#2a1638' },
+    { name: 'Magenta', hex: '#351431' }, { name: 'Fuchsia', hex: '#3a1330' }, { name: 'Pink', hex: '#3a1120' },
   ];
   const [solidSelected, setSolidSelected] = useState<{ name: string; hex: string }>(solidPalette[0]);
+
+  // Live preview overlay management (behind modal, not persisted)
+  const ensureLiveOverlay = (hex: string) => {
+    let el = overlayRef.current;
+    if (!el) {
+      el = document.createElement('div');
+      el.setAttribute('data-bg-live-preview', 'true');
+      Object.assign(el.style, {
+        position: 'fixed', inset: '0', zIndex: '9999', pointerEvents: 'none',
+        background: hex,
+      } as Partial<CSSStyleDeclaration>);
+      document.body.appendChild(el);
+      overlayRef.current = el;
+    } else {
+      el.style.background = hex;
+    }
+  };
+  const removeLiveOverlay = () => {
+    const el = overlayRef.current;
+    if (el && el.parentElement) {
+      try { el.parentElement.removeChild(el); } catch {}
+    }
+    overlayRef.current = null;
+  };
+
+  // Keep overlay only for Solid Colors slide and sync with current selection
+  useEffect(() => {
+    if (!entry) {
+      ensureLiveOverlay(solidSelected.hex);
+    } else {
+      removeLiveOverlay();
+    }
+    // Cleanup on slide change/unmount handled in other effect
+  }, [entry, solidSelected.hex]);
 
   return createPortal(
     <div
@@ -133,8 +160,10 @@ export function BackgroundModal({ onClose }: { onClose: () => void }) {
           </button>
 
           <div style={{ flex: '0 1 auto', display: 'flex', justifyContent: 'center' }}>
-            {entry ? preview : (
-              <div style={{ width: '100%', maxWidth: 720, height: 400, borderRadius: 12, border: '2px solid #ffcb05', background: solidSelected.hex }} />
+            {entry ? (
+              preview
+            ) : (
+              <div style={{ width: '100%', maxWidth: 720, borderRadius: 12, border: '2px solid #ffcb05', background: solidSelected.hex, aspectRatio: '16 / 9', minHeight: 200, boxShadow: 'inset 0 0 30px rgba(0,0,0,0.25)' }} />
             )}
           </div>
 
@@ -182,7 +211,9 @@ export function BackgroundModal({ onClose }: { onClose: () => void }) {
             {solidPalette.map(c => (
               <button
                 key={c.hex}
-                onClick={() => setSolidSelected(c)}
+                onClick={() => { setSolidSelected(c); ensureLiveOverlay(c.hex); }}
+                onMouseEnter={() => ensureLiveOverlay(c.hex)}
+                onMouseLeave={() => ensureLiveOverlay(solidSelected.hex)}
                 title={`${c.name} ${c.hex}`}
                 style={{
                   height: 42, borderRadius: 8, border: '1px solid rgba(255,203,5,0.3)', cursor: 'pointer',
