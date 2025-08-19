@@ -99,7 +99,6 @@ export default function Home() {
         </div>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'nowrap' }}>
           <button onClick={() => navigate('/shiny-hunt?open=start')} style={btn()}>Start New Hunt</button>
-          <button onClick={() => navigate('/shiny-hunt?open=phase')} style={btn()}>Add Phase</button>
           <button onClick={() => navigate('/pvp?open=new')} style={btn()}>New PvP Build</button>
           <button onClick={() => navigate('/pvp?open=import')} style={btn()}>Import Pokepaste</button>
         </div>

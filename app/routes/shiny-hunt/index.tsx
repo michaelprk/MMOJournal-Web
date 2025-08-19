@@ -148,11 +148,6 @@ export default function ShinyShowcase() {
       setShowStartHunt(true);
       params.delete('open');
       window.history.replaceState(null, '', `${window.location.pathname}`);
-    } else if (open === 'phase') {
-      // Open AddPhase by selecting a placeholder; show modal without parent if needed
-      setHuntForPhase({ id: 0, pokemonId: 0, pokemonName: '', method: '' } as any);
-      params.delete('open');
-      window.history.replaceState(null, '', `${window.location.pathname}`);
     }
   }, []);
 
