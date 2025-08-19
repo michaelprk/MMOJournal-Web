@@ -54,6 +54,7 @@ export default function MainLayout() {
             location.pathname === "/" ||
             location.pathname === "/home" ||
             location.pathname === "/pvp" ||
+            location.pathname === "/pvp/teams" ||
             location.pathname === "/shiny-hunt" ||
             location.pathname === "/journal" ||
             location.pathname === "/damage-calc"
