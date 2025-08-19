@@ -14,20 +14,12 @@ export function BackgroundModal({ onClose }: { onClose: () => void }) {
   const slides = [solidSlide, ...manifest];
   const entry = slides[index] && slides[index] !== solidSlide ? (slides[index] as any) : null;
 
-  const go = (delta: number) => setIndex((i) => (manifest.length ? (i + delta + manifest.length) % manifest.length : 0));
+  const go = (delta: number) => setIndex((i) => (slides.length ? (i + delta + slides.length) % slides.length : 0));
   const apply = () => {
     if (entry) {
       setById(entry.id);
     } else {
-      // Solid color selection
-      // Map to BackgroundContext solid mode
-      // We only support 'black' and curated names; unknowns map to black
-      const name = solidSelected.name.toLowerCase() as any;
-      if (name === 'black') {
-        (useBackground() as any).setSolid?.('black');
-      } else {
-        (useBackground() as any).setSolid?.(name);
-      }
+      setSolidHex(solidSelected.hex);
     }
     onClose();
   };
