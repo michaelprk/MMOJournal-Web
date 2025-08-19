@@ -30,6 +30,28 @@ export default function MainLayout() {
     };
   }, []);
 
+  // Measure footer height and expose as CSS variable --footer-h so pages can reserve space at bottom
+  useEffect(() => {
+    const root = document.documentElement;
+    const footer = document.querySelector('footer') as HTMLElement | null;
+    if (!footer) {
+      try { root.style.setProperty('--footer-h', '0px'); } catch {}
+      return;
+    }
+    const apply = () => {
+      try { root.style.setProperty('--footer-h', `${footer.offsetHeight}px`); } catch {}
+    };
+    apply();
+    const ro = new ResizeObserver(apply);
+    ro.observe(footer);
+    window.addEventListener('resize', apply);
+    return () => {
+      try { ro.disconnect(); } catch {}
+      window.removeEventListener('resize', apply);
+      try { root.style.removeProperty('--footer-h'); } catch {}
+    };
+  }, []);
+
   // TEMP DIAGNOSTIC (to be removed after verification)
   // useEffect(() => { console.log('[MAIN_LAYOUT] mounted'); }, []);
 

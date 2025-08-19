@@ -486,8 +486,12 @@ export default function ShinyShowcase() {
         </div>
       </div>
 
-      {/* Content area (document scrolls; no page-level fixed scroller) */}
-      <div style={{ marginTop: 'var(--page-sticky-h, 250px)' }}>
+      {/* Content area (document scrolls; pane starts below sticky; reserve footer space) */}
+      <div style={{ 
+        position: 'relative',
+        paddingTop: 'var(--page-sticky-h, 250px)',
+        paddingBottom: 'var(--footer-h, 0px)'
+      }}>
         <main 
           style={{ 
             maxWidth: '1400px',

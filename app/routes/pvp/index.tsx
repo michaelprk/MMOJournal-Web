@@ -551,7 +551,12 @@ export default function PVPPage() {
 
 
       {/* Content area (document scrolls; no page-level fixed scroller) */}
-      <div style={{ paddingTop: 'var(--page-sticky-h, 250px)' }}>
+      {/* Scrollable pane starts below sticky utility bar; reserve footer space to avoid last-row overlap */}
+      <div style={{ 
+        position: 'relative',
+        paddingTop: 'var(--page-sticky-h, 250px)',
+        paddingBottom: 'var(--footer-h, 0px)'
+      }}>
         <div 
           style={{ 
             maxWidth: '1400px', 
