@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import type { PokemonBuild } from '../../types/pokemon';
 import { PokemonBuildService } from '../../services/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import { TeamView } from '../../components/TeamView';
+import { PageFooter } from '../../components/layout/PageFooter';
 
 interface Team {
   id: string;
@@ -15,6 +16,7 @@ export default function TeamsPage() {
   const [builds, setBuilds] = useState<PokemonBuild[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [editingTeamId, setEditingTeamId] = useState<string | null>(null);
 
   // Load Pokemon builds
   useEffect(() => {
@@ -78,6 +80,63 @@ export default function TeamsPage() {
   };
 
   const teams = organizeIntoTeams();
+
+  const teamIds = useMemo(() => new Set(teams.map(t => t.id)), [teams]);
+
+  // Sync with URL param (?edit=<teamId>) after data loads
+  useEffect(() => {
+    if (isLoading) return;
+    try {
+      const url = new URL(window.location.href);
+      const editParam = url.searchParams.get('edit');
+      if (editParam) {
+        if (teamIds.has(editParam)) {
+          setEditingTeamId(editParam);
+        } else {
+          // Invalid team id, clear param/state
+          url.searchParams.delete('edit');
+          window.history.replaceState(null, '', url.toString());
+          setEditingTeamId(null);
+        }
+      } else {
+        setEditingTeamId(null);
+      }
+    } catch {}
+  }, [isLoading, teamIds]);
+
+  const openEditTeamName = (teamId: string) => {
+    setEditingTeamId(teamId);
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.set('edit', teamId);
+      window.history.replaceState(null, '', url.toString());
+    } catch {}
+  };
+
+  const closeEditTeamName = () => {
+    setEditingTeamId(null);
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.delete('edit');
+      window.history.replaceState(null, '', url.toString());
+    } catch {}
+  };
+
+  const handleEditTeamName = async (teamId: string, newName: string) => {
+    try {
+      const pokemonInTeam = builds.filter(build => build.team_id === teamId);
+      for (const pokemon of pokemonInTeam) {
+        await PokemonBuildService.updateBuild(pokemon.id, {
+          team_name: newName
+        });
+      }
+      setBuilds(prev => prev.map(b => (b.team_id === teamId ? { ...b, team_name: newName } : b)));
+    } catch (err) {
+      console.error('Failed to update team name:', err);
+    } finally {
+      closeEditTeamName();
+    }
+  };
 
   return (
     <>
@@ -162,26 +221,27 @@ export default function TeamsPage() {
         </a>
       </div>
 
-      {/* Main Content Container */}
+      {/* Main Content Container with in-pane footer (single instance) */}
       <div
         style={{
           position: 'fixed',
-          top: '380px', // Below header with adjusted spacing
+          top: '380px',
           left: 0,
           right: 0,
-          height: 'calc(100vh - 380px)',
-          backgroundColor: 'transparent',
-          overflowY: 'auto',
-          overflowX: 'hidden',
+          bottom: 0,
+          overflow: 'hidden',
         }}
       >
-        <div style={{ 
-          maxWidth: '1400px', 
-          margin: '0 auto',
-          padding: '1.5rem',
-          minHeight: '100%',
-          width: '100%',
-        }}>
+        <div style={{ height: '100%', overflowY: 'auto' }}>
+          <div style={{ 
+            maxWidth: '1400px', 
+            margin: '0 auto',
+            padding: '1.5rem',
+            width: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            minHeight: '100%'
+          }}>
           {isLoading ? (
             <div style={{ textAlign: 'center', padding: '4rem' }}>
               <div
@@ -329,9 +389,16 @@ export default function TeamsPage() {
                 teams={teams}
                 onEdit={handleEditBuild}
                 onDelete={handleDeleteBuild}
+                onEditTeamName={handleEditTeamName}
+                editingTeamId={editingTeamId}
+                onRequestEditTeamName={openEditTeamName}
+                onCancelEditTeamName={closeEditTeamName}
               />
+            {/* In-pane footer rendered once, at bottom of content */}
+            <PageFooter />
             </>
           )}
+          </div>
         </div>
       </div>
     </>

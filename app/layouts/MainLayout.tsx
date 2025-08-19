@@ -8,11 +8,60 @@ import { ScrollToTop } from "../components/ScrollToTop";
 export default function MainLayout() {
   const location = useLocation();
   const [plainDamageCalcBg, setPlainDamageCalcBg] = useState(false);
+  
+  // Measure navbar height and expose as CSS variable --nav-h
+  useEffect(() => {
+    const root = document.documentElement;
+    const navbar = document.querySelector('.navbar') as HTMLElement | null;
+    if (!navbar) {
+      try { root.style.setProperty('--nav-h', '0px'); } catch {}
+      return;
+    }
+    const apply = () => {
+      try { root.style.setProperty('--nav-h', `${navbar.offsetHeight}px`); } catch {}
+    };
+    apply();
+    const ro = new ResizeObserver(apply);
+    ro.observe(navbar);
+    window.addEventListener('resize', apply);
+    return () => {
+      try { ro.disconnect(); } catch {}
+      window.removeEventListener('resize', apply);
+    };
+  }, []);
+
+  // Measure footer height and expose as CSS variable --footer-h so pages can reserve space at bottom
+  useEffect(() => {
+    const root = document.documentElement;
+    const footer = document.querySelector('footer') as HTMLElement | null;
+    if (!footer) {
+      try { root.style.setProperty('--footer-h', '0px'); } catch {}
+      return;
+    }
+    const apply = () => {
+      try { root.style.setProperty('--footer-h', `${footer.offsetHeight}px`); } catch {}
+    };
+    apply();
+    const ro = new ResizeObserver(apply);
+    ro.observe(footer);
+    window.addEventListener('resize', apply);
+    return () => {
+      try { ro.disconnect(); } catch {}
+      window.removeEventListener('resize', apply);
+      try { root.style.removeProperty('--footer-h'); } catch {}
+    };
+  }, []);
 
   // TEMP DIAGNOSTIC (to be removed after verification)
   // useEffect(() => { console.log('[MAIN_LAYOUT] mounted'); }, []);
 
   useEffect(() => {
+    // Clear any page-scoped variables that might have been mistakenly applied to root
+    try {
+      const root = document.documentElement;
+      root.style.removeProperty('--page-sticky-h');
+      root.style.removeProperty('--content-offset');
+    } catch {}
     if (location.pathname === "/damage-calc") {
       try {
         const flag = window.localStorage.getItem("damageCalcPlainBg");
@@ -54,26 +103,30 @@ export default function MainLayout() {
             location.pathname === "/" ||
             location.pathname === "/home" ||
             location.pathname === "/pvp" ||
+            location.pathname === "/pvp/teams" ||
             location.pathname === "/shiny-hunt" ||
             location.pathname === "/journal" ||
             location.pathname === "/damage-calc"
               ? "transparent"
               : "rgba(0,0,0,0.7)",
-          // No padding needed - using fixed scroll containers for /pvp and /shiny-hunt
-          paddingTop: 
-            location.pathname !== "/pvp" && 
-            location.pathname !== "/shiny-hunt" 
-              ? "200px" 
-              : "0",
+          // Reserve space for the navbar globally so content never underlaps
+          paddingTop: 'var(--nav-h)',
           paddingBottom: 0,
           backdropFilter: "none",
+          overflowAnchor: 'none',
         }}
       >
         <Outlet />
       </main>
 
-      {/* Footer rendered once by layout */}
-      <Footer />
+      {/* Footer rendered once by layout except on routes with in-pane footer */}
+      {!(
+        location.pathname === "/pvp" ||
+        location.pathname === "/shiny-hunt" ||
+        location.pathname === "/pvp/teams" ||
+        location.pathname === "/privacy" ||
+        location.pathname === "/tos"
+      ) && <Footer />}
     </div>
   );
 }

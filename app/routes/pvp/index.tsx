@@ -14,6 +14,7 @@ import { TeamManager } from '../../components/TeamManager';
 
 import { AddPokemonModal } from '../../components/AddPokemonModal';
 import { ExportModal } from '../../components/ExportModal';
+import { PageFooter } from '../../components/layout/PageFooter';
 
 
 
@@ -34,6 +35,8 @@ export default function PVPPage() {
   const [currentSort, setCurrentSort] = useState<'tier' | 'name' | 'type' | 'newest' | 'oldest'>('tier');
   const [showExportModal, setShowExportModal] = useState(false);
   const [exportingPokemon, setExportingPokemon] = useState<PokemonBuild | undefined>();
+  
+  // No document-level page-specific CSS variables; any offsets are local to this page's own wrappers
 
   // Sort builds by different criteria
   const sortBuilds = (builds: PokemonBuild[], sortBy: 'tier' | 'name' | 'type' | 'newest' | 'oldest') => {
@@ -258,6 +261,23 @@ export default function PVPPage() {
     setShowAddModal(true);
     setShowAddOptions(false);
   };
+  // Auto-open modals via query params from /home
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const open = params.get('open');
+    if (open === 'new') {
+      handleAddNew();
+      params.delete('open');
+      window.history.replaceState(null, '', `${window.location.pathname}`);
+    } else if (open === 'import') {
+      setEditingBuild(undefined);
+      setModalDefaultTab('showdown');
+      setShowAddModal(true);
+      setShowAddOptions(false);
+      params.delete('open');
+      window.history.replaceState(null, '', `${window.location.pathname}`);
+    }
+  }, []);
 
   const handleShowdownImport = () => {
     setEditingBuild(undefined);
@@ -531,28 +551,35 @@ export default function PVPPage() {
 
 
       {/* Scrollable content area that starts below utility bar */}
-      <div 
+      <div
         style={{
           position: 'fixed',
-          top: '375px', // Start just below utility bar (280px navbar + ~95px utility bar)
+          top: '375px',
           left: 0,
           right: 0,
           bottom: 0,
-          overflowY: 'auto',
-          overflowX: 'hidden',
+          overflow: 'hidden',
           zIndex: 1,
         }}
       >
-        <div 
-          style={{ 
-            maxWidth: '1400px', 
-            margin: '0 auto',
-            padding: '1.5rem',
-            paddingTop: '5px', // Small breathing room at top of scroll area
-            width: '100%',
-            minHeight: '100%', // Ensure content fills the scroll area
+        <div
+          style={{
+            height: '100%',
+            overflowY: 'auto',
           }}
         >
+          <div 
+            style={{ 
+              maxWidth: '1400px', 
+              margin: '0 auto',
+              padding: '1.5rem',
+              paddingTop: '5px',
+              width: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              minHeight: '100%',
+            }}
+          >
           {/* Main Content Area */}
           <div style={{ width: '100%' }}>
             {/* Top Control Row - ViewToggle, Team Showcase, Sort Filter */}
@@ -751,9 +778,12 @@ export default function PVPPage() {
               )}
             </>
           )}
+          {/* Close Main Content Area wrapper */}
+          </div>
+            {/* Page Footer inside pane */}
+            <PageFooter />
           </div>
         </div>
-        
       </div> {/* Close scroll container */}
 
       {/* Add/Edit Modal */}

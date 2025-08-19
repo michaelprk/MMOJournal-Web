@@ -3,7 +3,26 @@ import type { BackgroundManifestEntry } from "../assets/backgrounds";
 import { BACKGROUND_MANIFEST } from "../assets/backgrounds";
 
 type BackgroundKind = "image" | "video" | "solid";
-type SolidColor = "black" | "white";
+type SolidColor =
+  | "black"
+  | "white"
+  | "crimson"
+  | "red"
+  | "orange"
+  | "amber"
+  | "gold"
+  | "olive"
+  | "green"
+  | "teal"
+  | "cyan"
+  | "azure"
+  | "blue"
+  | "indigo"
+  | "violet"
+  | "purple"
+  | "magenta"
+  | "fuchsia"
+  | "pink";
 
 export type BackgroundState = {
   kind: BackgroundKind;
@@ -11,6 +30,7 @@ export type BackgroundState = {
   solidColor: SolidColor;
   dim: boolean;
   blur: boolean;
+  solidHex?: string;
 };
 
 type BackgroundContextValue = {
@@ -18,6 +38,7 @@ type BackgroundContextValue = {
   setKind: (kind: BackgroundKind) => void;
   setById: (id: string) => void;
   setSolid: (color: SolidColor) => void;
+  setSolidHex: (hex: string) => void;
   reset: () => void;
   next: () => void;
   random: () => void;
@@ -78,9 +99,20 @@ export function BackgroundProvider({ children }: { children: React.ReactNode }) 
   };
 
   const setSolid = (color: SolidColor) => {
-    // Only allow black; map white -> black for backward compatibility
+    // Preserve backward compatibility for deprecated white (map to black)
     const resolved: SolidColor = color === "white" ? "black" : color;
-    setState((s) => ({ ...s, kind: "solid", solidColor: resolved }));
+    const nameToHex: Record<string, string> = {
+      black: "#000000", white: "#000000", // white maps to black
+      crimson: "#4a0d17", red: "#3e0b0b", orange: "#3b1f08", amber: "#3a2a0a",
+      gold: "#3a300a", olive: "#202a12", green: "#0f2a18", teal: "#0e2624",
+      cyan: "#0b2630", azure: "#0b2238", blue: "#0b1e3e", indigo: "#161a3f",
+      violet: "#22183e", purple: "#2a1638", magenta: "#351431", fuchsia: "#3a1330", pink: "#3a1120",
+    };
+    setState((s) => ({ ...s, kind: "solid", solidColor: resolved, solidHex: nameToHex[resolved] || "#000000" }));
+  };
+
+  const setSolidHex = (hex: string) => {
+    setState((s) => ({ ...s, kind: "solid", solidColor: "black", solidHex: hex }));
   };
 
   const next = () => {
@@ -104,6 +136,7 @@ export function BackgroundProvider({ children }: { children: React.ReactNode }) 
       setKind,
       setById,
       setSolid,
+      setSolidHex,
       reset: () => setState(defaultState),
       next,
       random,

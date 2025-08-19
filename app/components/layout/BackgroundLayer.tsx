@@ -21,7 +21,7 @@ export function BackgroundLayer() {
   };
 
   if (state.kind === "solid") {
-    const bg = state.solidColor === "white" ? "#ffffff" : "#000000";
+    const bg = state.solidHex || (state.solidColor === "white" ? "#000000" : "#000000");
     return <div aria-hidden="true" style={{ ...commonStyle, backgroundColor: bg }} />;
   }
 

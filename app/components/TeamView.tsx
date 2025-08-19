@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import type { PokemonBuild } from '../types/pokemon';
 import { TIER_COLORS } from '../types/pokemon';
 import { ExportModal } from './ExportModal';
@@ -15,6 +15,9 @@ interface TeamViewProps {
   onEdit?: (build: PokemonBuild) => void;
   onDelete?: (id: string) => void;
   onEditTeamName?: (teamId: string, newName: string) => void;
+  editingTeamId?: string | null;
+  onRequestEditTeamName?: (teamId: string) => void;
+  onCancelEditTeamName?: () => void;
 }
 
 // Team Name Edit Modal
@@ -27,6 +30,18 @@ function TeamNameEditModal({ isOpen, onClose, team, onSave }: {
   const [newName, setNewName] = useState(team.name);
   const initialName = team.name;
 
+  // Close on Esc key when open
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [isOpen, onClose]);
+
   const handleSave = () => {
     if (newName.trim()) {
       onSave(newName.trim());
@@ -36,6 +51,8 @@ function TeamNameEditModal({ isOpen, onClose, team, onSave }: {
 
   const isDirty = newName !== initialName;
 
+  if (!isOpen) return null;
+
   return (
     <div style={{
       position: 'fixed',
@@ -43,13 +60,13 @@ function TeamNameEditModal({ isOpen, onClose, team, onSave }: {
       left: 0,
       right: 0,
       bottom: 0,
-      backgroundColor: 'rgba(0, 0, 0, 0.95)',
+      backgroundColor: 'rgba(0, 0, 0, 0)',
       zIndex: 10000,
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
       padding: '20px',
-    }}>
+    }} onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
       <div style={{
         background: 'rgba(0, 0, 0, 0.95)',
         border: '2px solid #ffcb05',
@@ -154,7 +171,7 @@ function QuickPokemonEditModal({ isOpen, onClose, pokemon, onSave }: {
       left: 0,
       right: 0,
       bottom: 0,
-      backgroundColor: 'rgba(0, 0, 0, 0.95)',
+      backgroundColor: 'rgba(0, 0, 0, 0)',
       zIndex: 10000,
       display: 'flex',
       alignItems: 'center',
@@ -645,12 +662,15 @@ function PokemonMiniCard({ build, onEdit, onDelete, onQuickEdit }: {
   );
 }
 
-function TeamCard({ team, onEdit, onDelete, onEditTeamName, onQuickEdit }: { 
+function TeamCard({ team, onEdit, onDelete, onEditTeamName, onQuickEdit, editingTeamId, onRequestEditTeamName, onCancelEditTeamName }: { 
   team: Team; 
   onEdit?: (build: PokemonBuild) => void; 
   onDelete?: (id: string) => void; 
   onEditTeamName?: (teamId: string, newName: string) => void;
   onQuickEdit?: (build: PokemonBuild) => void;
+  editingTeamId?: string | null;
+  onRequestEditTeamName?: (teamId: string) => void;
+  onCancelEditTeamName?: () => void;
 }) {
   const [showTeamExportModal, setShowTeamExportModal] = useState(false);
   const [showTeamNameEdit, setShowTeamNameEdit] = useState(false);
@@ -715,7 +735,13 @@ function TeamCard({ team, onEdit, onDelete, onEditTeamName, onQuickEdit }: {
           {/* Edit Team Name Button */}
           {onEditTeamName && (
             <button
-              onClick={() => setShowTeamNameEdit(true)}
+              onClick={() => {
+                if (onRequestEditTeamName) {
+                  onRequestEditTeamName(team.id);
+                } else {
+                  setShowTeamNameEdit(true);
+                }
+              }}
               style={{
                 backgroundColor: 'transparent',
                 border: '1px solid #ffcb05',
@@ -869,8 +895,14 @@ function TeamCard({ team, onEdit, onDelete, onEditTeamName, onQuickEdit }: {
       
       {/* Team Name Edit Modal */}
       <TeamNameEditModal
-        isOpen={showTeamNameEdit}
-        onClose={() => setShowTeamNameEdit(false)}
+        isOpen={editingTeamId ? editingTeamId === team.id : showTeamNameEdit}
+        onClose={() => {
+          if (onCancelEditTeamName) {
+            onCancelEditTeamName();
+          } else {
+            setShowTeamNameEdit(false);
+          }
+        }}
         team={team}
         onSave={handleEditTeamName}
       />
@@ -878,7 +910,7 @@ function TeamCard({ team, onEdit, onDelete, onEditTeamName, onQuickEdit }: {
   );
 }
 
-export function TeamView({ teams, onEdit, onDelete, onEditTeamName }: TeamViewProps) {
+export function TeamView({ teams, onEdit, onDelete, onEditTeamName, editingTeamId, onRequestEditTeamName, onCancelEditTeamName }: TeamViewProps) {
   const [showQuickEdit, setShowQuickEdit] = useState(false);
   const [quickEditPokemon, setQuickEditPokemon] = useState<PokemonBuild | null>(null);
   
@@ -929,6 +961,9 @@ export function TeamView({ teams, onEdit, onDelete, onEditTeamName }: TeamViewPr
             onDelete={onDelete}
             onEditTeamName={onEditTeamName}
             onQuickEdit={handleQuickEdit}
+            editingTeamId={editingTeamId}
+            onRequestEditTeamName={onRequestEditTeamName}
+            onCancelEditTeamName={onCancelEditTeamName}
           />
         ))
       )}
