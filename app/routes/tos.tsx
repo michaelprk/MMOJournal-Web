@@ -1,13 +1,24 @@
-import React from 'react';
+import React, { useLayoutEffect, useRef } from 'react';
 import { PageFooter } from '../components/layout/PageFooter';
 
 export default function Terms() {
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+
+  useLayoutEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const reset = () => { try { el.scrollTo({ top: 0, left: 0 }); } catch { el.scrollTop = 0; } };
+    reset();
+    requestAnimationFrame(reset);
+    const t = setTimeout(reset, 60);
+    return () => clearTimeout(t);
+  }, []);
   return (
     <div style={{ position: 'fixed', inset: 0, display: 'flex', flexDirection: 'column' }}>
       {/* Spacer to keep content below navbar */}
       <div style={{ height: '300px', flex: '0 0 auto' }} />
       {/* Scroll pane */}
-      <div style={{ flex: 1, overflowY: 'auto' }}>
+      <div ref={scrollRef} data-route-scrollpane="true" style={{ flex: 1, overflowY: 'auto', overflowAnchor: 'none' }}>
         <div style={{ maxWidth: '900px', margin: '0 auto 80px', padding: '0 16px' }}>
           <h1 style={{ color: '#ffcb05', fontSize: '2rem', margin: '0 0 12px 0' }}>Terms of Service (MMOJournal)</h1>
           <p style={{ color: '#ccc', margin: '0 0 20px 0' }}>Last updated: 2025</p>
