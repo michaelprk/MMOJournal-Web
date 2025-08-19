@@ -112,8 +112,8 @@ export default function MainLayout() {
         <Outlet />
       </main>
 
-      {/* Footer rendered once by layout */}
-      <Footer />
+      {/* Footer rendered once by layout except on routes with in-pane footer */}
+      {!(location.pathname === "/pvp" || location.pathname === "/shiny-hunt") && <Footer />}
     </div>
   );
 }
