@@ -154,7 +154,7 @@ export const shinyHuntService = {
     return (data || []) as any;
   },
 
-  async updateHunt(id: number, patch: Partial<Pick<ShinyHuntRow, 'method' | 'region' | 'area' | 'location' | 'rarity' | 'start_date' | 'notes'>>): Promise<void> {
+  async updateHunt(id: number, patch: Partial<Pick<ShinyHuntRow, 'method' | 'region' | 'area' | 'location' | 'rarity' | 'start_date'>> & { notes?: string | null }): Promise<void> {
     const { error } = await supabase
       .from('shiny_hunts')
       .update(patch)

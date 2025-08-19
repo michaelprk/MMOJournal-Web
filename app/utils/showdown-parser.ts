@@ -218,12 +218,12 @@ export function buildToShowdownFormat(build: PokemonBuild): string {
   
   // EVs (only include non-zero values)
   const evEntries: string[] = [];
-  if (build.evs.hp > 0) evEntries.push(`${build.evs.hp} HP`);
-  if (build.evs.attack > 0) evEntries.push(`${build.evs.attack} Atk`);
-  if (build.evs.defense > 0) evEntries.push(`${build.evs.defense} Def`);
-  if (build.evs.sp_attack > 0) evEntries.push(`${build.evs.sp_attack} SpA`);
-  if (build.evs.sp_defense > 0) evEntries.push(`${build.evs.sp_defense} SpD`);
-  if (build.evs.speed > 0) evEntries.push(`${build.evs.speed} Spe`);
+  if ((build.evs.hp ?? 0) > 0) evEntries.push(`${build.evs.hp} HP`);
+  if ((build.evs.attack ?? 0) > 0) evEntries.push(`${build.evs.attack} Atk`);
+  if ((build.evs.defense ?? 0) > 0) evEntries.push(`${build.evs.defense} Def`);
+  if ((build.evs.sp_attack ?? 0) > 0) evEntries.push(`${build.evs.sp_attack} SpA`);
+  if ((build.evs.sp_defense ?? 0) > 0) evEntries.push(`${build.evs.sp_defense} SpD`);
+  if ((build.evs.speed ?? 0) > 0) evEntries.push(`${build.evs.speed} Spe`);
   
   if (evEntries.length > 0) {
     lines.push(`EVs: ${evEntries.join(' / ')}`);

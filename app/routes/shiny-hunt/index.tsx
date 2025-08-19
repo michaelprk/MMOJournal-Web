@@ -809,7 +809,7 @@ export default function ShinyShowcase() {
       <StartHuntModal
         isOpen={showStartHunt}
         onClose={() => setShowStartHunt(false)}
-        onStart={(data) => {
+        onCreated={(data: { pokemonId: number; pokemonName: string; method: string; startDate: string; notes?: string }) => {
           handleCreateHunt({ pokemonId: data.pokemonId, pokemonName: data.pokemonName, method: data.method });
           setShowStartHunt(false);
         }}
@@ -819,18 +819,27 @@ export default function ShinyShowcase() {
       {showCompletionModal && (
         <CompletionModal
           hunt={completingHunt}
+          isOpen={showCompletionModal}
           onClose={() => { setShowCompletionModal(false); setCompletingHunt(null); }}
-          onComplete={(huntId, data) => handleCompleteHunt(huntId, data)}
+          onCompleteHunt={(huntId: number, data) => handleCompleteHunt(huntId, data)}
         />
       )}
 
       {/* Edit Shiny Modal */}
       {editingShiny && (
         <EditShinyModal
-          shiny={editingShiny}
+          isOpen={!!editingShiny}
+          initial={{
+            id: editingShiny.id,
+            phase_count: (editingShiny as any).phase_count ?? 1,
+            total_encounters: (editingShiny as any).encounterCount ?? (editingShiny as any).total_encounters ?? 0,
+            meta: (editingShiny as any).meta,
+            pokemonName: editingShiny.pokemonName,
+            pokemonId: editingShiny.pokemonId,
+          }}
           onClose={() => setEditingShiny(null)}
-          onSave={(updated) => {
-            setPortfolio((prev) => prev.map((s) => s.id === updated.id ? updated : s));
+          onSave={async (updated) => {
+            setPortfolio((prev) => prev.map((s) => s.id === updated.id ? { ...s, encounterCount: updated.total_encounters } as any : s));
             setEditingShiny(null);
           }}
         />
@@ -839,14 +848,24 @@ export default function ShinyShowcase() {
       {/* Add Phase Modal */}
       {huntForPhase && (
         <AddPhaseModal
-          hunt={huntForPhase}
+          isOpen={!!huntForPhase}
+          parentHunt={{
+            id: huntForPhase.id,
+            pokemonId: huntForPhase.pokemonId,
+            pokemonName: huntForPhase.pokemonName,
+            method: huntForPhase.method as any,
+            region: (huntForPhase as any).region,
+            area: (huntForPhase as any).area,
+            totalEncounters: huntForPhase.totalEncounters,
+            phaseCount: huntForPhase.phaseCount,
+          }}
           onClose={() => setHuntForPhase(null)}
-          onAddPhase={(encounters) => {
+          onAdded={({ addedEncounters }) => {
             handleAddPhaseData({
               huntId: huntForPhase.id,
               pokemonId: huntForPhase.pokemonId,
               pokemonName: huntForPhase.pokemonName,
-              encounters,
+              encounters: addedEncounters,
             });
             setHuntForPhase(null);
           }}

@@ -9,7 +9,7 @@ export function BackgroundModal({ onClose }: { onClose: () => void }) {
   const [index, setIndex] = useState(() => Math.max(0, manifest.findIndex(m => m.id === state.id)));
   const dialogRef = useRef<HTMLDivElement | null>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
-  const overlayRef = useRef<HTMLDivElement | null>(null);
+  // Removed live preview overlay; background should not change until Apply
 
   const solidSlide = { id: '__solid__', label: 'Solid Colors' } as const;
   const slides = [solidSlide, ...manifest];
@@ -22,8 +22,6 @@ export function BackgroundModal({ onClose }: { onClose: () => void }) {
     } else {
       setSolidHex(solidSelected.hex);
     }
-    // Remove temp overlay before closing
-    removeLiveOverlay();
     onClose();
   };
 
@@ -40,8 +38,7 @@ export function BackgroundModal({ onClose }: { onClose: () => void }) {
       document.removeEventListener('keydown', onKey);
       previousFocusRef.current?.focus();
       try { document.body.classList.remove('modal-open'); } catch {}
-      // Cleanup any live overlay on unmount
-      removeLiveOverlay();
+      // No live overlay to clean up
     };
   }, [onClose]);
 
@@ -91,39 +88,7 @@ export function BackgroundModal({ onClose }: { onClose: () => void }) {
   ];
   const [solidSelected, setSolidSelected] = useState<{ name: string; hex: string }>(solidPalette[0]);
 
-  // Live preview overlay management (behind modal, not persisted)
-  const ensureLiveOverlay = (hex: string) => {
-    let el = overlayRef.current;
-    if (!el) {
-      el = document.createElement('div');
-      el.setAttribute('data-bg-live-preview', 'true');
-      Object.assign(el.style, {
-        position: 'fixed', inset: '0', zIndex: '9999', pointerEvents: 'none',
-        background: hex,
-      } as Partial<CSSStyleDeclaration>);
-      document.body.appendChild(el);
-      overlayRef.current = el;
-    } else {
-      el.style.background = hex;
-    }
-  };
-  const removeLiveOverlay = () => {
-    const el = overlayRef.current;
-    if (el && el.parentElement) {
-      try { el.parentElement.removeChild(el); } catch {}
-    }
-    overlayRef.current = null;
-  };
-
-  // Keep overlay only for Solid Colors slide and sync with current selection
-  useEffect(() => {
-    if (!entry) {
-      ensureLiveOverlay(solidSelected.hex);
-    } else {
-      removeLiveOverlay();
-    }
-    // Cleanup on slide change/unmount handled in other effect
-  }, [entry, solidSelected.hex]);
+  // No live preview overlay; keep background unchanged until Apply
 
   return createPortal(
     <div
@@ -211,9 +176,7 @@ export function BackgroundModal({ onClose }: { onClose: () => void }) {
             {solidPalette.map(c => (
               <button
                 key={c.hex}
-                onClick={() => { setSolidSelected(c); ensureLiveOverlay(c.hex); }}
-                onMouseEnter={() => ensureLiveOverlay(c.hex)}
-                onMouseLeave={() => ensureLiveOverlay(solidSelected.hex)}
+                onClick={() => { setSolidSelected(c); }}
                 title={`${c.name} ${c.hex}`}
                 style={{
                   height: 42, borderRadius: 8, border: '1px solid rgba(255,203,5,0.3)', cursor: 'pointer',
