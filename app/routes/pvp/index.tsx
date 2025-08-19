@@ -34,6 +34,25 @@ export default function PVPPage() {
   const [currentSort, setCurrentSort] = useState<'tier' | 'name' | 'type' | 'newest' | 'oldest'>('tier');
   const [showExportModal, setShowExportModal] = useState(false);
   const [exportingPokemon, setExportingPokemon] = useState<PokemonBuild | undefined>();
+  
+  // Set page sticky height variable for layout offset
+  useEffect(() => {
+    const root = document.documentElement;
+    const sticky = document.getElementById('pvp-sticky') as HTMLElement | null;
+    const apply = () => {
+      const h = sticky?.offsetHeight;
+      try { root.style.setProperty('--page-sticky-h', h ? `${h}px` : '280px'); } catch {}
+    };
+    apply();
+    const ro = sticky ? new ResizeObserver(apply) : null;
+    if (sticky && ro) ro.observe(sticky);
+    window.addEventListener('resize', apply);
+    return () => {
+      try { root.style.removeProperty('--page-sticky-h'); } catch {}
+      if (ro && sticky) try { ro.disconnect(); } catch {}
+      window.removeEventListener('resize', apply);
+    };
+  }, []);
 
   // Sort builds by different criteria
   const sortBuilds = (builds: PokemonBuild[], sortBy: 'tier' | 'name' | 'type' | 'newest' | 'oldest') => {
@@ -370,10 +389,11 @@ export default function PVPPage() {
     <>
       {/* Sticky Utility Bar - simplified */}
       <div
+        id="pvp-sticky"
         className="sticky z-30 px-4 py-2 flex justify-between items-center bg-black/10 rounded-md shadow-sm"
         style={{
           position: 'sticky',
-          top: '280px', // below navbar
+          top: 'var(--nav-h)', // below navbar
           left: 0,
           right: 0,
           zIndex: 30,
@@ -531,7 +551,11 @@ export default function PVPPage() {
 
 
       {/* Content area (document scrolls; no page-level fixed scroller) */}
-      <div>
+      <div
+        style={{
+          paddingTop: 'calc(var(--nav-h) + var(--page-sticky-h, 280px))',
+        }}
+      >
         <div 
           style={{ 
             maxWidth: '1400px', 

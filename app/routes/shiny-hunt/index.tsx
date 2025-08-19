@@ -140,6 +140,25 @@ export default function ShinyShowcase() {
     setShowCompletionModal(true);
   };
 
+  // Set page sticky height variable for layout offset
+  useEffect(() => {
+    const root = document.documentElement;
+    const sticky = document.getElementById('shiny-sticky') as HTMLElement | null;
+    const apply = () => {
+      const h = sticky?.offsetHeight;
+      try { root.style.setProperty('--page-sticky-h', h ? `${h}px` : '280px'); } catch {}
+    };
+    apply();
+    const ro = sticky ? new ResizeObserver(apply) : null;
+    if (sticky && ro) ro.observe(sticky);
+    window.addEventListener('resize', apply);
+    return () => {
+      try { root.style.removeProperty('--page-sticky-h'); } catch {}
+      if (ro && sticky) try { ro.disconnect(); } catch {}
+      window.removeEventListener('resize', apply);
+    };
+  }, []);
+
   const handleCompleteHunt = async (huntId: number, data: {
     nature?: string;
     ivs?: Partial<PokemonStats>;
@@ -399,9 +418,10 @@ export default function ShinyShowcase() {
     <>
       {/* Sticky Utility Bar - positioned outside scrollable container */}
       <div
+        id="shiny-sticky"
         style={{
           position: 'sticky',
-          top: '280px',
+          top: 'var(--nav-h)',
           left: 0,
           right: 0,
           zIndex: 30,
@@ -486,7 +506,7 @@ export default function ShinyShowcase() {
       </div>
 
       {/* Content area (document scrolls; no page-level fixed scroller) */}
-      <div>
+      <div style={{ paddingTop: 'calc(var(--nav-h) + var(--page-sticky-h, 280px))' }}>
         <main 
           style={{ 
             maxWidth: '1400px',

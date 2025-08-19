@@ -8,6 +8,27 @@ import { ScrollToTop } from "../components/ScrollToTop";
 export default function MainLayout() {
   const location = useLocation();
   const [plainDamageCalcBg, setPlainDamageCalcBg] = useState(false);
+  
+  // Measure navbar height and expose as CSS variable --nav-h
+  useEffect(() => {
+    const root = document.documentElement;
+    const navbar = document.querySelector('.navbar') as HTMLElement | null;
+    if (!navbar) {
+      try { root.style.setProperty('--nav-h', '0px'); } catch {}
+      return;
+    }
+    const apply = () => {
+      try { root.style.setProperty('--nav-h', `${navbar.offsetHeight}px`); } catch {}
+    };
+    apply();
+    const ro = new ResizeObserver(apply);
+    ro.observe(navbar);
+    window.addEventListener('resize', apply);
+    return () => {
+      try { ro.disconnect(); } catch {}
+      window.removeEventListener('resize', apply);
+    };
+  }, []);
 
   // TEMP DIAGNOSTIC (to be removed after verification)
   // useEffect(() => { console.log('[MAIN_LAYOUT] mounted'); }, []);
