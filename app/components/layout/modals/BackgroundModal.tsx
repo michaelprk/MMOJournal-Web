@@ -4,7 +4,7 @@ import { useLocation } from "react-router-dom";
 import { useBackground } from "../../../contexts/BackgroundContext";
 
 export function BackgroundModal({ onClose }: { onClose: () => void }) {
-  const { manifest, state, setById } = useBackground();
+  const { manifest, state, setById, setSolidHex } = useBackground();
   const location = useLocation();
   const [index, setIndex] = useState(() => Math.max(0, manifest.findIndex(m => m.id === state.id)));
   const dialogRef = useRef<HTMLDivElement | null>(null);
@@ -181,7 +181,7 @@ export function BackgroundModal({ onClose }: { onClose: () => void }) {
 
         {/* Solid color swatches when Solid Colors is selected */}
         {!entry && (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(56px, 1fr))', gap: 8, marginTop: 12 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(9, 1fr)', gap: 8, marginTop: 12 }}>
             {solidPalette.map(c => (
               <button
                 key={c.hex}
