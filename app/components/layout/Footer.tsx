@@ -90,7 +90,18 @@ export function Footer() {
     gap: 24,
   };
 
-  const buttonStyle: React.CSSProperties = {
+  const triggerStyle: React.CSSProperties = {
+    background: "transparent",
+    color: "inherit",
+    border: "none",
+    padding: 0,
+    borderRadius: 0,
+    cursor: "pointer",
+    outlineOffset: 2,
+    fontSize: 12,
+  };
+
+  const menuItemButtonStyle: React.CSSProperties = {
     background: "transparent",
     color: "inherit",
     border: "1px solid rgba(255,255,255,0.15)",
@@ -117,7 +128,7 @@ export function Footer() {
                 setOpenMenu((v) => !v);
               }}
               onKeyDown={(e) => e.stopPropagation()}
-              style={buttonStyle}
+              style={triggerStyle}
             >
               Change background
             </button>
@@ -127,7 +138,6 @@ export function Footer() {
           <nav aria-label="Legal" style={{ display: "flex", alignItems: "center", gap: 16, fontSize: 12 }}>
             <a href="/privacy" style={{ color: "#ffcb05", textDecoration: "none" }}>Privacy Policy</a>
             <a href="/tos" style={{ color: "#ffcb05", textDecoration: "none" }}>Terms of Service</a>
-            <a href="mailto:support@mmojournal.app" style={{ color: "#ffcb05", textDecoration: "none" }}>Contact</a>
           </nav>
 
           {/* Right: Tagline */}
@@ -156,7 +166,7 @@ export function Footer() {
           }}
         >
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            <button style={buttonStyle} role="menuitem" onClick={() => { random(); setOpenMenu(false); }}>Random</button>
+            <button style={menuItemButtonStyle} role="menuitem" onClick={() => { random(); setOpenMenu(false); }}>Random</button>
             <div style={{ borderTop: "1px solid rgba(255,255,255,0.12)" }} />
             <div style={{ fontSize: 11, color: "#bbb", padding: "2px 2px" }}>Animated</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
@@ -164,7 +174,7 @@ export function Footer() {
                 <button
                   key={m.id}
                   style={{
-                    ...buttonStyle,
+                    ...menuItemButtonStyle,
                     display: "flex",
                     alignItems: "center",
                     gap: 8,
@@ -184,7 +194,7 @@ export function Footer() {
             <div style={{ borderTop: "1px solid rgba(255,255,255,0.12)" }} />
             <div style={{ fontSize: 11, color: "#bbb", padding: "2px 2px" }}>Solid</div>
             <div style={{ display: "flex", gap: 6 }}>
-              <button style={buttonStyle} role="menuitem" onClick={() => { setSolid("black"); setOpenMenu(false); }}>Black</button>
+              <button style={menuItemButtonStyle} role="menuitem" onClick={() => { setSolid("black"); setOpenMenu(false); }}>Black</button>
             </div>
           </div>
         </div>
