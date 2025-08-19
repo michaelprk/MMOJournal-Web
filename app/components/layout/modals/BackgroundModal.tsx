@@ -46,28 +46,33 @@ export function BackgroundModal({ onClose }: { onClose: () => void }) {
       location.pathname === "/login" || location.pathname === "/create-account"
         ? "grayscale(50%) brightness(80%) contrast(95%) blur(4px)"
         : "grayscale(70%) brightness(40%) contrast(90%) blur(1px)";
+    const frameStyle: React.CSSProperties = { width: '100%', maxWidth: 720, borderRadius: 12, border: '2px solid #ffcb05', overflow: 'hidden' };
     if (entry.type === 'video') {
       return (
-        <video
-          key={entry.id}
-          autoPlay
-          muted
-          loop
-          playsInline
-          poster={entry.poster}
-          style={{ width: '100%', maxWidth: 720, borderRadius: 12, border: '2px solid #ffcb05', filter: videoFilter }}
-        >
-          <source src={entry.src} />
-        </video>
+        <div style={frameStyle}>
+          <video
+            key={entry.id}
+            autoPlay
+            muted
+            loop
+            playsInline
+            poster={entry.poster}
+            style={{ display: 'block', width: '100%', height: 'auto', filter: videoFilter }}
+          >
+            <source src={entry.src} />
+          </video>
+        </div>
       );
     }
     return (
-      <img
-        key={entry.id}
-        src={entry.src}
-        alt={entry.label}
-        style={{ width: '100%', maxWidth: 720, borderRadius: 12, border: '2px solid #ffcb05' }}
-      />
+      <div style={frameStyle}>
+        <img
+          key={entry.id}
+          src={entry.src}
+          alt={entry.label}
+          style={{ display: 'block', width: '100%', height: 'auto' }}
+        />
+      </div>
     );
   }, [entry]);
 
