@@ -21,6 +21,7 @@ import { StartHuntModal } from '../../components/shiny/StartHuntModal';
 import { AddPhaseModal } from '../../components/shiny/AddPhaseModal';
 import { EditShinyModal } from '../../components/shiny/EditShinyModal';
 import CompletionModal from '../../components/CompletionModal';
+import { PageFooter } from '../../components/layout/PageFooter';
 
 
 
@@ -493,20 +494,22 @@ export default function ShinyShowcase() {
           left: 0,
           right: 0,
           bottom: 0,
-          overflowY: 'auto',
-          overflowX: 'hidden',
+          overflow: 'hidden',
           zIndex: 1,
         }}
       >
-        <main 
-          style={{ 
-            maxWidth: '1400px',
-            margin: '0 auto',
-            padding: "2rem",
-            paddingTop: '5px', // Small breathing room at top of scroll area
-            minHeight: '100%', // Ensure content fills the scroll area
-          }}
-        >
+        <div style={{ height: '100%', overflowY: 'auto' }}>
+          <main 
+            style={{ 
+              maxWidth: '1400px',
+              margin: '0 auto',
+              padding: "2rem",
+              paddingTop: '5px', // Small breathing room at top of scroll area
+              minHeight: '100%', // Ensure content fills the scroll area
+              display: 'flex',
+              flexDirection: 'column',
+            }}
+          >
 
         {/* Filter and Sort Controls - moved from fixed bar to content area */}
         <div style={{
@@ -722,7 +725,10 @@ export default function ShinyShowcase() {
           
           <ShinyCalendar portfolio={portfolio} onEdit={(row) => setEditingShiny(row)} />
         </section>
+        {/* Page Footer inside pane */}
+        <PageFooter />
       </main>
+        </div>
       </div> {/* Close scroll container */}
 
 
