@@ -115,6 +115,7 @@ export function Footer() {
   return (
     <div style={{ position: "relative", zIndex: 2 }}>
       <footer style={footerStyle}>
+        {/* Row 1: left control, right tagline */}
         <div style={containerStyle}>
           {/* Left: Change Background */}
           <div>
@@ -134,16 +135,18 @@ export function Footer() {
             </button>
           </div>
 
-          {/* Center: Links */}
-          <nav aria-label="Legal" style={{ display: "flex", alignItems: "center", gap: 16, fontSize: 12 }}>
-            <a href="/privacy" style={{ color: "#ffcb05", textDecoration: "none" }}>Privacy Policy</a>
-            <a href="/tos" style={{ color: "#ffcb05", textDecoration: "none" }}>Terms of Service</a>
-          </nav>
-
           {/* Right: Tagline */}
           <div style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", color: "#ccc", fontSize: 12 }}>
             MMOJournal — Competitive builds, shiny tracking, and more.
           </div>
+        </div>
+
+        {/* Row 2: centered legal links */}
+        <div style={{ display: "flex", justifyContent: "center", marginTop: 8 }}>
+          <nav aria-label="Legal" style={{ display: "flex", alignItems: "center", gap: 16, fontSize: 12 }}>
+            <a href="/privacy" style={{ color: "#ffcb05", textDecoration: "none" }}>Privacy Policy</a>
+            <a href="/tos" style={{ color: "#ffcb05", textDecoration: "none" }}>Terms of Service</a>
+          </nav>
         </div>
       </footer>
 
