@@ -778,6 +778,8 @@ export default function PVPPage() {
               )}
             </>
           )}
+          {/* Close Main Content Area wrapper */}
+          </div>
             {/* Page Footer inside pane */}
             <PageFooter />
           </div>
