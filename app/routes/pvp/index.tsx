@@ -551,7 +551,7 @@ export default function PVPPage() {
 
 
       {/* Content area (document scrolls; no page-level fixed scroller) */}
-      <div style={{ marginTop: 'var(--page-sticky-h, 250px)' }}>
+      <div style={{ paddingTop: 'var(--page-sticky-h, 250px)' }}>
         <div 
           style={{ 
             maxWidth: '1400px', 
