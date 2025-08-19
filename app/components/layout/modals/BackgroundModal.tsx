@@ -11,7 +11,12 @@ export function BackgroundModal({ onClose }: { onClose: () => void }) {
   const entry = manifest[index] || null;
 
   const go = (delta: number) => setIndex((i) => (manifest.length ? (i + delta + manifest.length) % manifest.length : 0));
-  const apply = () => { if (entry) setById(entry.id); };
+  const apply = () => {
+    if (entry) {
+      setById(entry.id);
+      onClose();
+    }
+  };
 
   useEffect(() => {
     previousFocusRef.current = document.activeElement as HTMLElement;
