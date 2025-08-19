@@ -117,55 +117,67 @@ export default function Home() {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, overflow: 'hidden', alignItems: 'start' }}>
         {/* Panel 1: Continuing Hunts (max 4) */}
         <Panel title="Continuing Hunts" rightLinkLabel={hunts.length > 4 ? 'View all' : undefined} onRightLink={() => navigate('/shiny-hunt?view=current')}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8, justifyItems: 'center' }}>
-            {loading && Array.from({ length: 4 }).map((_, i) => (
-              <Skeleton key={i} height={100} />
-            ))}
-            {!loading && hunts.slice(0, 4).map((h) => (
-              <button key={h.id} onClick={() => navigate('/shiny-hunt?view=current')} style={cardStyle()}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <img
-                    src={getShinySpritePath(h.pokemon_id as any, h.pokemon_name as any)}
-                    alt={h.pokemon_name as any}
-                    style={{ width: 64, height: 64 }}
-                    onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/images/shiny-sprites/001_Bulbasaur.gif'; }}
-                  />
-                  <div style={{ minWidth: 0 }}>
-                    <div style={{ fontWeight: 800, whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{h.pokemon_name}</div>
-                    <div style={{ color: '#bbb', fontSize: 12, whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{(h as any).region}{(h as any).area ? ` — ${(h as any).area}` : ''}</div>
+          {loading ? (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
+              {Array.from({ length: 4 }).map((_, i) => (<Skeleton key={i} height={100} />))}
+            </div>
+          ) : hunts.length === 0 ? (
+            <div style={{ height: '100%', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Empty text={'No active hunts'} />
+            </div>
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
+              {hunts.slice(0, 4).map((h) => (
+                <button key={h.id} onClick={() => navigate('/shiny-hunt?view=current')} style={cardStyle()}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <img
+                      src={getShinySpritePath(h.pokemon_id as any, h.pokemon_name as any)}
+                      alt={h.pokemon_name as any}
+                      style={{ width: 64, height: 64 }}
+                      onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/images/shiny-sprites/001_Bulbasaur.gif'; }}
+                    />
+                    <div style={{ minWidth: 0 }}>
+                      <div style={{ fontWeight: 800, whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{h.pokemon_name}</div>
+                      <div style={{ color: '#bbb', fontSize: 12, whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{(h as any).region}{(h as any).area ? ` — ${(h as any).area}` : ''}</div>
+                    </div>
                   </div>
-                </div>
-              </button>
-            ))}
-            {!loading && hunts.length === 0 && <Empty text={'No active hunts'} />}
-          </div>
+                </button>
+              ))}
+            </div>
+          )}
         </Panel>
 
         {/* Panel 2: Recent Finds (max 6, 3x2) */}
         <Panel title="Recent Finds" rightLinkLabel={ytdCompleted.length > 6 ? 'View all' : undefined} onRightLink={() => navigate(`/shiny-hunt?view=showcase&year=${y}`)}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, justifyItems: 'center' }}>
-            {loading && Array.from({ length: 6 }).map((_, i) => (
-              <Skeleton key={i} height={84} />
-            ))}
-            {!loading && completed.filter((r: any) => (r as any).is_phase !== true).slice(0, 6).map((r: any) => (
-              <button key={r.id} onClick={() => navigate('/shiny-hunt?view=showcase')} style={cardStyle()}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <img
-                    src={getShinySpritePath(r.pokemon_id as any, r.pokemon_name as any)}
-                    alt={r.pokemon_name as any}
-                    style={{ width: 56, height: 56, outline: (r.is_alpha || r?.meta?.alpha) ? '2px solid #ffd700' : undefined, outlineOffset: (r.is_alpha || r?.meta?.alpha) ? -2 : undefined }}
-                    onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/images/shiny-sprites/001_Bulbasaur.gif'; }}
-                  />
-                  <div style={{ minWidth: 0 }}>
-                    <div style={{ fontWeight: 800, whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{r.pokemon_name}</div>
-                    <div style={{ color: '#bbb', fontSize: 12, whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{new Date(r.found_at || r.created_at).toLocaleDateString()} — {r.method}</div>
+          {loading ? (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
+              {Array.from({ length: 6 }).map((_, i) => (<Skeleton key={i} height={84} />))}
+            </div>
+          ) : ytdCompleted.length === 0 ? (
+            <div style={{ height: '100%', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Empty text={'No finds yet this year'} />
+            </div>
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
+              {completed.filter((r: any) => (r as any).is_phase !== true).slice(0, 6).map((r: any) => (
+                <button key={r.id} onClick={() => navigate('/shiny-hunt?view=showcase')} style={cardStyle()}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <img
+                      src={getShinySpritePath(r.pokemon_id as any, r.pokemon_name as any)}
+                      alt={r.pokemon_name as any}
+                      style={{ width: 56, height: 56, outline: (r.is_alpha || r?.meta?.alpha) ? '2px solid #ffd700' : undefined, outlineOffset: (r.is_alpha || r?.meta?.alpha) ? -2 : undefined }}
+                      onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/images/shiny-sprites/001_Bulbasaur.gif'; }}
+                    />
+                    <div style={{ minWidth: 0 }}>
+                      <div style={{ fontWeight: 800, whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{r.pokemon_name}</div>
+                      <div style={{ color: '#bbb', fontSize: 12, whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{new Date(r.found_at || r.created_at).toLocaleDateString()} — {r.method}</div>
+                    </div>
+                    {(r.is_secret_shiny || r?.meta?.secret_shiny) && <span style={{ marginLeft: 'auto', fontSize: 10, fontWeight: 800, color: '#000', background: '#ffd700', borderRadius: 999, padding: '2px 6px' }}>SECRET</span>}
                   </div>
-                  {(r.is_secret_shiny || r?.meta?.secret_shiny) && <span style={{ marginLeft: 'auto', fontSize: 10, fontWeight: 800, color: '#000', background: '#ffd700', borderRadius: 999, padding: '2px 6px' }}>SECRET</span>}
-                </div>
-              </button>
-            ))}
-            {!loading && ytdCompleted.length === 0 && <Empty text={'No finds yet this year'} />}
-          </div>
+                </button>
+              ))}
+            </div>
+          )}
         </Panel>
 
         {/* Panel 3: PvP — Recent Builds (max 5) */}
