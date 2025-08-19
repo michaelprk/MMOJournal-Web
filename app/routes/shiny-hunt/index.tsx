@@ -515,7 +515,7 @@ export default function ShinyShowcase() {
           zIndex: 1,
         }}
       >
-        <div ref={scrollPaneRef} style={{ height: '100%', overflowY: 'auto' }}>
+        <div ref={scrollPaneRef} data-route-scrollpane="true" style={{ height: '100%', overflowY: 'auto' }}>
           <main 
             style={{ 
               maxWidth: '1400px',
