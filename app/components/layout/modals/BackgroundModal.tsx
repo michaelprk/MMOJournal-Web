@@ -61,15 +61,15 @@ export function BackgroundModal({ onClose }: { onClose: () => void }) {
       role="dialog"
       aria-modal="true"
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
-      style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
+      style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.56)', zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
     >
       <div
         ref={dialogRef}
-        style={{ background: 'rgba(0,0,0,0.95)', border: '2px solid #ffcb05', borderRadius: 12, width: 'min(92vw, 960px)', padding: 16, color: '#fff' }}
+        style={{ background: 'rgba(0,0,0,0.95)', border: '2px solid #ffcb05', borderRadius: 12, width: 'min(92vw, 960px)', padding: 16, color: '#fff', position: 'relative' }}
       >
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-          <div style={{ fontWeight: 800, color: '#ffcb05' }}>Backgrounds</div>
-          <button onClick={onClose} style={{ background: 'transparent', color: '#ffcb05', border: '1px solid #ffcb05', borderRadius: 999, width: 32, height: 32, cursor: 'pointer' }}>✕</button>
+        <button onClick={onClose} aria-label="Close" style={{ background: 'transparent', color: '#ffcb05', border: '1px solid #ffcb05', borderRadius: 999, width: 32, height: 32, cursor: 'pointer', position: 'absolute', top: 12, right: 12 }}>✕</button>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: 12 }}>
+          <div style={{ fontWeight: 800, color: '#ffcb05', textAlign: 'center' }}>Change Background</div>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, justifyContent: 'center' }}>
