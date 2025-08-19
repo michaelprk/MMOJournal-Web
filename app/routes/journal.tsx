@@ -1,40 +1,42 @@
 import { Link } from "react-router-dom";
 
 export default function JournalComingSoon() {
-  const navbarApproxHeightPx = 180; // approximate space taken by fixed navbar/logo cluster
-
   return (
     <div
-      className="w-full overflow-auto"
-      style={{ height: "100vh", paddingTop: `${navbarApproxHeightPx}px` }}
+      className="w-full"
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: 'calc(100vh - var(--nav-h) - var(--footer-h, 0px))',
+        overflow: 'hidden',
+        paddingLeft: 24,
+        paddingRight: 24,
+      }}
     >
-      <div
-        className="flex items-start justify-center px-6"
-        style={{ minHeight: `calc(100vh - ${navbarApproxHeightPx}px)` }}
-      >
-        <div className="text-center animate-fadeIn">
-          <img
-            src="/images/MMOJournal_logo.svg"
-            alt="MMO Journal"
-            className="mx-auto mb-6 w-[350px] max-w-[70vw] h-auto drop-shadow-[0_0_20px_rgba(255,203,5,0.25)]"
-          />
+      <div className="text-center animate-fadeIn">
+        <img
+          src="/images/MMOJournal_logo.svg"
+          alt="MMO Journal"
+          className="mx-auto mb-6 w-[350px] max-w-[70vw] h-auto drop-shadow-[0_0_20px_rgba(255,203,5,0.25)]"
+        />
 
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-            Journal Page
-          </h1>
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+          Journal Page
+        </h1>
 
-          <p className="mt-3 text-white/70 text-base sm:text-lg animate-slowPulse">
-            Coming Soon
-          </p>
+        <p className="mt-3 text-white/70 text-base sm:text-lg animate-slowPulse">
+          Coming Soon
+        </p>
 
-          <div className="mt-8">
-            <Link
-              to="/home"
-              className="inline-flex items-center gap-2 rounded-full bg-[#ffcb05] px-6 py-2.5 text-black font-semibold shadow-md transition-transform transition-colors duration-200 hover:scale-105 hover:bg-[#e6b800] focus:outline-none focus:ring-2 focus:ring-[#ffcb05]/40"
-            >
-              Back to Home
-            </Link>
-          </div>
+        <div className="mt-8">
+          <Link
+            to="/home"
+            className="inline-flex items-center gap-2 rounded-full bg-[#ffcb05] px-6 py-2.5 text-black font-semibold shadow-md transition-transform transition-colors duration-200 hover:scale-105 hover:bg-[#e6b800] focus:outline-none focus:ring-2 focus:ring-[#ffcb05]/40"
+          >
+            Back to Home
+          </Link>
         </div>
       </div>
 

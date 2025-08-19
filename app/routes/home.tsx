@@ -83,7 +83,7 @@ export default function Home() {
       gridTemplateRows: '56px 72px 1fr',
       gap: 10,
       overflow: 'hidden',
-      paddingTop: 200,
+      paddingTop: 130,
     }}>
       {/* Row A — Header & Actions */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
