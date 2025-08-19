@@ -10,7 +10,14 @@ export interface PokemonBuild {
   item?: string | null;
   moves: string[];
   ivs: PokemonStats;
-  evs: PokemonStats;
+  evs: Partial<PokemonStats>;
+  // Back-compat flattened EV fields that might exist on some sources
+  hpEV?: number;
+  attackEV?: number;
+  defenseEV?: number;
+  spAttackEV?: number;
+  spDefenseEV?: number;
+  speedEV?: number;
   description?: string | null;
   showdown_import?: string | null;
   team_id?: string | null;

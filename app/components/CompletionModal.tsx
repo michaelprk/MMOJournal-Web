@@ -55,7 +55,7 @@ export default function CompletionModal({
     alpha: false
   };
 
-  const handleInputChange = (field: string, value: string | number) => {
+  const handleInputChange = (field: string, value: string | number | boolean) => {
     setCompletionData(prev => ({
       ...prev,
       [field]: value

@@ -1,0 +1,21 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "app/**/*",
+    "types/**/*",
+    "vite.config.*",
+    "tailwind.config.*",
+    "vercel.json",
+    ".react-router/types/**/*"
+  ],
+  "exclude": [
+    "backend/**",
+    "node_modules/**",
+    "build/**"
+  ],
+  "compilerOptions": {
+    "noEmit": true
+  }
+}
+
+

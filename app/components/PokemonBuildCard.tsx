@@ -942,7 +942,7 @@ export function PokemonBuildCard({ build, onEdit, onDelete, onExport }: PokemonB
                   { label: 'SPD', value: build.evs.sp_defense, icon: '🔰' },
                   { label: 'SPE', value: build.evs.speed, icon: '⚡' },
                 ].map((stat, index) => {
-                  const percentage = (stat.value / 252) * 100;
+                  const percentage = (Number(stat.value || 0) / 252) * 100;
                   return (
                     <div key={index} style={{ 
                       position: 'relative',

@@ -386,7 +386,7 @@ const getPokemonTypes = (speciesName: string): string[] => {
 };
 
 // Gender Icon Component
-function GenderIcon({ gender }: { gender?: 'M' | 'F' | 'U' }) {
+function GenderIcon({ gender }: { gender?: 'M' | 'F' | 'U' | null }) {
   if (!gender) return null;
   
   const getGenderDisplay = () => {

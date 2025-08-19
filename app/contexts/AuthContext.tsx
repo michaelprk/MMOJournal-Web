@@ -25,7 +25,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     (async () => {
       const { data } = await supabase.auth.getUser();
       if (!isMounted) return;
-      const authedUser = data.user ? { id: data.user.id, email: data.user.email } : null;
+      const authedUser = data.user ? { id: data.user.id, email: data.user.email ?? null } : null;
       setUser(authedUser);
       setInitializing(false);
       if (authedUser) {
@@ -34,7 +34,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     })();
 
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ? { id: session.user.id, email: session.user.email } : null);
+      setUser(session?.user ? { id: session.user.id, email: session.user.email ?? null } : null);
     });
     return () => {
       isMounted = false;
