@@ -2,12 +2,8 @@ import React from 'react';
 
 export default function Terms() {
   return (
-    <div style={{ position: 'fixed', inset: 0, display: 'flex', flexDirection: 'column' }}>
-      {/* Spacer to keep content below navbar */}
-      <div style={{ height: '300px', flex: '0 0 auto' }} />
-      {/* Scroll pane */}
-      <div style={{ flex: 1, overflowY: 'auto' }}>
-        <div style={{ maxWidth: '900px', margin: '0 auto 80px', padding: '0 16px' }}>
+    <div>
+      <div style={{ maxWidth: '900px', margin: '0 auto', padding: '0 16px 24px' }}>
           <h1 style={{ color: '#ffcb05', fontSize: '2rem', margin: '0 0 12px 0' }}>Terms of Service (MMOJournal)</h1>
           <p style={{ color: '#ccc', margin: '0 0 20px 0' }}>Last updated: 2025</p>
 
@@ -59,7 +55,6 @@ export default function Terms() {
               If you have any questions or queries, feel free to whisper or mail “PRK” in PokéMMO.
             </p>
           </section>
-        </div>
       </div>
     </div>
   );
