@@ -79,7 +79,7 @@ export function Footer() {
   const footerStyle: React.CSSProperties = {
     position: "relative",
     padding: "12px 16px",
-    background: isLegal ? "rgba(0,0,0,0.7)" : "transparent",
+    background: isLegal ? "transparent" : "transparent",
     color: "white",
   };
 
