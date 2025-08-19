@@ -1,11 +1,13 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useBackground } from "../../contexts/BackgroundContext";
+import { BackgroundModal } from "./modals/BackgroundModal";
 
 export function Footer() {
   const { random, setById, setSolid, manifest } = useBackground();
   const location = useLocation();
   const [openMenu, setOpenMenu] = useState(false);
+  const [openModal, setOpenModal] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
   const menuButtonRef = useRef<HTMLButtonElement | null>(null);
 
@@ -122,11 +124,11 @@ export function Footer() {
             <button
               ref={menuButtonRef}
               type="button"
-              aria-haspopup="menu"
-              aria-expanded={openMenu}
+              aria-haspopup="dialog"
+              aria-expanded={openModal}
               onClick={(e) => {
                 e.stopPropagation();
-                setOpenMenu((v) => !v);
+                setOpenModal(true);
               }}
               onKeyDown={(e) => e.stopPropagation()}
               style={triggerStyle}
@@ -150,57 +152,8 @@ export function Footer() {
         </div>
       </footer>
 
-      {openMenu && (
-        <div
-          ref={menuRef}
-          role="menu"
-          aria-label="Background menu"
-          style={{
-            position: "absolute",
-            right: 16,
-            bottom: "calc(100% + 8px)",
-            width: 320,
-            background: "rgba(0,0,0,0.9)",
-            border: "1px solid rgba(255,255,255,0.15)",
-            borderRadius: 8,
-            padding: 8,
-            color: "white",
-            zIndex: 2,
-          }}
-        >
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            <button style={menuItemButtonStyle} role="menuitem" onClick={() => { random(); setOpenMenu(false); }}>Random</button>
-            <div style={{ borderTop: "1px solid rgba(255,255,255,0.12)" }} />
-            <div style={{ fontSize: 11, color: "#bbb", padding: "2px 2px" }}>Animated</div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-              {manifest.filter((m) => m.type === "video").map((m) => (
-                <button
-                  key={m.id}
-                  style={{
-                    ...menuItemButtonStyle,
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 8,
-                    border: "1px solid rgba(255,255,255,0.15)",
-                    borderRadius: 6,
-                    padding: 6,
-                  }}
-                  onClick={() => { setById(m.id); setOpenMenu(false); }}
-                >
-                  <div style={{ width: 56, height: 36, background: "#111", borderRadius: 4, display: "grid", placeItems: "center" }}>
-                    <span style={{ fontSize: 10, opacity: 0.8 }}>video</span>
-                  </div>
-                  <span style={{ fontSize: 12, whiteSpace: "nowrap", textOverflow: "ellipsis", overflow: "hidden" }}>{m.label}</span>
-                </button>
-              ))}
-            </div>
-            <div style={{ borderTop: "1px solid rgba(255,255,255,0.12)" }} />
-            <div style={{ fontSize: 11, color: "#bbb", padding: "2px 2px" }}>Solid</div>
-            <div style={{ display: "flex", gap: 6 }}>
-              <button style={menuItemButtonStyle} role="menuitem" onClick={() => { setSolid("black"); setOpenMenu(false); }}>Black</button>
-            </div>
-          </div>
-        </div>
+      {openModal && (
+        <BackgroundModal onClose={() => setOpenModal(false)} />
       )}
     </div>
   );
