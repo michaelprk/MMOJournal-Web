@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useBackground } from "../../../contexts/BackgroundContext";
 
 export function BackgroundModal({ onClose }: { onClose: () => void }) {
@@ -14,6 +15,7 @@ export function BackgroundModal({ onClose }: { onClose: () => void }) {
 
   useEffect(() => {
     previousFocusRef.current = document.activeElement as HTMLElement;
+    try { document.body.classList.add('modal-open'); } catch {}
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
       if (e.key === 'ArrowLeft') go(-1);
@@ -23,6 +25,7 @@ export function BackgroundModal({ onClose }: { onClose: () => void }) {
     return () => {
       document.removeEventListener('keydown', onKey);
       previousFocusRef.current?.focus();
+      try { document.body.classList.remove('modal-open'); } catch {}
     };
   }, [onClose]);
 
@@ -53,7 +56,7 @@ export function BackgroundModal({ onClose }: { onClose: () => void }) {
     );
   }, [entry]);
 
-  return (
+  return createPortal(
     <div
       role="dialog"
       aria-modal="true"
@@ -101,7 +104,8 @@ export function BackgroundModal({ onClose }: { onClose: () => void }) {
           <button onClick={apply} style={{ background: '#ffcb05', color: '#000', border: 'none', padding: '8px 14px', borderRadius: 8, fontWeight: 800, cursor: 'pointer' }}>Apply</button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 
