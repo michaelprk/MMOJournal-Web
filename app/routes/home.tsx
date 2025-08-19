@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '../services/supabase';
 import { shinyHuntService } from '../services/shinyHuntService';
 import type { ShinyHuntRow } from '../services/shinyHuntService';
 import { PokemonBuildService } from '../services/supabase';
@@ -38,6 +39,30 @@ export default function Home() {
   }, [user, initializing, navigate]);
 
   const y = new Date().getFullYear();
+  const [profileUsername, setProfileUsername] = useState<string | null>(null);
+  const [profileLoading, setProfileLoading] = useState(false);
+
+  useEffect(() => {
+    let ignore = false;
+    (async () => {
+      if (!user?.id) return;
+      setProfileLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('username')
+          .eq('user_id', user.id)
+          .maybeSingle();
+        if (error) throw error;
+        if (!ignore) setProfileUsername(data?.username ?? null);
+      } catch {
+        if (!ignore) setProfileUsername(null);
+      } finally {
+        if (!ignore) setProfileLoading(false);
+      }
+    })();
+    return () => { ignore = true; };
+  }, [user?.id]);
   const ytdCompleted = useMemo(() => completed.filter((r: any) => {
     const d = new Date(r.found_at || r.created_at);
     return d.getFullYear() === y && (r as any).is_phase !== true;
@@ -63,7 +88,13 @@ export default function Home() {
       {/* Row A — Header & Actions */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div>
-          <div style={{ fontSize: 22, fontWeight: 900, color: '#ffd700' }}>Welcome back{user?.id ? `, ${getUsername(user.id)}!` : '!'}
+          <div style={{ fontSize: 22, fontWeight: 900, color: '#ffd700' }}>
+            {(() => {
+              if (!user?.id) return 'Welcome back!';
+              if (profileLoading) return 'Welcome back, …';
+              const name = profileUsername || getUsernameFallback(user.id);
+              return `Welcome back, ${name}!`;
+            })()}
           </div>
         </div>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'nowrap' }}>
@@ -169,7 +200,7 @@ export default function Home() {
   );
 }
 
-function getUsername(userId: string): string {
+function getUsernameFallback(userId: string): string {
   try {
     const cached = window.localStorage.getItem(`profile:username:${userId}`);
     if (cached) return cached;
